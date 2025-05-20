@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/usermanage/list",
+    "pages/usermanage/index",
+    "pages/logs/logs",
+    "pages/usermanage/add",
+    "pages/usermanage/modify",
+    "pages/usermanage/detail"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Weixin",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
