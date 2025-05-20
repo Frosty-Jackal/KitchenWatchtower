@@ -18,7 +18,7 @@ Page({
       },
       {
         id: 2,
-        imgurl: '/images/meal2.jpg', // 示例图片路径
+        imgurl: '/pages/accrecord/pc2.png', // 示例图片路径
         device_id: '王老板',
         create_time: '2025-5-20 18:45',
         device_name: '成都市温江区商务宴请'

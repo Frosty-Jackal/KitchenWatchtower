@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理系统</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        /* 左侧导航栏样式 */
+        .sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 200px;
+            background: #2c3e50;
+            box-shadow: 2px 0 6px rgba(0,0,0,.1);
+            z-index: 1000;
+        }
+
+        .el-menu-vertical-demo {
+            height: 100%;
+            border-right: none;
+        }
+
+        .el-menu-item {
+            color: #ecf0f1 !important;
+            height: 56px;
+            line-height: 56px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .el-menu-item:hover {
+            background: #34495e !important;
+        }
+
+        .el-menu-item.is-active {
+            color: #3498db !important;
+            background: #2c3e50 !important;
+            border-left: 3px solid #3498db;
+        }
+
+        /* 页面内容容器 */
+        .main-container {
+            margin-left: 200px;
+            padding: 20px;
+            transition: margin 0.3s;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 左侧导航栏 -->
+    <div class="sidebar-container">
+        <el-menu
+                class="el-menu-vertical-demo"
+                :default-active="activeIndex"
+                @select="handleSelect"
+                background-color="#2c3e50"
+                text-color="#ecf0f1"
+                active-text-color="#3498db">
+            <el-menu-item index="1">
+                <i class="el-icon-menu"></i>
+                <span slot="title">学校管理</span>
+            </el-menu-item>
+            <el-menu-item index="2">
+                <i class="el-icon-s-shop"></i>
+                <span slot="title">商户管理</span>
+            </el-menu-item>
+            <el-menu-item index="3">
+                <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
+                <span slot="title">供应商管理</span>
+            </el-menu-item>
+        </el-menu>
+    </div>
+
+    <!-- 页面主要内容 -->
+    <div class="main-container">
+        <h2>欢迎来到管理系统</h2>
+        <p>请选择左侧菜单进行操作</p>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            activeIndex: '1'
+        },
+        methods: {
+            handleSelect(key) {
+                let targetPath = '';
+
+                if(key === '1') {
+                    targetPath = './schoolmanage/schoolmanage.html';
+                } else if(key === '2') {
+                    targetPath = './mercmanage/mercmanage.html';
+                } else if(key === '3') {
+                    targetPath = './suppmanage/suppmanage.html';
+                }
+
+                // 执行页面跳转
+                if(targetPath) {
+                    window.location.href = targetPath;
+                } else {
+                    console.warn('未配置的路由路径');
+                }
+            }
+        }
+    })
+
+</script>
