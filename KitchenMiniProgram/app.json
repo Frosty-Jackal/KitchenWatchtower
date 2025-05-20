@@ -7,7 +7,8 @@
     "pages/usermanage/add",
     "pages/usermanage/modify",
     "pages/usermanage/detail",
-    "pages/me/me"
+    "pages/me/me",
+    "pages/accrecord/accrecord"
   ],
   "tabBar": {
     "list": [
@@ -16,7 +17,6 @@
         "text": "首页",
         "iconPath": "pages/menu/home.png",
         "selectedIconPath": "pages/menu/selected.png"
-
       },
       {
         "pagePath": "pages/me/me",

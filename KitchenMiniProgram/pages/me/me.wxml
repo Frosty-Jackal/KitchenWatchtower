@@ -1,2 +1,15 @@
-<!--pages/me/me.wxml-->
-<text>pages/me/me.wxml</text>
+<view class="container">
+  <!-- 头部信息区 -->
+  <view class="header">
+    <image class="avatar" src="{{avatar}}" mode="aspectFill"></image>
+    <text class="name">{{name}}</text>
+  </view>
+
+  <!-- 个人信息卡片 -->
+  <view class="info-card">
+    <view class="info-item" wx:for="{{infoList}}" wx:key="index">
+      <text class="item-label">{{item.label}}</text>
+      <text class="item-value">{{item.value}}</text>
+    </view>
+  </view>
+</view>

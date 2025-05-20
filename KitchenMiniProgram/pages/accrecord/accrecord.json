@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "陪餐记录",
+  "backgroundColor": "#fff",
+  "backgroundTextStyle": "dark",
+  "enablePullDownRefresh": true
+}

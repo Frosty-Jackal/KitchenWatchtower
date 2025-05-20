@@ -2,12 +2,12 @@
 <view class="container">
   <!-- 标题栏 -->
   <view class="header">
-    <view class="title">全民食安</view>
+    <view class="title">明厨亮灶管理系统</view>
   </view>
    <!-- 标题栏结束 -->
   <view class="card-grid">
     <view class="card-item" wx:for="{{cardItems}}" wx:key="index" bindtap="navigateTo" data-path="{{item.pagePath}}">
-      <image class="card-image" src="people.jpg" mode="aspectFit" />
+      <image class="card-image" src="{{item.imagePath}}" mode="aspectFit" />
       <text class="card-text">{{item.title}}</text>
     </view>
   </view>

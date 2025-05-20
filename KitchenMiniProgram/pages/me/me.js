@@ -1,66 +1,13 @@
-// pages/me/me.js
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+    avatar: '/pages/me/head.png', // 默认头像路径
+    name: '张三', // 默认姓名
+    infoList: [
+      { label: '账号', value: 'zhangsan@stu.scu.edu.cn' },
+      { label: '手机号', value: '888****8888' },
+      { label: '性别', value: '男' },
+      { label: '生日', value: '2025-05-20' },
+      { label: '地区', value: '中国 四川' }
+    ]
   }
 })
