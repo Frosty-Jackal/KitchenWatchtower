@@ -1,0 +1,14 @@
+<!-- app.wxml -->
+<view class="container">
+  <!-- 标题栏 -->
+  <view class="header">
+    <view class="title">全民食安</view>
+  </view>
+   <!-- 标题栏结束 -->
+  <view class="card-grid">
+    <view class="card-item" wx:for="{{cardItems}}" wx:key="index" bindtap="navigateTo" data-path="{{item.pagePath}}">
+      <image class="card-image" src="people.jpg" mode="aspectFit" />
+      <text class="card-text">{{item.title}}</text>
+    </view>
+  </view>
+</view>

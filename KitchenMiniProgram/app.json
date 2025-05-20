@@ -1,12 +1,31 @@
 {
   "pages": [
+    "pages/menu/menu",
     "pages/usermanage/list",
     "pages/usermanage/index",
     "pages/logs/logs",
     "pages/usermanage/add",
     "pages/usermanage/modify",
-    "pages/usermanage/detail"
+    "pages/usermanage/detail",
+    "pages/me/me"
   ],
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/menu/menu",
+        "text": "首页",
+        "iconPath": "pages/menu/home.png",
+        "selectedIconPath": "pages/menu/selected.png"
+
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我",
+        "iconPath": "pages/menu/people2.png",
+        "selectedIconPath": "pages/menu/selected.png"
+      }
+    ]
+  },
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "Weixin",

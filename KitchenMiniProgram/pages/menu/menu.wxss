@@ -1,0 +1,65 @@
+/* app.wxss */
+.container {
+  padding-bottom: 60px;
+}
+
+.header {
+  height: 44px;
+  padding: 8px 10px;
+  background: rgb(233, 118, 118);
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+
+
+.icon-placeholder {
+  width: 60px;
+  height: 60px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  margin: 0 auto 8px;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  padding: 5px;
+}
+
+.card-item {
+  display: flex;
+  flex-direction: column;  /* 改为纵向排列 */
+  align-items: center;     /* 水平居中 */
+  justify-content: center; /* 垂直居中（可选） */
+  padding: 30rpx;
+  /* 其他原有样式保持不变 */
+}
+
+.card-icon {
+  width: 57px;
+  height: 65px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  margin: 0 auto 8px;
+}
+
+.card-image {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 16rpx;  /* 图片与文字间距 */
+}
+
+.card-text {
+  font-size: 28rpx;
+  color: #333;
+  /* 添加文字对齐方式 */
+  text-align: center;
+}
