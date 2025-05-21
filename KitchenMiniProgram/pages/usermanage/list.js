@@ -438,12 +438,13 @@ Page({
   },
   OnsubmitSearch:function(){    
     let that=this;
+    var id = that.data.searchtext;
     const searchText = that.data.searchtext;
-
     console.log(searchText);
+    console.log(id);
     wx.request({
       url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=get_todo_record',
-      data:{"object_id": searchText,want_attachment:1,},
+      data:{"object_id": searchText},
       header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
       success:function(res){
           that.handle(res);
@@ -458,4 +459,115 @@ Page({
       searchtext:e.detail.value
     })
   },
+  saveSearchResult: function() {
+    const devicelist = this.data.devicelist;
+    const searchText = this.data.searchtext;
+    
+    // 防止重复点击
+    if (this.data.isSaving) return;
+    
+    if (!devicelist || devicelist.length === 0) {
+      wx.showToast({
+        title: '没有数据可保存',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    this.setData({ isSaving: true });
+    wx.showLoading({
+      title: '正在导出...',
+      mask: true
+    });
+    
+    // 准备要保存的数据
+    const dataToSave = {
+      searchText: searchText,
+      timestamp: new Date().toISOString(),
+      results: devicelist
+    };
+    
+    wx.setStorage({
+      key: 'search_result_' + searchText,
+      data: dataToSave,
+      success: () => {
+        wx.showToast({
+          title: '导出成功',
+          icon: 'success',
+          duration: 2000
+        });
+      },
+      fail: (err) => {
+        console.error('导出失败:', err);
+        wx.showToast({
+          title: '导出失败',
+          icon: 'none',
+          duration: 2500
+        });
+      },
+      complete: () => {
+        wx.hideLoading();
+        this.setData({ isSaving: false });
+      }
+    });
+  },
+  // saveSearchResult: function() {
+  //   const devicelist = this.data.devicelist;
+  //   const searchText = this.data.searchtext;
+  
+  //   if (this.data.isSaving) return;
+  
+  //   if (!devicelist || devicelist.length === 0) {
+  //     wx.showToast({ title: '没有数据可保存', icon: 'none' });
+  //     return;
+  //   }
+  
+  //   this.setData({ isSaving: true });
+  //   wx.showLoading({ title: '正在保存...', mask: true });
+  
+  //   // 准备数据
+  //   const dataToSave = {
+  //     searchText: searchText,
+  //     timestamp: new Date().toISOString(),
+  //     results: devicelist
+  //   };
+  
+  //   // 生成文件名（包含时间戳防止覆盖）
+  //   const filename = `search_result_${searchText}_${Date.now()}.json`;
+  //   const filePath = `${wx.env.USER_DATA_PATH}/${filename}`; // 保存到小程序用户目录
+    
+  //   try {
+  //     // 写入文件
+  //     const fs = wx.getFileSystemManager();
+  //     fs.writeFile({
+  //       filePath: filePath,
+  //       data: JSON.stringify(dataToSave),
+  //       encoding: 'utf8',
+  //       success: () => {
+  //         wx.showToast({
+  //           title: '文件保存成功',
+  //           icon: 'success',
+  //           duration: 2000
+  //         });
+  //         console.log('文件路径：', filePath);
+          
+  //         // 可选：引导用户保存到手机相册/存储
+  //         wx.saveFileToDisk({
+  //           filePath: filePath,
+  //           success: () => console.log('已引导用户保存'),
+  //           fail: (e) => console.warn('保存引导失败', e)
+  //         });
+  //       },
+  //       fail: (err) => {
+  //         console.error('文件保存失败:', err);
+  //         wx.showToast({ title: '保存失败', icon: 'none' });
+  //       }
+  //     });
+  //   } catch (e) {
+  //     console.error('捕获异常:', e);
+  //   } finally {
+  //     wx.hideLoading();
+  //     this.setData({ isSaving: false });
+  //   }
+  // },
 })

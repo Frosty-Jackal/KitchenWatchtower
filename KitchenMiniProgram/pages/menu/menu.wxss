@@ -6,7 +6,7 @@
 .header {
   height: 44px;
   padding: 8px 10px;
-  background: rgb(233, 118, 118);
+  background: rgb(0, 34, 68);
   border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
@@ -16,6 +16,7 @@
 .title {
   font-size: 20px;
   font-weight: bold;
+  color:#eee;
 }
 
 
@@ -59,7 +60,7 @@
 
 .card-text {
   font-size: 28rpx;
-  color: #333;
+  color: #000000;
   /* 添加文字对齐方式 */
   text-align: center;
 }

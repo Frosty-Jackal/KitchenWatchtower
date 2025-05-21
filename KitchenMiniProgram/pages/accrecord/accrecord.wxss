@@ -32,9 +32,9 @@
 }
 .service-tags text{
 	padding: 6rpx 16rpx;
-	border: 1rpx solid #f7982a;
+	border: 1rpx solid #003366;
 	line-height: 1;
-	color: #f7982a;
+	color: #003366;
 	font-size: 28rpx;
 	border-radius: 4rpx;
 	margin-right: 10rpx;
@@ -43,4 +43,34 @@
 }
 .service-city{
 	color: #666;
+}
+/* 在原有wxss基础上添加/修改以下样式 */
+
+/* 修改添加按钮样式 */
+.btn-block.btn-orange {
+  background-color: #003366; /* 深蓝色背景 */
+  border-color: #003366;    /* 边框颜色同步 */
+  color: white !important;   /* 文字颜色改为白色 */
+}
+
+/* 新增搜索按钮样式 */
+.search-btn {
+  background-color: #003366 !important;
+  color: white !important;
+  border: 1rpx solid #003366 !important;
+}
+
+/* 新增导出按钮样式 */
+.search-extra-btn {
+  background-color: #003366 !important;
+  color: white !important;
+  border: 1rpx solid #003366 !important;
+}
+
+/* 可选：调整按钮悬停状态（根据实际需要添加） */
+.btn-block.btn-orange:active,
+.search-btn:active,
+.search-extra-btn:active {
+  background-color: #002244 !important; /* 深色变体 */
+  opacity: 0.8;
 }

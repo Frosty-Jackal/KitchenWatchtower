@@ -57,5 +57,53 @@ inputnumber:function(e) {
     content:e.detail.value,
   });
 },
+chooseImage:function() {
+  let _this = this;
+  wx.showActionSheet({
+    itemList: ['从相册中选择', '拍照'],
+    itemColor: "#f7982a",
+    success: function(res) {
+      if (!res.cancel) {
+        if(res.tapIndex == 0){
+          _this.chooseWxImage('album')
+        }else if(res.tapIndex == 1){
+          _this.chooseWxImage('camera')
+        }
+      }
+    }
+  })
+},
+chooseWxImage:function(type){
+  let _this = this;
+  wx.chooseImage({
+    sizeType: ['original', 'compressed'],
+    sourceType: [type],
+    success: function (res) {
+      _this.setData({
+        uploadimgs: _this.data.uploadimgs.concat(res.tempFilePaths)
+      })
+    }
+  })
+},
+editImage:function(){
+  this.setData({
+    editable: !this.data.editable
+  })
+},
+deleteImg:function(e){
+  console.log(e.currentTarget.dataset.index);
+  const imgs = this.data.uploadimgs
+  // Array.prototype.remove = function(i){
+  //   const l = this.length;
+  //   if(l==1){
+  //     return []
+  //   }else if(i>1){
+  //     return [].concat(this.splice(0,i),this.splice(i+1,l-1))
+  //   }
+  // }
+  this.setData({
+    uploadimgs: imgs.remove(e.currentTarget.dataset.index)
+  })
+},
 
 })

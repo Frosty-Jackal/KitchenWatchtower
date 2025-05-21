@@ -1,10 +1,13 @@
 <view class="container">
 	<view class="search-flex {{scrolltop>200?'tophide':''}}">
 		<view class="search-bar">
-			<input type="text" maxlength="12" placeholder="请输入关键字查询" bindinput="inputSearch"></input>
+			<input type="text" maxlength="12" placeholder="请输入用户名查询（输入全部显示列表）" bindinput="inputSearch"></input>
 			<button class="search-btn" bindtap="OnsubmitSearch" wx:if="{{showsearch}}">查询</button>
 		</view>
 		<button class="search-extra-btn" bindtap="OnAddRecord">用户添加</button>
+	</view>
+  <view class="search-flex {{scrolltop>200?'tophide':''}}">
+		<button class="search-extra-btn" bindtap="saveSearchResult">导出</button>
 	</view>
 	<view class="filter-flex">
 		<view class="filter-tab">

@@ -21,6 +21,16 @@
 						<input type="text" placeholder="请输入身份证号" value="{{content}}" bindinput="inputnumber"></input>
 					</view>
 				</view>
+        <view class="group-header">上传图片</view>
+			<view class="group-body">
+				<view class="img-upload">
+					<view class="img-add" bindtap="chooseImage"></view>
+					<view class="img-item" bindlongtap="editImage" wx:for="{{uploadimgs}}" wx:key="{{index}}">
+						<icon type="clear" size="20" color="red" style="display:{{editable?'block':'none'}}" bindtap="deleteImg" data-index="{{index}}"/>
+						<image src="{{item}}" mode="aspectFill"></image>
+					</view>
+				</view>
+			</view>
       </view>
     </view>
   </view>

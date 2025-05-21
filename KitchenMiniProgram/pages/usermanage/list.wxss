@@ -32,9 +32,9 @@
 }
 .service-tags text{
 	padding: 6rpx 16rpx;
-	border: 1rpx solid #f7982a;
+	border: 1rpx solid #002244;
 	line-height: 1;
-	color: #f7982a;
+	color: #002244;
 	font-size: 28rpx;
 	border-radius: 4rpx;
 	margin-right: 10rpx;
@@ -43,4 +43,10 @@
 }
 .service-city{
 	color: #666;
+}
+
+.btn-block.btn-orange {
+  background-color: #003366; /* 深蓝色背景 */
+  border-color: #003366;    /* 边框颜色同步 */
+  color: white !important;   /* 文字颜色改为白色 */
 }
