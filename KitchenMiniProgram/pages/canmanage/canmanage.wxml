@@ -1,0 +1,39 @@
+<!-- index.wxml -->
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="navbar">
+    <view class="nav-title">食堂管理</view>
+  </view>
+
+  <!-- 食堂列表 -->
+  <view class="card-list">
+    <block wx:for="{{canteenList}}" wx:key="id">
+      <view class="canteen-card">
+        <view class="card-content">
+          <view class="card-header">
+            <text class="canteen-name">{{item.name}}</text>
+            <view class="rating">
+              <text class="star active">★</text>
+              <text class="star active">★</text>
+              <text class="star active">★</text>
+              <text class="star active">★</text>
+              <text class="star">★</text>
+              <text class="score">{{item.score}}</text>
+            </view>
+          </view>
+          
+          <view class="tags">
+            <view class="tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</view>
+          </view>
+
+          <view class="card-footer">
+            <view class="distance">
+              <text>{{item.distance}}</text>
+            </view>
+            <view class="type">{{item.type}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

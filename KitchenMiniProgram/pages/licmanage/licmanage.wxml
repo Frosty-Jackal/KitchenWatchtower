@@ -1,0 +1,30 @@
+<view class="service-item" wx:for="{{todoList}}" wx:key="{{item.id}}">
+  <!-- 证书信息卡片 -->
+  <view class="cert-card">
+    <!-- 标题区域 -->
+    <view class="card-header">
+      <text class="cert-title">{{item.device_name}}</text>
+      <view class="header-actions">
+        <text class="action-btn delete" bindtap="onDeleteRecord" data-itemId="{{item.id}}">删除</text>
+        <text class="action-btn modify" bindtap="onModifyRecord" data-itemId="{{item.id}}" data-itemdid="{{item.device_id}}" data-itemdname="{{item.device_name}}">修改</text>
+      </view>
+    </view>
+
+    <!-- 信息区域 -->
+    <view class="card-body">
+      <view class="info-group">
+        <view class="info-item">
+          <text class="info-label">证书编号：</text>
+          <text class="info-value">{{item.device_id}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">有效期至：</text>
+          <text class="info-value">{{item.create_time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+<view class="btn-submit">
+  <button class="btn-block btn-orange" bindtap="onAddRecord">添加证书</button>
+</view>

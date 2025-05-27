@@ -135,7 +135,7 @@ radio-group label.checked:before{
 	line-height: 88rpx;
 }
 .btn-orange{
-	background: #003366;
+	background: linear-gradient(135deg, #FF6B6B, #FF8E53);
 	color: #fff;
 }
 .btn-gray{
@@ -157,7 +157,7 @@ radio-group label.checked:before{
 	margin-top: -117rpx;
 }
 .search-flex button{
-	background: #003366;
+	background: linear-gradient(135deg, #FF6B6B, #FF8E53);
 	color: #fff;
 	line-height: 72rpx;
 	height: 72rpx;

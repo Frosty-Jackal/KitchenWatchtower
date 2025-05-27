@@ -20,3 +20,4 @@ This is a team project of Sichuan University's Problem Solving Practical Course,
 
 - Drag the directory "KitchenWeb" to “IDEA”
 - Then click the "Run" button
+- Then open the url "http://localhost:8080/menu.html" to start your journey!

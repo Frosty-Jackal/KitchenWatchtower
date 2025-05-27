@@ -8,7 +8,10 @@
     "pages/usermanage/modify",
     "pages/usermanage/detail",
     "pages/me/me",
-    "pages/accrecord/accrecord"
+    "pages/accrecord/accrecord",
+    "pages/canmanage/canmanage",
+    "pages/licmanage/licmanage",
+    "pages/licmanage/lic_add"
   ],
   "tabBar": {
     "list": [
@@ -24,11 +27,14 @@
         "iconPath": "pages/menu/people2.png",
         "selectedIconPath": "pages/menu/selected.png"
       }
-    ]
+    ],
+    "color": "#f8f8f8",
+    "selectedColor":"#f8f8f8",
+    "backgroundColor":"#FF6B6B"
   },
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
+    "navigationBarTitleText": "明厨亮灶",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "componentFramework": "glass-easel",

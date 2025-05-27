@@ -32,9 +32,9 @@
 }
 .service-tags text{
 	padding: 6rpx 16rpx;
-	border: 1rpx solid #003366;
+	border: 1rpx solid #FF6B6B;
 	line-height: 1;
-	color: #003366;
+	color: #FF6B6B;
 	font-size: 28rpx;
 	border-radius: 4rpx;
 	margin-right: 10rpx;
@@ -48,23 +48,23 @@
 
 /* 修改添加按钮样式 */
 .btn-block.btn-orange {
-  background-color: #003366; /* 深蓝色背景 */
-  border-color: #003366;    /* 边框颜色同步 */
+  background-color: #f7982a; /* 深蓝色背景 */
+  border-color: #f7982a;    /* 边框颜色同步 */
   color: white !important;   /* 文字颜色改为白色 */
 }
 
 /* 新增搜索按钮样式 */
 .search-btn {
-  background-color: #003366 !important;
+  background-color: #f7982a !important;
   color: white !important;
   border: 1rpx solid #003366 !important;
 }
 
 /* 新增导出按钮样式 */
 .search-extra-btn {
-  background-color: #003366 !important;
+  background-color: #f8f8f8!important;
   color: white !important;
-  border: 1rpx solid #003366 !important;
+  border: 1rpx solid #f8f8f8 !important;
 }
 
 /* 可选：调整按钮悬停状态（根据实际需要添加） */

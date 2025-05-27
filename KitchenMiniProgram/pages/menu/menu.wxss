@@ -6,7 +6,7 @@
 .header {
   height: 44px;
   padding: 8px 10px;
-  background: rgb(0, 34, 68);
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
   border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
@@ -60,7 +60,7 @@
 
 .card-text {
   font-size: 28rpx;
-  color: #000000;
+  color: linear-gradient(135deg, #FF6B6B, #FF8E53);
   /* 添加文字对齐方式 */
   text-align: center;
 }

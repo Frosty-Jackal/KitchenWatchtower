@@ -1,0 +1,30 @@
+<view class="container container-gray">
+	<view class="group">
+		<view class="group-header">基本信息</view>
+		<view class="group-body">
+			<view class="input-list">
+				<view class="input-item">
+					<text class="input-item-label">证件编号</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入证件编号" value = "{{device_id}}" bindinput="inputId"></input>
+					</view>
+        </view>
+        <view class="input-item">
+          <text class="input-item-label">证件名字</text>
+          <view class="input-item-content">
+						<input type="text" placeholder="请输入证件名字" value = "{{device_name}}" bindinput="inputTitle"></input>
+					</view>
+				</view>
+        <view class="input-item">
+          <text class="input-item-label">有效期</text>
+          <view class="input-item-content">
+						<input type="text" placeholder="请输入有效期" value = "{{device_time}}" bindinput="inputTime"></input>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+	<view class="btn-submit">
+		<button class="btn-block btn-orange" bindtap="applySubmit">提交</button>
+	</view>
+</view>
