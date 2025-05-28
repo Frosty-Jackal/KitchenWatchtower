@@ -1,84 +1,255 @@
 <!DOCTYPE html>
-<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Device List</title>
+    <title>投诉管理系统</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 </head>
 <body>
-<div id = "app">
-    <input type="text" v-model=deviceId><br>
-    <input type="text" v-model=deviceName><br>
-    <button type="button" @click="addDeviceRecord">add</button>
-    <button type="button" @click="getDeviceRecord">query</button>
-    <div v-for="item in list"> {{item}} </div>
+<div id="app">
+    <!-- 筛选表单 -->
+    <el-form :inline="true" :model="filters" label-width="80px" class="filter-form">
+        <el-form-item label="投诉商户">
+            <el-input v-model="filters.merchant"></el-input>
+        </el-form-item>
+        <el-form-item label="联系方式">
+            <el-input v-model="filters.contact"></el-input>
+        </el-form-item>
+        <el-form-item label="投诉人">
+            <el-input v-model="filters.complainer"></el-input>
+        </el-form-item>
+        <el-form-item label="城市">
+            <el-select v-model="filters.city" placeholder="选择城市">
+                <el-option label="重庆市" value="重庆市"></el-option>
+                <el-option label="成都市" value="成都市"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="县区">
+            <el-select v-model="filters.district" placeholder="选择区县">
+                <el-option label="彭水县" value="彭水县"></el-option>
+                <el-option label="江北区" value="江北区"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="投诉单位">
+            <el-select v-model="filters.unit">
+                <el-option label="彭水县食品药品监督管理所" value="彭水县食品药品监督管理所"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="起止时间">
+            <el-date-picker
+                    v-model="filters.dateRange"
+                    type="daterange"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    unlink-panels
+            ></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="handleSearch">筛选</el-button>
+            <el-button type="danger" icon="el-icon-refresh" @click="handleReset">重置</el-button>
+            <el-button type="success" icon="el-icon-download" @click="handleExport">导出</el-button>
+        </el-form-item>
+    </el-form>
 
-    <template>
-        <el-table
-                :data="tableData"
-                border
-                style="width: 100%">
-            <el-table-column
-                    prop="device_id"
-                    label="device's ID"
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="device_name"
-                    label="device's 姓名"
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="device_type"
-                    label="device's type">
-            </el-table-column>
-        </el-table>
-    </template>
+    <!-- 标签页 -->
+    <el-tabs v-model="activeTab">
+        <el-tab-pane label="未处理" name="unprocessed"></el-tab-pane>
+        <el-tab-pane label="已处理" name="processed"></el-tab-pane>
+    </el-tabs>
 
+    <!-- 表格 -->
+    <el-table :data="tableData" border style="width: 100%" height="600px">
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="content" label="投诉内容" width="300"></el-table-column>
+        <el-table-column prop="merchant" label="投诉商户"></el-table-column>
+        <el-table-column prop="address" label="商户地址" width="200"></el-table-column>
+        <el-table-column prop="unit" label="负责单位" width="200"></el-table-column>
+        <el-table-column prop="contact" label="联系方式"></el-table-column>
+        <el-table-column prop="complainer" label="投诉人"></el-table-column>
+        <el-table-column prop="date" label="投诉时间"></el-table-column>
+        <el-table-column label="操作" width="100">
+            <template slot-scope="scope">
+                <el-link type="primary" @click="handleAction(scope.row)">操作</el-link>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <!-- 分页 -->
+    <el-pagination
+            background
+            layout="prev, pager, next"
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :total="total"
+            @current-change="handlePageChange"
+            class="pagination"
+    >
+    </el-pagination>
 </div>
-</body>
-</html>
 
 <script>
-    var vue =  new Vue({
-        el:"#app",
-        data:{
-            deviceId:"",
-            deviceName:"",
-            list:[],
-            tableData: [],
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                filters: {
+                    merchant: '',
+                    contact: '',
+                    complainer: '',
+                    city: '',
+                    district: '',
+                    unit: '',
+                    dateRange: []
+                },
+                activeTab: 'unprocessed',
+                tableData: [],
+                currentPage: 1,
+                pageSize: 15,
+                total: 0
+            };
         },
-        methods:{
-            addDeviceRecord(){
-                alert(this.deviceId);
-                axios.post("/device/add_record",{
-                    deviceid:this.deviceId,
-                    devicename:this.deviceName,
-                    devicetype:"sensor",
-                    createtime:"2025-04-01 00:00:01"
-                }).then(function(res){
-                    console.log(res);
-                }).catch(function(err){
-                    console.log(err);
+        created() {
+            this.fetchData();
+        },
+        methods: {
+            fetchData() {
+                // 生成100条模拟数据
+                const allData = Array.from({ length: 100 }, (_, i) => {
+                    const shopType = i % 3;  // 0-烧烤 1-火锅 2-快餐
+                    const district = ['武侯区', '锦江区', '成华区'][i % 3];
+                    const baseNumber = 17358620000; // 基础号码
+                    const street = ['天府三街', '春熙路', '建设路'][i % 3];
+
+                    return {
+                        content: this.generateComplaintContent(shopType), // 动态生成投诉内容
+                        merchant: this.generateMerchantName(shopType, i), // 生成商户名
+                        address: `四川省成都市${district}${street}${100 + i}号`,
+                        unit: `${district}食品药品监督管理所`,
+                        contact: baseNumber + i, // 生成17358620001到17358620100
+                        complainer: ['李大白', '张大强', '王小明'][i % 3],
+                        date: this.generateDate(i),
+                        status: i % 2 === 0 ? 'unprocessed' : 'processed'
+                    };
                 });
-            },
-            getDeviceRecord(){
-                axios.post("device/get_record",{
-                }).then(function(res){
-                    console.log(res);
-                    var l = res.data.aaData;
-                    for ( var i =0 ; i<l.length;i++){
-                        var record = l[i];
-                        vue.tableData.push(record);
+                // 补充特色数据
+                allData.push(
+                    {
+                        content: '商家使用过期食材，后厨发现老鼠活动痕迹',
+                        merchant: '老码头火锅（太古里店）',
+                        address: '四川省成都市锦江区东大街下东大街段88号',
+                        unit: '锦江区食品药品监督管理所',
+                        contact: 17358628888, // 特殊号码1
+                        complainer: '赵晓丽',
+                        date: '2024-06-01 18:45:21',
+                        status: 'unprocessed'
+                    },
+                    {
+                        content: '就餐后多人出现腹泻症状，怀疑食物中毒',
+                        merchant: '肯德基（天府广场店）',
+                        address: '四川省成都市青羊区人民中路一段16号',
+                        unit: '青羊区食品药品监督管理所',
+                        contact: 17358629999, // 特殊号码2
+                        complainer: '周建国',
+                        date: '2024-06-02 09:12:34',
+                        status: 'processed'
                     }
-                    console.log(this.tableData);
-                }).catch(function(err){
-                    console.log(err);
+                );
+
+                // 过滤逻辑
+                let filteredData = allData.filter(item => {
+                    const statusMatch = this.activeTab === item.status;
+                    let dateMatch = true;
+                    if (this.filters.dateRange.length === 2) {
+                        const [start, end] = this.filters.dateRange;
+                        const itemDate = new Date(item.date);
+                        dateMatch = itemDate >= start && itemDate <= end;
+                    }
+                    return statusMatch && dateMatch;
                 });
+
+                this.total = filteredData.length;
+                const start = (this.currentPage - 1) * this.pageSize;
+                this.tableData = filteredData.slice(start, start + this.pageSize);
+            },
+            // 新增数据生成方法
+            generateComplaintContent(type) {
+                const base = '商家食材存储环境脏乱差，工作人员不注意卫生，服务态度';
+                const additions = {
+                    0: '烧烤台油污严重，通风系统故障导致店内烟雾弥漫',
+                    1: '火锅底料重复使用，餐具清洗不彻底发现食物残渣',
+                    2: '快餐包装破损导致洒漏，配送员未佩戴口罩'
+                };
+                return base + ['恶劣', '差', '粗暴'][type] + '。' + additions[type];
+            },
+            generateMerchantName(type, index) {
+                const types = ['烧烤', '火锅', '快餐'];
+                const brands = {
+                    0: ['何师烧烤', '火焰山烧烤', '木屋烧烤'],
+                    1: ['小龙坎', '大龙燚', '蜀大侠'],
+                    2: ['麦当劳', '华莱士', '乡村基']
+                };
+                return `${brands[type][index % 3]}（${['华阳', '春熙路', '天府三街'][index % 3]}店）`;
+            },
+            generateDate(index) {
+                const baseDate = new Date(2024, 4, 1); // 2024-06-01
+                baseDate.setDate(baseDate.getDate() + index % 30); // 生成30天内日期
+                const pad = n => n.toString().padStart(2, '0');
+                return `${baseDate.getFullYear()}-${pad(baseDate.getMonth()+1)}-${pad(baseDate.getDate())} ` +
+                    `${pad(8 + index % 10)}:${pad(10 + index % 50)}:${pad(index % 60)}`;
+            },
+            handleSearch() {
+                this.currentPage = 1;
+                this.fetchData();
+            },
+            handleReset() {
+                this.filters = {
+                    merchant: '',
+                    contact: '',
+                    complainer: '',
+                    city: '',
+                    district: '',
+                    unit: '',
+                    dateRange: []
+                };
+                this.fetchData();
+            },
+            handleExport() {
+                const headers = ['投诉内容', '投诉商户', '商户地址', '负责单位', '联系方式', '投诉人', '投诉时间'];
+                const rows = this.tableData.map(item => [
+                    item.content,
+                    item.merchant,
+                    item.address,
+                    item.unit,
+                    item.contact,
+                    item.complainer,
+                    item.date
+                ]);
+
+                const csvContent = [headers, ...rows]
+                    .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+                    .join('\n');
+
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "投诉数据.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            handleAction(row) {
+                alert('点击了操作：' + row.merchant);
+            },
+            handlePageChange(page) {
+                this.currentPage = page;
+                this.fetchData();
             }
-        },
-    })
+        }
+    });
 </script>
+</body>
+</html>
