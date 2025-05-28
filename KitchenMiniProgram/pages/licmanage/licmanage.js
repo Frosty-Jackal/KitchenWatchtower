@@ -1,6 +1,10 @@
 Page({
   data: {
-
+    todoList: [],
+    allRecords: [], // 原始数据
+    searchQuery: '',
+    sortOptions: ['证书名 ↑', '证书名 ↓', '有效期 ↑', '有效期 ↓'],
+  sortIndex: 0
   },
   onLoad(options) {
     this.getTodoRecord();
@@ -62,7 +66,16 @@ Page({
       }
     });
   },
-  
+  onSearchInput(e) {
+    const query = e.detail.value.toLowerCase();
+    this.setData({
+      searchQuery: query,
+      todoList: this.data.allRecords.filter(item =>
+        item.device_name.toLowerCase().includes(query) ||
+        item.device_id.toString().includes(query)
+      )
+    });
+  },
   // 新增数据刷新方法
   refreshData() {
     // 这里调用你的数据获取方法，例如：
@@ -73,5 +86,31 @@ Page({
     wx.navigateTo({
       url: `/pages/licmanage/lic_modify?licId=${licId}&licName=${licName}&limitTime=${limitTime}`
     });
+  },
+  handleGetTodoRecordResult: function(res) {
+  this.setData({
+    allRecords: res.data.aaData,
+    todoList: res.data.aaData
+  });
+},
+onSortChange(e) {
+  const index = e.detail.value;
+  const sortedList = [...this.data.todoList];
+  switch (parseInt(index)) {
+    case 0:
+      sortedList.sort((a, b) => a.device_name.localeCompare(b.device_name));
+      break;
+    case 1:
+      sortedList.sort((a, b) => b.device_name.localeCompare(a.device_name));
+      break;
+    case 2:
+      sortedList.sort((a, b) => new Date(a.create_time) - new Date(b.create_time));
+      break;
+    case 3:
+      sortedList.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
+      break;
   }
+  this.setData({ sortIndex: index, todoList: sortedList });
+}
+
 })

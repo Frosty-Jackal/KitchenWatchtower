@@ -1,3 +1,19 @@
+<view class="top-controls">
+<view class="search-bar">
+  <input type="text" placeholder="搜索设备名称或证书编号" bindinput="onSearchInput" />
+</view>
+
+<picker mode="selector" range="{{sortOptions}}" bindchange="onSortChange">
+  <view class="sort-picker">排序：{{sortOptions[sortIndex]}}</view>
+</picker>
+
+</view>
+<!-- 在顶部控制容器后添加 -->
+<view wx:if="{{todoList.length === 0}}" class="empty-state">
+  <image src="/images/empty.png" class="empty-icon"/>
+  <text class="empty-text">暂无证书数据</text>
+</view>
+
 <view class="service-item" wx:for="{{todoList}}" wx:key="{{item.id}}">
   <!-- 证书信息卡片 -->
   <view class="cert-card">
