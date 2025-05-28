@@ -1,0 +1,64 @@
+<view class="container container-gray">
+	<view class="group">
+		<view class="group-header">基本信息</view>
+		<view class="group-body">
+			<view class="input-list">
+				<view class="input-item">
+					<text class="input-item-label">食材名</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入食材名字"value="{{food_name}}"  bindinput="inputfood_name"></input> 
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">食材类型</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入食材类型"  bindinput="inputfood_type"></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">食材数量</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入食材数量" value="{{content}}" bindinput="inputfood_quantity"></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">保质期</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入保质期" value="{{content}}" bindinput="inputfood_keeptime"></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">食材质量</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入食材质量" value="{{content}}" bindinput="inputfood_quality"></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">保存条件</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入食材保存条件" value="{{content}}" bindinput="inputfood_keepcondition"></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">供应商</text>
+					<view class="input-item-content">
+						<input type="text" placeholder="请输入供应商" value="{{content}}" bindinput="inputfood_supplier"></input>
+					</view>
+				</view>
+        <view class="group-header">上传图片</view>
+			<view class="group-body">
+				<view class="img-upload">
+					<view class="img-add" bindtap="chooseImage"></view>
+					<view class="img-item" bindlongtap="editImage" wx:for="{{uploadimgs}}" wx:key="{{index}}">
+						<icon type="clear" size="20" color="red" style="display:{{editable?'block':'none'}}" bindtap="deleteImg" data-index="{{index}}"/>
+						<image src="{{item}}" mode="aspectFill"></image>
+					</view>
+				</view>
+			</view>
+      </view>
+    </view>
+  </view>
+	<view class="btn-submit">
+		<button class="btn-block btn-orange" bindtap="applySubmit">入库</button>
+	</view>
+</view>

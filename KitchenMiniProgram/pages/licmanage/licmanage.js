@@ -41,7 +41,7 @@ Page({
           wx.request({
             url: 'http://localhost:8080/lic/delete_record', // 明确删除端点
             method: 'POST', // 明确使用POST方法
-            data: { id: itemid },
+            data: { lic_id: itemid },
             header: {
               'content-type': 'application/json', // 正确的内容类型
               'x-requested-with': 'XMLHttpRequest'
@@ -66,6 +66,12 @@ Page({
   // 新增数据刷新方法
   refreshData() {
     // 这里调用你的数据获取方法，例如：
-    this.getTodoList();
+    this.getTodoRecord();
+  },
+  onModifyRecord: function(e) {
+    const { licId, licName, limitTime } = e.currentTarget.dataset;
+    wx.navigateTo({
+      url: `/pages/licmanage/lic_modify?licId=${licId}&licName=${licName}&limitTime=${limitTime}`
+    });
   }
 })

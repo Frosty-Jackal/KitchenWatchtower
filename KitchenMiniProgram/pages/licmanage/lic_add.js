@@ -84,6 +84,7 @@ Page({
       success:function(res){
       //that.handleAddTodoRecordResult(res);
       wx.navigateBack({
+       
       });
       },
       fail:function(res){

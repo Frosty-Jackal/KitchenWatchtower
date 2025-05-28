@@ -1,0 +1,97 @@
+/* 页面容器 */
+.container {
+  padding: 20rpx;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-title {
+  font-size: 36rpx;
+  color: #303133;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #ebeef5;
+  margin-bottom: 40rpx;
+}
+
+/* 证书卡片 */
+.cert-card {
+  background: #ffffff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+}
+
+/* 信息组 */
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+/* 信息项 */
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+/* 信息标签 */
+.info-label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #606266;
+  white-space: nowrap;
+}
+
+/* 信息输入框 */
+.info-input {
+  flex: 1;
+  height: 80rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #303133;
+  border: 1rpx solid #dcdfe6;
+  border-radius: 8rpx;
+  background: #f5f7fa;
+}
+
+/* 禁用状态 */
+.info-input[disabled] {
+  color: #909399;
+  background: #f5f7fa;
+}
+
+/* 日期选择器样式 */
+.picker-view {
+  flex: 1;
+  position: relative;
+}
+
+.picker-icon {
+  position: absolute;
+  right: 20rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c0c4cc;
+  font-size: 24rpx;
+}
+
+/* 按钮组 */
+.btn-group {
+  margin-top: 40rpx;
+  padding: 0 30rpx;
+}
+
+/* 橙色按钮 */
+.btn-orange {
+  background: #ff9900;
+  color: white;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+}
+
+.btn-orange:active {
+  background: #e68a00;
+}

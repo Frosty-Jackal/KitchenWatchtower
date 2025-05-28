@@ -5,7 +5,9 @@ Page({
       { title: '人员管理', pagePath: '/pages/usermanage/list',imagePath: '/pages/menu/people.png' },
       { title: '陪餐记录', pagePath: '/pages/accrecord/accrecord',imagePath: '/pages/menu/accrecord.png' },
       { title: '食堂管理', pagePath: '/pages/canmanage/canmanage',imagePath: '/pages/menu/canteen.png' },
-      { title: '证书管理', pagePath: '/pages/licmanage/licmanage',imagePath: '/pages/menu/lic.png' }
+      { title: '证书管理', pagePath: '/pages/licmanage/licmanage',imagePath: '/pages/menu/lic.png' },
+      { title: '原料控制', pagePath: '/pages/warehousemanage/list',imagePath: '/pages/menu/warehouse.png' }
+
     ]
   },
   navigateTo(e) {

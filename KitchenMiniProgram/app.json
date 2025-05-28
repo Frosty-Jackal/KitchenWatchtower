@@ -11,7 +11,14 @@
     "pages/accrecord/accrecord",
     "pages/canmanage/canmanage",
     "pages/licmanage/licmanage",
-    "pages/licmanage/lic_add"
+    "pages/licmanage/lic_add",
+    "pages/warehousemanage/list",
+    "pages/warehousemanage/add",
+    "pages/warehousemanage/detail",
+    "pages/warehousemanage/modify",
+    "pages/warehousemanage/index",
+    "pages/licmanage/lic_modify",
+    "pages/menu/webview"
   ],
   "tabBar": {
     "list": [
@@ -29,8 +36,8 @@
       }
     ],
     "color": "#f8f8f8",
-    "selectedColor":"#f8f8f8",
-    "backgroundColor":"#FF6B6B"
+    "selectedColor": "#f8f8f8",
+    "backgroundColor": "#FF6B6B"
   },
   "window": {
     "navigationBarTextStyle": "black",

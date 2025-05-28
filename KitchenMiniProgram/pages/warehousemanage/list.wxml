@@ -1,0 +1,66 @@
+<view class="container">
+	<view class="search-flex {{scrolltop>200?'tophide':''}}">
+		<view class="search-bar">
+			<input type="text" maxlength="12" placeholder="请输入食材类型查询" bindinput="inputSearch"></input>
+			<button class="search-btn" bindtap="OnsubmitSearch" wx:if="{{showsearch}}">查询</button>
+		</view>
+		<button style="background-color: red; color: white; border-radius: 4px;" class="search-extra-btn " bindtap="OnAddRecord">食材入库</button>
+	</view>
+  <!-- <view class="search-flex {{scrolltop>200?'tophide':''}}">
+		<button class="search-extra-btn" bindtap="saveSearchResult">导出</button>
+	</view> -->
+	<view class="filter-flex">
+		<view class="filter-tab">
+			<!-- <text bindtap="setFilterPanel" data-findex="1" class="{{showfilterindex==1?'active':''}}">服务类别</text>
+			<text bindtap="setFilterPanel" data-findex="2" class="{{showfilterindex==2?'active':''}}">服务城市</text> -->
+		</view>
+		<view class="filter-content" wx:if="{{showfilter}}">
+			<view class="filter-panel" wx:if="{{showfilterindex==1}}">
+				<view class="filter-panel-left">
+					<view wx:for="{{filterdata.sort}}" wx:key="{{item.id}}" bindtap="setSortIndex" data-sortindex="{{index}}" data-sortid="{{item.id}}" class="{{sortindex==index?'active':''}}">{{item.title}}</view>
+				</view>
+				<view class="filter-panel-right">
+					<view wx:for="{{filterdata.sort[sortindex].subsort}}" wx:key="{{item.id}}" bindtap="setSubsortIndex" data-subsortindex="{{index}}" data-subsortid="{{item.id}}" class="{{subsortindex==index?'active':''}}">{{item.title}}</view>
+				</view>
+			</view>
+			<view class="filter-panel" wx:if="{{showfilterindex==2}}">
+				<view class="filter-panel-left">
+					<view wx:for="{{filterdata.city}}" wx:key="{{item.id}}" bindtap="setCityIndex" data-cityindex="{{index}}" data-cityid="{{item.id}}" class="{{cityindex==index?'active':''}}">{{item.title}}</view>
+				</view>
+				<view class="filter-panel-right">
+					<view wx:for="{{filterdata.city[cityindex].subcity}}" wx:key="{{item.id}}" bindtap="setSubcityIndex" data-subcityindex="{{index}}" data-subcityid="{{item.id}}" class="{{subcityindex==index?'active':''}}">{{item.title}}</view>
+				</view>
+			</view>
+		</view>
+		<view class="filter-shadow" wx:if="{{showfilter}}" bindtap="hideFilter"></view>
+	</view>
+	<scroll-view class="container-body" scroll-y="true" scroll-top="{{scrolltop}}" bindscroll="scrollHandle" lower-threshold="50" bindscrolltolower="scrollLoading">
+		<view class="service-list">
+			<navigator class="service-item" wx:for="{{devicelist}}" wx:key="{{item.id}}" url="../servicedetail/servicedetail?id={{item.id}}">
+			  <view class="service-img">
+					<image src="https://cdn.pixabay.com/photo/2025/01/11/16/28/vegetables-9326373_1280.jpg" mode="aspectFill"></image>
+				</view> 
+				<view class="service-text">
+					<view class="service-tite">食材名:{{item.food_name}}</view>
+					<view class="service-tags">
+						<text>保质期：{{item.food_keeptime}}</text>
+					</view>
+					<text class="service-city">类型：{{item.food_type}}</text>
+        <view>
+          <text class="service-city">数量：{{item.food_quantity}}斤</text>
+        </view>
+          <view class="service-tags">
+						<text bindtap="OnDeleteRecord" data-id="{{item.id}}"
+             data-food_name="{{item.food_name}}" data-food_keeptime="{{item.food_keeptime}}"data-food_type="{{item.food_type}}" data-food_quantity="{{item.food_quantity}}" data-create_time="{{item.create_time}}" data-food_quality="{{item.food_quality}}"data-food_keepcondition="{{item.food_keepcondition}}"data-supplier="{{item.supplier}}">食材删除</text><text style="color: red;"bindtap="OnModifyRecord" data-id="{{item.id}}"
+             data-food_name="{{item.food_name}}" data-food_keeptime="{{item.food_keeptime}}"data-food_type="{{item.food_type}}" data-food_quantity="{{item.food_quantity}}" data-create_time="{{item.create_time}}" data-food_quality="{{item.food_quality}}"data-food_keepcondition="{{item.food_keepcondition}}"data-supplier="{{item.supplier}}">食材出库</text><text bindtap="OndetailRecord" data-id="{{item.id}}"
+             data-food_name="{{item.food_name}}" data-food_keeptime="{{item.food_keeptime}}"data-food_type="{{item.food_type}}" data-food_quantity="{{item.food_quantity}}" data-create_time="{{item.create_time}}" data-food_quality="{{item.food_quality}}"data-food_keepcondition="{{item.food_keepcondition}}"data-supplier="{{item.supplier}}">食品详情</text>
+            </view>
+				</view>
+			</navigator>
+		</view>
+		<view class="gototop {{scrolltop>200?'active':''}}" bindtap="goToTop"></view>
+	</scroll-view>
+  <view class="btn-submit">
+		<button style="background-color: red; color: white; border-radius: 4px;" class="btn-block btn-orange" bindtap="OnAddRecord">入库</button>
+	</view>
+</view>

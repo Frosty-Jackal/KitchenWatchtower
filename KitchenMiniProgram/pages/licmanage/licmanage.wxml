@@ -5,8 +5,13 @@
     <view class="card-header">
       <text class="cert-title">{{item.device_name}}</text>
       <view class="header-actions">
-        <text class="action-btn delete" bindtap="onDeleteRecord" data-itemId="{{item.id}}">删除</text>
-        <text class="action-btn modify" bindtap="onModifyRecord" data-itemId="{{item.id}}" data-itemdid="{{item.device_id}}" data-itemdname="{{item.device_name}}">修改</text>
+        <text class="action-btn delete" bindtap="onDeleteRecord" data-itemId="{{item.device_id}}">删除</text>
+<text class="action-btn modify" 
+      bindtap="onModifyRecord" 
+      data-lic-id="{{item.device_id}}" 
+      data-lic-name="{{item.device_name}}" 
+      data-limit-time="{{item.create_time}}">修改
+</text>
       </view>
     </view>
 

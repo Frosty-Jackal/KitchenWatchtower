@@ -1,0 +1,57 @@
+<view class="container-body space-content">
+	<view class="group">
+		<view class="group-header">基本信息</view>
+		<view class="group-body">
+			<view class="input-list">
+				<view class="input-item">
+					<text class="input-item-label">食材名</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{food_name}}" disabled bindinput="inputname"></input> 
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">食材类型</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{food_type}}" disabled ></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">食材数量</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{food_quantity}}斤" disabled></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">食材质量</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{food_quality}}"disabled></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">保质期</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{food_keeptime}}"disabled></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">保存条件</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{food_keepcondition}}" disabled></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">供应商</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{supplier}}" disabled></input>
+					</view>
+				</view>
+        <view class="input-item">
+					<text class="input-item-label">创建时间</text>
+					<view class="input-item-content">
+						<input type="text"  value="{{create_time}}" disabled></input>
+					</view>
+				</view>
+      </view>
+    </view>
+  </view>
+</view>

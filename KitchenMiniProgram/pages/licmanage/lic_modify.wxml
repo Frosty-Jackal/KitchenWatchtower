@@ -1,0 +1,69 @@
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-title">
+    <text>修改证书信息</text>
+  </view>
+
+  <!-- 证书信息卡片 -->
+  <view class="cert-card">
+    <!-- 信息区域 -->
+    <view class="card-body">
+      <view class="info-group">
+        <!-- 证书编号（不可编辑） -->
+        <view class="info-item">
+          <text class="info-label">证书编号：</text>
+          <input 
+            class="info-input" 
+            value="{{licId}}" 
+            disabled
+            placeholder="自动生成不可修改"
+          />
+        </view>
+
+        <!-- 证书名称 -->
+        <view class="info-item">
+          <text class="info-label">证书名称：</text>
+          <input 
+            class="info-input" 
+            value="{{licName}}" 
+            placeholder="请输入证书名称"
+            bindinput="onLicNameInput"
+          />
+        </view>
+
+        <!-- 有效期至 -->
+        <view class="info-item">
+          <text class="info-label">有效期至：</text>
+          <picker 
+            mode="date" 
+            value="{{limitTime}}" 
+            start="2020-01-01" 
+            end="2030-12-31"
+            bindchange="onDateChange"
+          >
+            <view class="picker-view">
+              <input 
+                class="info-input" 
+                value="{{limitTime}}" 
+                disabled
+                placeholder="请选择有效期"
+              />
+              <text class="picker-icon">▾</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="btn-group">
+      <button 
+        class="btn-block btn-orange" 
+        type="primary"
+        bindtap="applySubmit"
+      >
+        保存修改
+      </button>
+    </view>
+  </view>
+</view>

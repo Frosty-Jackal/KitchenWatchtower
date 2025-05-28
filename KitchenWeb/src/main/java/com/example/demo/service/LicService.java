@@ -16,4 +16,13 @@ public class LicService {
         LicDao dao =  new LicDao();
         dao.addLicRecord(lic,json);
     }
+    public void deleteDeviceRecord(String id) throws Exception {
+        LicDao dao =  new LicDao();
+        dao.deleteLicRecord(id);
+    }
+
+    public void updateDeviceRecord(Lic lic) throws Exception {
+        LicDao dao = new LicDao();
+        dao.updateLicRecord(lic);
+    }
 }

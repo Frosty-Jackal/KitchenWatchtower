@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>明厨亮灶系统 - 原材料管理</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>明厨亮灶系统 - 原材料管理</h1>
+            <div class="user-info">
+                <span class="username">管理员</span>
+                <a href="#" class="logout"><i class="bi bi-box-arrow-right"></i> 退出</a>
+            </div>
+        </header>
+        
+        <main>
+            <div class="toolbar">
+                <div class="search-area">
+                    <input type="text" id="searchInput" placeholder="请输入原材料名称、规格或来源">
+                    <button id="searchBtn"><i class="bi bi-search"></i> 搜索</button>
+                </div>
+                <div class="filter-area">
+                    <select id="categoryFilter">
+                        <option value="">所有类别</option>
+                        <option value="肉类">肉类</option>
+                        <option value="蔬菜">蔬菜</option>
+                        <option value="水产">水产</option>
+                        <option value="调料">调料</option>
+                        <option value="干货">干货</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">所有状态</option>
+                        <option value="充足">充足</option>
+                        <option value="不足">不足</option>
+                        <option value="缺货">缺货</option>
+                    </select>
+                </div>
+                <div class="action-area">
+                    <button id="addMaterialBtn" class="primary-btn"><i class="bi bi-plus-lg"></i> 新增原材料</button>
+                    <button id="exportBtn"><i class="bi bi-download"></i> 导出数据</button>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <table id="materialTable">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>原材料名称</th>
+                            <th>类别</th>
+                            <th>规格</th>
+                            <th>库存数量</th>
+                            <th>库存状态</th>
+                            <th>最近入库日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 数据将由JavaScript动态生成 -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="pagination">
+                    <!-- 分页控件将由JavaScript动态生成 -->
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 原材料表单模态框 -->
+    <div id="materialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">新增原材料</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="materialForm">
+                    <input type="hidden" id="materialId">
+                    <div class="form-group">
+                        <label for="materialName">原材料名称：</label>
+                        <input type="text" id="materialName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="materialCategory">类别：</label>
+                        <select id="materialCategory" required>
+                            <option value="">请选择</option>
+                            <option value="肉类">肉类</option>
+                            <option value="蔬菜">蔬菜</option>
+                            <option value="水产">水产</option>
+                            <option value="调料">调料</option>
+                            <option value="干货">干货</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="specification">规格：</label>
+                        <input type="text" id="specification" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">库存数量：</label>
+                        <input type="number" id="quantity" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">单位：</label>
+                        <input type="text" id="unit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="materialStatus">库存状态：</label>
+                        <select id="materialStatus" required>
+                            <option value="充足">充足</option>
+                            <option value="不足">不足</option>
+                            <option value="缺货">缺货</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="source">来源：</label>
+                        <input type="text" id="source">
+                    </div>
+                    <div class="form-group">
+                        <label for="remarks">备注：</label>
+                        <textarea id="remarks"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="primary-btn">保存</button>
+                        <button type="button" class="cancel-btn">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认删除模态框 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h2>确认删除</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除该原材料信息吗？此操作不可恢复。</p>
+                <div class="form-actions">
+                    <button id="confirmDeleteBtn" class="danger-btn">确认删除</button>
+                    <button class="cancel-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 原材料详情模态框 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>原材料详情</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-group">
+                    <label>原材料名称：</label>
+                    <span id="detailName"></span>
+                </div>
+                <div class="detail-group">
+                    <label>类别：</label>
+                    <span id="detailCategory"></span>
+                </div>
+                <div class="detail-group">
+                    <label>规格：</label>
+                    <span id="detailSpecification"></span>
+                </div>
+                <div class="detail-group">
+                    <label>库存数量：</label>
+                    <span id="detailQuantity"></span>
+                </div>
+                <div class="detail-group">
+                    <label>单位：</label>
+                    <span id="detailUnit"></span>
+                </div>
+                <div class="detail-group">
+                    <label>库存状态：</label>
+                    <span id="detailStatus"></span>
+                </div>
+                <div class="detail-group">
+                    <label>来源：</label>
+                    <span id="detailSource"></span>
+                </div>
+                <div class="detail-group">
+                    <label>最近入库日期：</label>
+                    <span id="detailLastEntryDate"></span>
+                </div>
+                <div class="detail-group">
+                    <label>备注：</label>
+                    <p id="detailRemarks"></p>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

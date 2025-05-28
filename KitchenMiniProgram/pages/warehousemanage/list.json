@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "仓库管理",
+  "backgroundColor": "#fff",
+  "backgroundTextStyle": "dark",
+  "enablePullDownRefresh": true
+}

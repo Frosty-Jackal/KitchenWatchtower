@@ -88,4 +88,42 @@ public class LicDao {
 
     public void getDeviceRecord(JSONObject param, JSONObject json) {
     }
+    public void deleteLicRecord(String id) throws Exception {
+        String url = "jdbc:mysql://localhost:3306/jeff?useSSL=false&serverTimezone=UTC";
+        String sql = "DELETE FROM liclic WHERE lic_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, "root", "584237");
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, id);
+            pstmt.executeUpdate();
+            System.out.println("[LicDao/deleteRecord]succdelete");
+            System.out.println(pstmt);
+
+        } catch (SQLException e) {
+            throw new Exception("数据库操作失败：" + e.getMessage());
+        }
+    }
+
+    public void updateLicRecord(Lic lic) throws Exception {
+        String url = "jdbc:mysql://localhost:3306/jeff?useSSL=false&serverTimezone=UTC";
+        String sql = "UPDATE liclic SET lic_name = ?, limit_time = ? WHERE lic_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, "root", "584237");
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, lic.getLicName());
+            pstmt.setString(2, lic.getLimitTime());
+            pstmt.setString(3, lic.getLicId());
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new Exception("未找到对应的证书记录");
+            }
+
+        } catch (SQLException e) {
+            throw new Exception("数据库操作失败：" + e.getMessage());
+        }
+    }
+
 }
