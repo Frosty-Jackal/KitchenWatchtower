@@ -74,6 +74,19 @@
                 <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
                 <span slot="title">供应商管理</span>
             </el-menu-item>
+            <!-- 新增菜单项 -->
+            <el-menu-item index="4">
+                <i class="el-icon-s-management"></i>
+                <span slot="title">原料管理</span>
+            </el-menu-item>
+            <el-menu-item index="5">
+                <i class="el-icon-s-comment"></i>
+                <span slot="title">投诉管理</span>
+            </el-menu-item>
+            <el-menu-item index="6">
+                <i class="el-icon-warning"></i>
+                <span slot="title">风险预警</span>
+            </el-menu-item>
         </el-menu>
     </div>
 
@@ -96,20 +109,23 @@
             handleSelect(key) {
                 let targetPath = '';
 
-                if(key === '1') {
-                    targetPath = './schoolmanage/schoolmanage.html';
-                } else if(key === '2') {
-                    targetPath = './mercmanage/mercmanage.html';
-                } else if(key === '3') {
-                    targetPath = './suppmanage/suppmanage.html';
-                }
+                const pathMap = {
+                    '1': './schoolmanage/schoolmanage.html',
+                    '2': './mercmanage/mercmanage.html',
+                    '3': './suppmanage/suppmanage.html',
+                    '4': './matermanage/index.html',       // 原料管理
+                    '5': './compmanage/device_list.html',  // 投诉管理
+                    '6': './riskwarn/riskwarn.html'        // 风险预警
+                };
 
-                // 执行页面跳转
+                targetPath = pathMap[key] || '';
+
                 if(targetPath) {
                     window.location.href = targetPath;
                 } else {
-                    console.warn('未配置的路由路径');
+                    console.warn('未配置的路由路径', key);
                 }
+   
             }
         }
     })

@@ -19,6 +19,7 @@
     "pages/warehousemanage/index",
     "pages/licmanage/lic_modify",
     "pages/menu/webview"
+    
   ],
   "tabBar": {
     "list": [

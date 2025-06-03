@@ -1,1 +1,69 @@
-/* pages/licmanage/lic_add.wxss */
+/* 添加到原有样式底部 */
+.ocr-container {
+  padding: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.preview-container {
+  position: relative;
+  width: 600rpx;
+  height: 400rpx;
+  margin: 0 auto;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+}
+
+.clear-btn {
+  position: absolute!important;
+  right: 20rpx;
+  top: 20rpx;
+  z-index: 99;
+}
+
+.ocr-result-container {
+  margin: 20rpx;
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 8rpx;
+}
+
+.result-header {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.result-content {
+  width: 100%;
+  min-height: 200rpx;
+  padding: 20rpx;
+  background-color: #fff;
+  border-radius: 4rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+.ocr-result-container {
+  margin: 20rpx 0;
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 16rpx;
+  border: 1rpx solid #eee;
+}
+
+.result-header {
+  color: #666;
+  font-size: 28rpx;
+  margin-bottom: 10rpx;
+}
+
+.ocr-result-content {
+  font-size: 32rpx;
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-height: 400rpx;
+}
