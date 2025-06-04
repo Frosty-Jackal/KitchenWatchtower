@@ -87,6 +87,14 @@
                 <i class="el-icon-warning"></i>
                 <span slot="title">风险预警</span>
             </el-menu-item>
+            <el-menu-item index="7">
+                <i class="el-icon-s-check"></i>
+                <span slot="title">抽检任务</span>
+            </el-menu-item>
+            <el-menu-item index="8">
+                <i class="el-icon-video-camera"></i>
+                <span slot="title">监控视频</span>
+            </el-menu-item>
         </el-menu>
     </div>
 
@@ -115,7 +123,10 @@
                     '3': './suppmanage/suppmanage.html',
                     '4': './matermanage/index.html',       // 原料管理
                     '5': './compmanage/device_list.html',  // 投诉管理
-                    '6': './riskwarn/riskwarn.html'        // 风险预警
+                    '6': './riskwarn/riskwarn.html',        // 风险预警
+                    '7': './samplingtask/3.html',  // 抽检任务
+                    '8': './monitoringvideo/device_list.html'  // 监控视频
+
                 };
 
                 targetPath = pathMap[key] || '';

@@ -1,12 +1,12 @@
 <view class="container container-gray">
   <view class="ocr-container">
   <view wx:if="{{!faceImgUrl}}">
-    <button type="primary" bindtap="chooseMedia">上传证件图片</button>
+    <button type="primary" class="custom-button" bindtap="chooseMedia">上传证件图片</button>
   </view>
   
   <view wx:if="{{faceImgUrl}}" class="preview-container">
     <image src="{{faceImgUrl}}" mode="aspectFit" class="preview-image"/>
-    <button type="warn" bindtap="clearImage" class="clear-btn">重新上传</button>
+    <button type="warn" bindtap="clearImage"  class="clear-btn" >重新上传</button>
   </view>
   <view wx:if="{{ocrResult}}" class="ocr-result-container">
       <view class="result-header">识别结果：</view>

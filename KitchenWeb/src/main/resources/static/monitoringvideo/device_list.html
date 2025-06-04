@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商户监控视频管理系统</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff; /* 整体背景为白色 */
+        }
+
+        /* 搜索表单样式 */
+        .search-form {
+            margin-bottom: 20px;
+            padding: 0; /* 移除内边距 */
+            background-color: #ffffff; /* 背景为白色 */
+            border-radius: 0; /* 移除圆角 */
+            box-shadow: none; /* 移除阴影 */
+        }
+
+        /* 表格样式 */
+        .el-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* 表头样式 */
+        .el-table__header th {
+            background-color: #f5f7fa; /* 灰色背景 */
+        }
+
+        /* 分页样式 */
+        .el-pagination {
+            text-align: center;
+        }
+
+        /* 视频播放器容器 */
+        .video-player-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        /* 对话框样式调整 */
+        .el-dialog__body {
+            padding: 0;
+        }
+
+        /* 按钮组样式 */
+        .el-button-group {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 自定义搜索表单样式 */
+        .search-form-row {
+            margin-bottom: 10px;
+        }
+
+        .search-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 搜索表单区域 -->
+    <div class="search-form">
+        <!-- 第一行搜索条件 -->
+        <div class="search-form-row">
+            <el-form :inline="true" :model="filters">
+                <el-form-item label="商户名称">
+                    <el-input v-model="filters.merchantName" placeholder="请输入商户名称" style="width: 300px;"></el-input>
+                </el-form-item>
+
+                <el-form-item label="餐饮单位类型">
+                    <el-select v-model="filters.restaurantType" placeholder="请选择餐饮类型" style="width: 200px;">
+                        <el-option label="全部" value=""></el-option>
+                        <el-option label="社会餐饮" value="社会餐饮"></el-option>
+                        <el-option label="幼儿园食堂" value="幼儿园食堂"></el-option>
+                        <el-option label="中小学食堂" value="中小学食堂"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+        </div>
+
+        <!-- 第二行搜索条件 -->
+        <div class="search-form-row">
+            <el-form :inline="true" :model="filters">
+                <el-form-item label="所在城市">
+                    <el-select v-model="filters.city" placeholder="请选择城市" style="width: 200px;">
+                        <el-option label="全部" value=""></el-option>
+                        <el-option label="重庆市" value="重庆市"></el-option>
+                        <el-option label="成都市" value="成都市"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="所在区县">
+                    <el-select v-model="filters.district" placeholder="请选择区县" style="width: 200px;">
+                        <el-option label="全部" value=""></el-option>
+                        <el-option label="彭水县" value="彭水县"></el-option>
+                        <el-option label="青羊区" value="青羊区"></el-option>
+                        <el-option label="武侯区" value="武侯区"></el-option>
+                        <el-option label="锦江区" value="锦江区"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="视频时间">
+                    <el-date-picker
+                            v-model="filters.dateRange"
+                            type="daterange"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            align="right"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            unlink-panels
+                            style="width: 300px;"
+                    ></el-date-picker>
+                </el-form-item>
+            </el-form>
+        </div>
+
+        <!-- 第三行：搜索、重置、下载按钮 -->
+        <div class="search-form-actions">
+            <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+            <el-button type="danger" icon="el-icon-refresh" @click="reset">重置</el-button>
+            <el-button type="success" icon="el-icon-download" @click="download">下载</el-button>
+        </div>
+    </div>
+
+    <!-- 表格区域 -->
+    <el-table
+            :data="tableData"
+            border
+            highlight-current-row
+            @row-dblclick="playVideo"
+            style="text-align: center;"
+    >
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="merchantName" label="监控商户" sortable></el-table-column>
+        <el-table-column prop="city" label="所在市" sortable></el-table-column>
+        <el-table-column prop="district" label="所在区县" sortable></el-table-column>
+        <el-table-column prop="address" label="详细地址" min-width="150"></el-table-column>
+        <el-table-column prop="restaurantType" label="餐饮单位类型" sortable></el-table-column>
+        <el-table-column prop="startTime" label="视频开始时间" sortable></el-table-column>
+        <el-table-column prop="endTime" label="视频结束时间" sortable></el-table-column>
+        <el-table-column prop="fileSize" label="视频文件大小(MB)" sortable></el-table-column>
+        <!-- 表格操作列 -->
+        <el-table-column label="操作" width="80">
+            <template slot-scope="scope">
+                <el-button-group>
+                    <el-button type="text" size="small" @click="playVideo(scope.row)">操作</el-button>
+                </el-button-group>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <!-- 分页区域 -->
+    <div class="el-pagination">
+        <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                :current-page="currentPage"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="pageSize"
+                :total="total"
+                @size-change="handleSizeChange"
+                @current-change="handlePageChange"
+        >
+        </el-pagination>
+    </div>
+
+    <!-- 视频播放对话框 -->
+    <el-dialog :visible.sync="videoDialogVisible" title="视频播放" width="80%">
+        <template #content>
+            <div class="video-player-container">
+                <video
+                        ref="videoPlayer"
+                        width="800"
+                        height="450"
+                        controls
+                        poster="https://picsum.photos/800/450?grayscale"
+                >
+                    您的浏览器不支持视频播放
+                </video>
+            </div>
+        </template>
+        <template #footer>
+            <el-button @click="videoDialogVisible = false">关闭</el-button>
+        </template>
+    </el-dialog>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                filters: {
+                    merchantName: '',
+                    restaurantType: '',
+                    city: '',
+                    district: '',
+                    dateRange: []
+                },
+                tableData: [],
+                currentPage: 1,
+                pageSize: 10,
+                total: 0,
+                videoDialogVisible: false,
+                currentVideoUrl: '',
+                loading: false
+            };
+        },
+        methods: {
+            // 模拟获取数据
+            getMockData() {
+                const mockData = [];
+                const merchantList = [
+                    '彭水县两江假日酒店', '彭水苗族土家族自治幼儿园', '彭水县职业教育中心',
+                    'G65高速服务区', '成都石室中学文庙校区', '味之绝美蛙鱼头火锅(科华店)',
+                    '绿茶餐厅'
+                ];
+                const addressList = [
+                    '汉葭街道文庙社区黔中大道30号', '靛水街道靛水社区一组', '汉葭街道长滩社区',
+                    '高谷镇狮子社区2组(服务区北)', '文庙前街93号', '科华北路22号',
+                    '中纱帽街8号成都远洋太古里东里2层2328'
+                ];
+                const types = ['社会餐饮', '幼儿园食堂', '中小学食堂'];
+
+                // 生成400条模拟数据
+                for (let i = 0; i < 400; i++) {
+                    const baseDate = new Date(2023, 0, 1); // 从2023年1月1日开始
+                    baseDate.setDate(baseDate.getDate() + i % 365); // 随机365天内的日期
+
+                    const startTime = new Date(baseDate);
+                    startTime.setHours(8 + Math.floor(Math.random() * 10)); // 8点到18点之间
+                    startTime.setMinutes(Math.floor(Math.random() * 60));
+
+                    const endTime = new Date(startTime);
+                    endTime.setMinutes(startTime.getMinutes() + 30 + Math.floor(Math.random() * 90)); // 视频时长30-120分钟
+
+                    mockData.push({
+                        id: i + 1,
+                        merchantName: merchantList[i % merchantList.length],
+                        city: i % 2 === 0 ? '重庆市' : '成都市',
+                        district: i % 2 === 0 ? '彭水县' :
+                            i % 4 === 1 ? '青羊区' :
+                                i % 4 === 2 ? '武侯区' : '锦江区',
+                        address: addressList[i % addressList.length],
+                        restaurantType: types[i % types.length],
+                        startTime: startTime.toISOString().slice(0, 19).replace('T', ' '),
+                        endTime: endTime.toISOString().slice(0, 19).replace('T', ' '),
+                        fileSize: Math.floor(100 + Math.random() * 900), // 100-1000MB
+                        videoUrl: `https://example.com/video/${i + 1}.mp4` // 模拟视频URL
+                    });
+                }
+                return mockData;
+            },
+
+            // 搜索数据
+            search() {
+                this.loading = true;
+
+                // 模拟API请求延迟
+                setTimeout(() => {
+                    // 将日期范围拆分为开始时间和结束时间
+                    if (this.filters.dateRange && this.filters.dateRange.length === 2) {
+                        this.filters.startTime = this.filters.dateRange[0];
+                        this.filters.endTime = this.filters.dateRange[1];
+                    } else {
+                        this.filters.startTime = '';
+                        this.filters.endTime = '';
+                    }
+
+                    const allData = this.getMockData();
+                    let filteredData = allData;
+
+                    // 应用过滤条件
+                    if (this.filters.merchantName) {
+                        filteredData = filteredData.filter(item =>
+                            item.merchantName.includes(this.filters.merchantName)
+                        );
+                    }
+
+                    if (this.filters.restaurantType) {
+                        filteredData = filteredData.filter(item =>
+                            item.restaurantType === this.filters.restaurantType
+                        );
+                    }
+
+                    if (this.filters.city) {
+                        filteredData = filteredData.filter(item =>
+                            item.city === this.filters.city
+                        );
+                    }
+
+                    if (this.filters.district) {
+                        filteredData = filteredData.filter(item =>
+                            item.district === this.filters.district
+                        );
+                    }
+
+                    if (this.filters.startTime) {
+                        filteredData = filteredData.filter(item =>
+                            item.startTime >= this.filters.startTime
+                        );
+                    }
+
+                    if (this.filters.endTime) {
+                        filteredData = filteredData.filter(item =>
+                            item.endTime <= this.filters.endTime
+                        );
+                    }
+
+                    this.total = filteredData.length;
+                    const start = (this.currentPage - 1) * this.pageSize;
+                    this.tableData = filteredData.slice(start, start + this.pageSize);
+
+                    this.loading = false;
+
+                    // 显示搜索结果消息
+                    if (this.total > 0) {
+                        this.$message({
+                            message: `找到 ${this.total} 条记录`,
+                            type: 'success'
+                        });
+                    } else {
+                        this.$message.warning('未找到匹配的记录');
+                    }
+                }, 800);
+            },
+
+            // 重置搜索条件
+            reset() {
+                this.filters = {
+                    merchantName: '',
+                    restaurantType: '',
+                    city: '',
+                    district: '',
+                    dateRange: []
+                };
+                this.currentPage = 1;
+                this.search();
+            },
+
+            // 下载选中的视频
+            download() {
+                const selectedRows = this.$refs.table.selection;
+                if (selectedRows.length === 0) {
+                    this.$message.warning('请先选择要下载的视频');
+                    return;
+                }
+
+                // 显示下载确认对话框
+                this.$confirm(`确定要下载选中的 ${selectedRows.length} 个视频吗？`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    // 模拟下载过程
+                    const downloadProgress = this.$loading({
+                        lock: true,
+                        text: '正在准备下载...',
+                        spinner: 'el-icon-loading',
+                        background: 'rgba(0, 0, 0, 0.7)'
+                    });
+
+                    // 模拟下载完成
+                    setTimeout(() => {
+                        downloadProgress.close();
+                        this.$message({
+                            message: '下载任务已开始，请到下载文件夹查看',
+                            type: 'success'
+                        });
+                    }, 2000);
+                }).catch(() => {
+                    this.$message({
+                        message: '已取消下载',
+                        type: 'info'
+                    });
+                });
+            },
+
+            // 播放视频
+            playVideo(row) {
+                this.currentVideoUrl = row.videoUrl;
+                this.videoDialogVisible = true;
+
+                // 视频对话框打开后，自动加载视频
+                this.$nextTick(() => {
+                    const videoPlayer = this.$refs.videoPlayer;
+                    videoPlayer.src = row.videoUrl;
+                    videoPlayer.load();
+                    // 视频准备好后自动播放
+                    videoPlayer.oncanplay = () => {
+                        videoPlayer.play();
+                    };
+                });
+            },
+
+            // 预览视频
+            previewVideo(row) {
+                // 这里可以实现视频预览功能，可能是一个小窗口预览
+                this.$message({
+                    message: `正在预览 ${row.merchantName} 的监控视频`,
+                    type: 'info'
+                });
+            },
+
+            // 表格行双击事件
+            handleRowDblClick(row) {
+                this.playVideo(row);
+            },
+
+            // 操作按钮点击事件
+            handleOperation(row) {
+                this.$confirm(`确定要对 ${row.merchantName} 进行操作吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    // 模拟操作成功
+                    setTimeout(() => {
+                        this.$message({
+                            message: `对 ${row.merchantName} 的操作已完成`,
+                            type: 'success'
+                        });
+                    }, 1000);
+                }).catch(() => {
+                    this.$message({
+                        message: '已取消操作',
+                        type: 'info'
+                    });
+                });
+            },
+
+            // 分页大小改变
+            handleSizeChange(size) {
+                this.pageSize = size;
+                this.search();
+            },
+
+            // 当前页码改变
+            handlePageChange(page) {
+                this.currentPage = page;
+                this.search();
+            }
+        },
+        created() {
+            this.search();
+        }
+    });
+</script>
+</body>
+</html>

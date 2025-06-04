@@ -19,6 +19,7 @@
 
 .clear-btn {
   position: absolute!important;
+  background-image: linear-gradient(135deg, #FF6B6B, #FF8E53) !important;
   right: 20rpx;
   top: 20rpx;
   z-index: 99;
@@ -67,3 +68,12 @@
   white-space: pre-wrap;
   max-height: 400rpx;
 }
+
+.custom-button {
+  background-image: linear-gradient(135deg, #FF6B6B, #FF8E53) !important;
+  border: none !important;
+  border-radius: 8rpx !important; /* 可选圆角 */
+  color: white !important; /* 文字颜色 */
+  line-height: 1.8 !important; /* 垂直居中修正 */
+}
+

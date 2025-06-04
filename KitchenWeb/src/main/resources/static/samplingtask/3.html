@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食品检查任务管理系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            width: 100px;
+            text-align: right;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            margin: 10px 0 20px;
+            justify-content: flex-end; /* 右对齐按钮 */
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px; /* 使用左侧距代替右侧距，以保持右对齐效果 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #F44336;
+            color: white;
+        }
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            color: #333;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .pagination-item {
+            padding: 8px 12px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pagination-item.active {
+            background-color: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        .notes {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .notes h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+        .notes ol {
+            padding-left: 20px;
+        }
+        .notes li {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="form-group">
+                <label>抽检人员</label>
+                <input type="text" id="inspector-name" placeholder>
+            </div>
+            <div class="form-group">
+                <label>抽检人员附属机构</label>
+                <input type="text" id="inspector-org" placeholder>
+            </div>
+            <div class="form-group">
+                <label>抽检结果</label>
+                <select id="inspection-result">
+                    <option value="">全部</option>
+                    <option value="待检查">待检查</option>
+                    <option value="已检查">已检查</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>被检商户</label>
+                <input type="text" id="business-name" placeholder>
+            </div>
+            <div class="form-group">
+                <label>所在城市</label>
+                <select id="city">
+                    <option value="">全部</option>
+                    <option value="重庆市">重庆市</option>
+                    <option value="成都市">成都市</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>所在区县</label>
+                <select id="district">
+                    <option value="">全部</option>
+                    <option value="彭水县">彭水县</option>
+                    <option value="锦江区">锦江区</option>
+                    <option value="武侯区">武侯区</option>
+                    <option value="成华区">成华区</option>
+                    <option value="金牛区">金牛区</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>发布时间(始)</label>
+                <input type="text" id="start-date">
+            </div>
+            <div class="form-group">
+                <label>发布时间(止)</label>
+                <input type="text" id="end-date">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" id="search-btn">
+                <span>查询</span>
+            </button>
+            <button class="btn btn-danger" id="reset-btn">
+                <span>重置</span>
+            </button>
+            <button class="btn btn-success" id="export-btn">
+                <span>导出</span>
+            </button>
+        </div>
+        
+        <div class="table-container">
+            <table id="inspection-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>发布时间</th>
+                        <th>发布机构</th>
+                        <th>被检商户</th>
+                        <th>商户地址</th>
+                        <th>抽检人员</th>
+                        <th>抽检人员所属机构</th>
+                        <th>抽检结果</th>
+                    </tr>
+                </thead>
+                <tbody id="inspection-tbody">
+                    <!-- 表格数据将通过JavaScript动态生成 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化表格数据
+            const inspectionData = [
+                { 
+                    publishDate: "2019-06-12", 
+                    publishOrg: "成都市成华区食品药品监督局",
+                    businessName: "味之绝美蛙鱼头火锅(科华店)",
+                    businessAddress: "成都市锦江区中纱帽街8号成都远洋太古里东里2层2328",
+                    inspectorName: "赵霞",
+                    inspectorOrg: "建设路街道食品药品监督",
+                    result: "待检查"
+                },
+                { 
+                    publishDate: "2019-06-12", 
+                    publishOrg: "成都市成华区食品药品监督局",
+                    businessName: "绿茶餐厅",
+                    businessAddress: "成都市武侯区科华北路22号",
+                    inspectorName: "赵霞",
+                    inspectorOrg: "建设路街道食品药品监督",
+                    result: "待检查"
+                },
+                { 
+                    publishDate: "2019-06-12", 
+                    publishOrg: "成都市成华区食品药品监督局",
+                    businessName: "何师烧烤(华阳独栋河畔店)",
+                    businessAddress: "成都市天府新区滨江路二段368号戛纳码头",
+                    inspectorName: "李有才",
+                    inspectorOrg: "建设路街道食品药品监督",
+                    result: "待检查"
+                },
+                { 
+                    publishDate: "2019-06-12", 
+                    publishOrg: "成都市成华区食品药品监督局",
+                    businessName: "微鲜鲜锅鱼",
+                    businessAddress: "成都市武侯区吉泰六路189号",
+                    inspectorName: "李有才",
+                    inspectorOrg: "建设路街道食品药品监督",
+                    result: "待检查"
+                },
+                { 
+                    publishDate: "2019-06-05", 
+                    publishOrg: "成都市锦江区食品药品监督局",
+                    businessName: "味之绝美蛙鱼头火锅(科华店)",
+                    businessAddress: "成都市锦江区中纱帽街8号成都远洋太古里东里2层2328",
+                    inspectorName: "刘玉欣",
+                    inspectorOrg: "春熙路街道食品药品监督",
+                    result: "89"
+                },
+                { 
+                    publishDate: "2019-06-05", 
+                    publishOrg: "成都市锦江区食品药品监督局",
+                    businessName: "绿茶餐厅",
+                    businessAddress: "成都市武侯区科华北路22号",
+                    inspectorName: "刘玉欣",
+                    inspectorOrg: "春熙路街道食品药品监督",
+                    result: "91"
+                },
+                { 
+                    publishDate: "2019-06-05", 
+                    publishOrg: "成都市锦江区食品药品监督局",
+                    businessName: "何师烧烤(华阳独栋河畔店)",
+                    businessAddress: "成都市天府新区滨江路二段368号戛纳码头",
+                    inspectorName: "吴婷",
+                    inspectorOrg: "春熙路街道食品药品监督",
+                    result: "82"
+                },
+                { 
+                    publishDate: "2019-06-05", 
+                    publishOrg: "成都市锦江区食品药品监督局",
+                    businessName: "微鲜鲜锅鱼",
+                    businessAddress: "成都市武侯区吉泰六路189号",
+                    inspectorName: "吴婷",
+                    inspectorOrg: "春熙路街道食品药品监督",
+                    result: "96"
+                },
+                { 
+                    publishDate: "2019-05-26", 
+                    publishOrg: "成都市金牛区食品药品监督局",
+                    businessName: "味之绝美蛙鱼头火锅(科华店)",
+                    businessAddress: "成都市锦江区中纱帽街8号成都远洋太古里东里2层2328",
+                    inspectorName: "赵霞",
+                    inspectorOrg: "九里堤街道食品药品监督",
+                    result: "93"
+                },
+                { 
+                    publishDate: "2019-05-26", 
+                    publishOrg: "成都市金牛区食品药品监督局",
+                    businessName: "绿茶餐厅",
+                    businessAddress: "成都市武侯区科华北路22号",
+                    inspectorName: "赵霞",
+                    inspectorOrg: "九里堤街道食品药品监督",
+                    result: "90"
+                },
+                { 
+                    publishDate: "2019-05-26", 
+                    publishOrg: "成都市金牛区食品药品监督局",
+                    businessName: "何师烧烤(华阳独栋河畔店)",
+                    businessAddress: "成都市天府新区滨江路二段368号戛纳码头",
+                    inspectorName: "李有才",
+                    inspectorOrg: "九里堤街道食品药品监督",
+                    result: "84"
+                },
+                { 
+                    publishDate: "2019-05-26", 
+                    publishOrg: "成都市金牛区食品药品监督局",
+                    businessName: "微鲜鲜锅鱼",
+                    businessAddress: "成都市武侯区吉泰六路189号",
+                    inspectorName: "李有才",
+                    inspectorOrg: "九里堤街道食品药品监督",
+                    result: "86"
+                },
+                { 
+                    publishDate: "2019-05-17", 
+                    publishOrg: "成都市武侯区食品药品监督局",
+                    businessName: "味之绝美蛙鱼头火锅(科华店)",
+                    businessAddress: "成都市锦江区中纱帽街8号成都远洋太古里东里2层2328",
+                    inspectorName: "刘玉欣",
+                    inspectorOrg: "玉林街道食品药品监督",
+                    result: "89"
+                },
+                { 
+                    publishDate: "2019-05-17", 
+                    publishOrg: "成都市武侯区食品药品监督局",
+                    businessName: "绿茶餐厅",
+                    businessAddress: "成都市武侯区科华北路22号",
+                    inspectorName: "刘玉欣",
+                    inspectorOrg: "玉林街道食品药品监督",
+                    result: "87"
+                },
+                { 
+                    publishDate: "2019-05-17", 
+                    publishOrg: "成都市武侯区食品药品监督局",
+                    businessName: "何师烧烤(华阳独栋河畔店)",
+                    businessAddress: "成都市天府新区滨江路二段368号戛纳码头",
+                    inspectorName: "刘玉欣",
+                    inspectorOrg: "玉林街道食品药品监督",
+                    result: "91"
+                }
+            ];
+            
+            // 初始化表格显示
+            renderTable(inspectionData);
+            
+            // 初始化日历选择器
+            flatpickr("#start-date", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i:S",
+                defaultDate: null
+            });
+            
+            flatpickr("#end-date", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i:S",
+                defaultDate: null
+            });
+            
+            // 筛选按钮点击事件
+            document.getElementById('search-btn').addEventListener('click', function() {
+                const inspectorName = document.getElementById('inspector-name').value.toLowerCase();
+                const inspectorOrg = document.getElementById('inspector-org').value.toLowerCase();
+                const inspectionResult = document.getElementById('inspection-result').value;
+                const businessName = document.getElementById('business-name').value.toLowerCase();
+                const city = document.getElementById('city').value;
+                const district = document.getElementById('district').value;
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                
+                // 筛选数据
+                const filteredData = inspectionData.filter(item => {
+                    // 抽检人员筛选
+                    if (inspectorName && !item.inspectorName.toLowerCase().includes(inspectorName)) {
+                        return false;
+                    }
+                    
+                    // 抽检人员所属机构筛选
+                    if (inspectorOrg && !item.inspectorOrg.toLowerCase().includes(inspectorOrg)) {
+                        return false;
+                    }
+                    
+                    // 抽检结果筛选
+                    if (inspectionResult && item.result !== inspectionResult) {
+                        return false;
+                    }
+                    
+                    // 被检商户筛选
+                    if (businessName && !item.businessName.toLowerCase().includes(businessName)) {
+                        return false;
+                    }
+                    
+                    // 城市筛选
+                    if (city && !item.businessAddress.includes(city)) {
+                        return false;
+                    }
+                    
+                    // 区县筛选
+                    if (district && !item.businessAddress.includes(district)) {
+                        return false;
+                    }
+                    
+                    // 开始日期筛选
+                    if (startDate && item.publishDate < startDate.split(' ')[0]) {
+                        return false;
+                    }
+                    
+                    // 结束日期筛选
+                    if (endDate && item.publishDate > endDate.split(' ')[0]) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                renderTable(filteredData);
+            });
+            
+            // 重置按钮点击事件
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                document.getElementById('inspector-name').value = '';
+                document.getElementById('inspector-org').value = '';
+                document.getElementById('inspection-result').value = '';
+                document.getElementById('business-name').value = '';
+                document.getElementById('city').value = '';
+                document.getElementById('district').value = '';
+                document.getElementById('start-date').value = '';
+                document.getElementById('end-date').value = '';
+                
+                renderTable(inspectionData);
+            });
+            
+            // 全选/取消全选功能
+            document.getElementById('select-all').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('#inspection-table tbody input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+            
+            // 导出按钮点击事件
+            document.getElementById('export-btn').addEventListener('click', function() {
+                const selectedRows = [];
+                const checkboxes = document.querySelectorAll('#inspection-table tbody input[type="checkbox"]:checked');
+                
+                checkboxes.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const cells = row.cells;
+                    
+                    selectedRows.push({
+                        '发布时间': cells[1].textContent,
+                        '发布机构': cells[2].textContent,
+                        '被检商户': cells[3].textContent,
+                        '商户地址': cells[4].textContent,
+                        '抽检人员': cells[5].textContent,
+                        '抽检人员所属机构': cells[6].textContent,
+                        '抽检结果': cells[7].textContent
+                    });
+                });
+                
+                if (selectedRows.length === 0) {
+                    alert('请至少选择一行数据进行导出');
+                    return;
+                }
+                
+                // 创建工作簿
+                const wb = XLSX.utils.book_new();
+                
+                // 创建工作表
+                const ws = XLSX.utils.json_to_sheet(selectedRows, {header: ['发布时间', '发布机构', '被检商户', '商户地址', '抽检人员', '抽检人员所属机构', '抽检结果']});
+                
+                // 添加工作表到工作簿
+                XLSX.utils.book_append_sheet(wb, ws, "抽检记录");
+                
+                // 导出Excel文件
+                XLSX.writeFile(wb, "抽检记录.xlsx");
+            });
+            
+            // 渲染表格函数
+            function renderTable(data) {
+                const tbody = document.getElementById('inspection-tbody');
+                tbody.innerHTML = '';
+                
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    
+                    // 添加选择框
+                    const checkboxTd = document.createElement('td');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkboxTd.appendChild(checkbox);
+                    tr.appendChild(checkboxTd);
+                    
+                    // 添加各列数据
+                    tr.innerHTML += `
+                        <td>${item.publishDate}</td>
+                        <td>${item.publishOrg}</td>
+                        <td>${item.businessName}</td>
+                        <td>${item.businessAddress}</td>
+                        <td>${item.inspectorName}</td>
+                        <td>${item.inspectorOrg}</td>
+                        <td>${item.result}</td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
