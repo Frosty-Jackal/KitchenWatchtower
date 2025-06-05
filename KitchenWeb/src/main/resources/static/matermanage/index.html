@@ -202,4 +202,14 @@
 
     <script src="js/main.js"></script>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = '../login.html';
+            return;
+        }
+    });
+
+</script>
 </html>

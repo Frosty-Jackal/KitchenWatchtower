@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #000814 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 动态背景粒子效果 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 25% 25%, #0080ff, transparent),
+                radial-gradient(1px 1px at 75% 75%, #00bfff, transparent),
+                radial-gradient(1px 1px at 50% 10%, #4da6ff, transparent),
+                radial-gradient(1px 1px at 90% 50%, #1e90ff, transparent);
+            background-size: 120px 120px, 90px 90px, 100px 100px, 110px 110px;
+            animation: particles 25s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes particles {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-120px) rotate(360deg); }
+        }
+
+        .container {
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 50px rgba(0, 150, 255, 0.2);
+            width: 420px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #0080ff, #00bfff, #4da6ff, #1e90ff);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 
+                0 0 15px #0096ff,
+                0 0 25px #0096ff;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 150, 255, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #0096ff;
+            box-shadow: 
+                0 0 20px rgba(0, 150, 255, 0.5),
+                inset 0 0 20px rgba(0, 150, 255, 0.1);
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #0080ff, #0096ff);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.5s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #0096ff, #00bfff);
+            box-shadow: 
+                0 15px 40px rgba(0, 150, 255, 0.5),
+                0 0 50px rgba(0, 150, 255, 0.8);
+            transform: translateY(-3px);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .login-link, .login-link a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a {
+            color: #0096ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+        }
+
+        .login-link a:hover {
+            color: #00bfff;
+            text-shadow: 0 0 15px rgba(0, 191, 255, 0.8);
+        }
+
+        .error {
+            color: #ff4444;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+            background: rgba(255, 68, 68, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 3px solid #ff4444;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+            animation: errorShake 0.5s ease;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* 装饰性元素 */
+        .container::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #0096ff, transparent);
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        /* 密码强度指示器 */
+        .password-strength {
+            margin-top: 5px;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: #ff6666; width: 33%; }
+        .strength-medium { background: #ffaa33; width: 66%; }
+        .strength-strong { background: #0096ff; width: 100%; }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>用户注册</h2>
+        <div id="registerForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" placeholder="请输入用户名">
+                <div id="usernameError" class="error">用户名不能为空</div>
+                <div id="usernameExistError" class="error">用户名已存在</div>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入密码">
+                <div class="password-strength">
+                    <div id="passwordStrengthBar" class="password-strength-bar"></div>
+                </div>
+                <div id="passwordError" class="error">密码不能为空</div>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">确认密码</label>
+                <input type="password" id="confirmPassword" placeholder="请再次输入密码">
+                <div id="confirmPasswordError" class="error">两次输入的密码不一致</div>
+            </div>
+            <button id="registerBtn">注册</button>
+            <div class="login-link">
+                已有账号？<a href="login.html">立即登录</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 密码强度检查
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            strengthBar.className = 'password-strength-bar';
+            if (strength >= 1) strengthBar.classList.add('strength-weak');
+            if (strength >= 2) strengthBar.classList.add('strength-medium');
+            if (strength >= 3) strengthBar.classList.add('strength-strong');
+        });
+
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            // 获取输入值
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // 重置错误信息
+            document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
+            
+            // 验证用户名
+            if (!username) {
+                document.getElementById('usernameError').style.display = 'block';
+                return;
+            }
+            
+            // 验证密码
+            if (!password) {
+                document.getElementById('passwordError').style.display = 'block';
+                return;
+            }
+            
+            // 验证确认密码
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').style.display = 'block';
+                return;
+            }
+            
+            // 检查用户名是否已存在
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userExists = users.some(user => user.username === username);
+            
+            if (userExists) {
+                document.getElementById('usernameExistError').style.display = 'block';
+                return;
+            }
+            
+            // 保存用户信息
+            users.push({ username, password });
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // 注册成功，跳转到登录页
+            alert('注册成功！请登录。');
+            window.location.href = 'login.html';
+        });
+
+        // 添加回车键注册功能
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('registerBtn').click();
+            }
+        });
+    </script>
+</body>
+</html> 

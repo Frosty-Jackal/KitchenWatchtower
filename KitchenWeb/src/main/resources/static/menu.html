@@ -106,6 +106,8 @@
     <!-- 页面主要内容 -->
     <div class="main-container">
         <h2>欢迎来到明厨亮灶管理系统</h2>
+        <span id="userDisplay"></span>
+        <button id="logoutBtn" class="logout-btn">退出登录</button>
         <p>请选择左侧菜单进行操作</p>
     </div>
 </div>
@@ -146,5 +148,28 @@
             }
         }
     })
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+        }
+
+    document.getElementById('userDisplay').textContent = `当前用户: ${currentUser.username}`;
+
+    // 退出登录按钮
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        // 添加确认对话框
+        if (confirm('确定要退出登录吗？')) {
+            // 清除当前用户信息
+            localStorage.removeItem('currentUser');
+            // 跳转到登录页面
+            window.location.href = 'login.html';
+        }
+    });
+});
 
 </script>
