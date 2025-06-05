@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,12 +20,10 @@
             padding: 10px;
         }
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
+            margin-left: 200px;  /* 关键偏移量 */
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            transition: margin 0.3s;
         }
         .header {
             display: flex;
@@ -131,9 +132,102 @@
             color: #555;
         }
     </style>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        /* 左侧导航栏样式 */
+        .sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 200px;
+            background: #2c3e50;
+            box-shadow: 2px 0 6px rgba(0,0,0,.1);
+            z-index: 1000;
+        }
+
+        .el-menu-vertical-demo {
+            height: 100%;
+            border-right: none;
+        }
+
+        .el-menu-item {
+            color: #ecf0f1 !important;
+            height: 56px;
+            line-height: 56px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .el-menu-item:hover {
+            background: #34495e !important;
+        }
+
+        .el-menu-item.is-active {
+            color: #3498db !important;
+            background: #2c3e50 !important;
+            border-left: 3px solid #3498db;
+        }
+
+        /* 页面内容容器 */
+        .main-container {
+            margin-left: 200px;
+            padding: 20px;
+            transition: margin 0.3s;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="app">
+        <div class="sidebar-container">
+            <el-menu
+                    class="el-menu-vertical-demo"
+                    :default-active="activeIndex"
+                    @select="handleSelect"
+                    background-color="#2c3e50"
+                    text-color="#ecf0f1"
+                    active-text-color="#3498db">
+
+                <el-menu-item index="0">
+                    <i class="el-icon-s-home"></i>
+                    <span slot="title">首页</span>
+                </el-menu-item>
+                <el-menu-item index="1">
+                    <i class="el-icon-menu"></i>
+                    <span slot="title">学校管理</span>
+                </el-menu-item>
+                <el-menu-item index="2">
+                    <i class="el-icon-s-shop"></i>
+                    <span slot="title">商户管理</span>
+                </el-menu-item>
+                <el-menu-item index="3">
+                    <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
+                    <span slot="title">供应商管理</span>
+                </el-menu-item>
+                <!-- 新增菜单项 -->
+                <el-menu-item index="4">
+                    <i class="el-icon-s-management"></i>
+                    <span slot="title">原料管理</span>
+                </el-menu-item>
+                <el-menu-item index="5">
+                    <i class="el-icon-s-comment"></i>
+                    <span slot="title">投诉管理</span>
+                </el-menu-item>
+                <el-menu-item index="6">
+                    <i class="el-icon-warning"></i>
+                    <span slot="title">风险预警</span>
+                </el-menu-item>
+                <el-menu-item index="7">
+                    <i class="el-icon-s-check"></i>
+                    <span slot="title">抽检任务</span>
+                </el-menu-item>
+                <el-menu-item index="8">
+                    <i class="el-icon-video-camera"></i>
+                    <span slot="title">监控视频</span>
+                </el-menu-item>
+            </el-menu>
+        </div>
+
         <div class="header">
             <div class="form-group">
                 <label>抽检人员</label>
@@ -523,6 +617,39 @@
                     
                     tbody.appendChild(tr);
                 });
+            }
+        });
+    </script>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    activeIndex: '7',  // 当前页面激活状态
+                }
+            },
+            methods: {
+                handleSelect(key) {
+                    const pathMap = {
+                        '0': '../../menu.html',        // 假设项目根目录为/
+                        '1': '../../schoolmanage/schoolmanage.html',
+                        '2': '../../mercmanage/mercmanage.html',
+                        '3': '../../suppmanage/suppmanage.html',
+                        '4': '../../matermanage/index.html',
+                        '5': '../../compmanage/device_list.html',
+                        '6': '../../riskwarn/riskwarn.html',
+                        '7': '../../samplingtask/3.html',               // 当前页面
+                        '8': '../../monitoringvideo/device_list.html'
+                    };
+
+                    this.activeIndex = key;  // 更新激活状态
+                    const targetPath = pathMap[key];
+
+                    if(targetPath) {
+                        // 如果是当前页面则刷新，否则跳转
+                        key === '7' ? location.reload() : (window.location.href = targetPath);
+                    }
+                }
             }
         });
     </script>

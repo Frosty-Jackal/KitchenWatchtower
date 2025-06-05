@@ -2,7 +2,7 @@
 	<view class="search-flex {{scrolltop>200?'tophide':''}}">
 		<view class="search-bar">
 			<input type="text" maxlength="12" placeholder="请输入食材类型查询" bindinput="inputSearch"></input>
-			<button class="search-btn" bindtap="OnsubmitSearch" wx:if="{{showsearch}}">查询</button>
+			<button class="search-btn" bindtap="onSubmitSearch" wx:if="{{showsearch}}">查询</button>
 		</view>
 		<button style="background-color: red; color: white; border-radius: 4px;" class="search-extra-btn " bindtap="OnAddRecord">食材入库</button>
 	</view>

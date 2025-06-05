@@ -11,6 +11,7 @@ Page({
     id:0,
     title:"",
     object_id:0,
+    content:"",
   },
   onLoad: function (options) {
     console.log(options.record);
@@ -61,9 +62,10 @@ Page({
           console.log(object_id);
           console.log(title);
           wx.request({
-            url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=modify_todo_record',
-            data:{"id":id,"object_id":object_id,"title":title,},
-            header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+            url: 'http://localhost:8080/User/update_record',
+            method: 'PUT',
+            data: JSON.stringify({id:id,userName:object_id,userPhone:title}),
+            header: { "content-type": "application/json" },
             success:function(res){
                wx.navigateBack({
 

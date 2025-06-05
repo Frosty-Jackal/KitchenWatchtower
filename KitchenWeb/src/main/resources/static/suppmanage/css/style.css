@@ -18,6 +18,19 @@ body {
     padding: 20px;
 }
 
+/* 修改后的.main-container样式 */
+.main-container {
+    margin-left: 200px; /* 保持与导航栏宽度一致 */
+    padding: 20px;
+    min-height: 100vh; /* 确保内容区域至少充满整个视口高度 */
+}
+
+/* 删除原.container的max-width限制（或根据需要调整） */
+.container {
+    /* max-width: 1280px; 注释或删除这行 */
+    margin: 0 auto;
+    padding: 20px;
+}
 /* 头部样式 */
 header {
     display: flex;

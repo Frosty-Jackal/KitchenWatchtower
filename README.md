@@ -1,26 +1,92 @@
+
 # KitchenWatchtower
 
-This is a team project of Sichuan University's Problem Solving Practical Course, aiming to implement a kitchen monitoring system.
+A team project for Sichuan University's Problem Solving Practical Course, implementing a kitchen monitoring system with real-time data visualization and mini-program integration.
 
-<div align=center>
-<img src=page/Composition.jpg width=400 height = 300/>
+<div align="center">
+  <img src="page/Composition.jpg" alt="System Architecture" width="400" height="300">
 </div>
 
----
 
-**To run web-end**:
+## 🚀 Quick Start
 
-- Drag the directory "KitchenWeb" to “IDEA”
-- Replace all related login and database information with yours   
-- Then click the "Run" button
-- Then open the url "http://localhost:8080/menu.html" to start your journey!
+### Database Preparation
+1. Open terminal and navigate to project directory
+   ```bash
+   cd KITCHENWATCHTOWER
+   ```
 
----
+2. Log in to MySQL database
+   ```bash
+   mysql -u <your_username> -p
+   ```
+   Enter your MySQL password when prompted
 
-**To run mini-program**:
+3. Create new database with UTF8MB4 support
+   ```sql
+   CREATE DATABASE KitchenWatchtower 
+   CHARACTER SET utf8mb4 
+   COLLATE utf8mb4_unicode_ci;
+   ```
 
-- First run web-end
-- Drag the directory "KitchenMiniProgram" to “微信开发者工具”
-- Then replace "appid" with `<your-app-id>` (in the path "KitchenMiniProgram\project.config.json")
-- Then click the "编译" button
-- Start your mini-program journey!
+4. Switch to the new database
+   ```sql
+   USE KitchenWatchtower;
+   ```
+
+5. Import SQL schema
+   ```bash
+   source ./KitchenWatchtower.sql
+   ```
+
+   _Database preparation completed!_
+
+### Run Web Application
+1. Import project to IDEA:
+   ```bash
+   Drag the "KitchenWeb" directory into IntelliJ IDEA
+   ```
+
+2. Update configuration files:
+   - Modify database connection settings in `KitchenWeb\src\main\java\com\example\demo\dao`
+   - Update all the `root` and `password` parts 
+
+3. Start application:
+   - Click the "Run" button in IDEA
+   - Access web interface via:
+     ```
+     http://localhost:8080/menu.html
+     ```
+
+### Run Mini-Program
+1. Ensure web application is running (as described above)
+
+2. Import project to WeChat Developer Tools:
+   ```bash
+   Drag the "KitchenMiniProgram" directory into WeChat Developer Tools
+   ```
+
+3. Update mini-program configuration:
+   - Modify `appid` in `KitchenMiniProgram/project.config.json`
+     ```json
+     {
+       "appid": "<your-app-id>"
+     }
+     ```
+
+4. Build and preview:
+   - Click "Compile" button in WeChat Developer Tools
+
+   _start mini-program journey!_
+
+## 📋 Recommended Requirements
+- MySQL 8.0+ 
+
+## 📂 Project Structure
+```
+KITCHENWATCHTOWER/
+├── KitchenWeb/          # Web application source code
+├── KitchenMiniProgram/  # WeChat mini-program source code
+├── page/               # Documentation assets
+└── KitchenWatchtower.sql # Database schema
+```

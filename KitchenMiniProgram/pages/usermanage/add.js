@@ -28,9 +28,17 @@ Page({
            console.log(title);
            console.log(content);
           wx.request({
-            url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=add_todo_record',
-            data:{"object_id":object_id,"title":title,"content":content},
-            header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+            url: 'http://localhost:8080/User/add_record',
+            method: 'POST', // 明确指定POST方法
+      data: JSON.stringify({
+            userName: object_id,
+            userPhone: title,
+            userIdNumber: content 
+          }),
+          header: {
+            "content-type": "application/json", // 修改为JSON格式
+            "x-requested-with": "XMLHttpRequest"
+          },
             success:function(res){
                wx.navigateBack({
                });

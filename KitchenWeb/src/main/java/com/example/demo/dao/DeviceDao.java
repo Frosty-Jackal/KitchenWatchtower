@@ -14,7 +14,7 @@ import java.util.Date;
 public class DeviceDao {
     public void getDeviceRecord(JSONObject param,JSONObject json) {
         System.out.println("[DeviceDao/getDeviceRecord]here!param=null");
-        String url =  "jdbc:mysql://localhost:3306/jeff?";
+        String url =  "jdbc:mysql://localhost:3306/KitchenWatchtower?";
         String username="root";
         String password="584237";
 
@@ -63,7 +63,7 @@ public class DeviceDao {
 
     public void addDeviceRecord(Device device, JSONObject json) {
         System.out.println("[DeviceDao/addDeviceRecord]here!device="+device.toString());
-        String url =  "jdbc:mysql://localhost:3306/jeff?";
+        String url =  "jdbc:mysql://localhost:3306/KitchenWatchtower?";
         String username="root";
         String password="584237";
 

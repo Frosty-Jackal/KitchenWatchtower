@@ -1,7 +1,7 @@
 package com.example.demo.dao;
 
 import com.alibaba.fastjson.JSONObject;
-import com.example.demo.entity.Lic;
+import com.example.demo.entity.User;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Date;
 
-public class LicDao {
-    public void getLicRecord(JSONObject param, JSONObject json) {
-        System.out.println("[LicDao/getLicRecord]here!param=null");
+public class UserDao {
+    public void getUserRecord(JSONObject param, JSONObject json) {
+        System.out.println("[UserDao/getUserRecord]here!param=null");
         String url = "jdbc:mysql://localhost:3306/KitchenWatchtower?";
         String username = "root";
         String password = "584237";
@@ -26,16 +26,19 @@ public class LicDao {
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement()) {
 
-            String sql = "SELECT * FROM liclic ORDER BY lic_name";
+            String sql = "SELECT * FROM user ORDER BY user_name";
             List<Map<String, String>> list = new ArrayList<>();
 
             try (ResultSet rs = statement.executeQuery(sql)) {
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
                 while (rs.next()) {
                     Map<String, String> map = new HashMap<>();
-                    // 映射数据库字段到原有接口字段（保持前端兼容）
-                    map.put("device_id", rs.getString("lic_id"));    // 实际存储lic_id，但接口保持device_id
-                    map.put("device_name", rs.getString("lic_name"));  // 实际存储lic_name，但接口保持device_name
-                    map.put("create_time", rs.getString("limit_time")); // 实际存储limit_time，但接口保持create_time
+                    // 将每一行数据存入Map
+                    for (int i = 1; i <= columnCount; i++) {
+                        map.put(metaData.getColumnName(i), rs.getString(i));
+                    }
                     list.add(map);
                 }
             }
@@ -43,15 +46,27 @@ public class LicDao {
             json.put("aaData", list);
             json.put("result_code", 0);
             json.put("result_msg", "ok");
-            System.out.println("[LicDao]finish!");
+            System.out.println("[UserDao]finish!");
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    /**
+     * 统一异常处理方法
+     * @param json 响应JSON对象
+     * @param msg 错误信息
+     * @param e 异常对象
+     */
+    private void handleException(JSONObject json, String msg, Throwable e) {
+        json.put("result_code", -1);
+        json.put("result_msg", msg + ": " + e.getMessage());
+        e.printStackTrace(); // 建议替换为日志框架记录
+        System.out.println("[UserDao] 异常处理：" + msg);
+    }
 
-    public void addLicRecord(Lic lic, JSONObject json) {
-        System.out.println("[LicDao/addLicRecord]here!lic=" + lic.toString());
+    public void addUserRecord(User user, JSONObject json) {
+        System.out.println("[UserDao/addUserRecord]here!user=" + user.toString());
         String url = "jdbc:mysql://localhost:3306/KitchenWatchtower?";
         String username = "root";
         String password = "584237";
@@ -66,20 +81,21 @@ public class LicDao {
              Statement statement = connection.createStatement()) {
 
             // 构造插入语句
-            String licId = lic.getLicId();
-            String licName = lic.getLicName();
-            String limitTime = lic.getLimitTime();
+            String userId = user.getUserIdNumber();
+            String userName = user.getUserName();
+            String userPhone = user.getUserPhone();
+            String create_time=(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date());
 
             String sql = String.format(
-                    "INSERT INTO liclic (lic_id, lic_name, limit_time) VALUES ('%s', '%s', '%s')",
-                    licId, licName, limitTime
+                    "INSERT INTO user (user_idnumber, user_name, user_phone, create_time) VALUES ('%s', '%s', '%s', '%s')",
+                    userId, userName, userPhone, create_time
             );
 
             statement.executeUpdate(sql);
 
             json.put("result_code", 0);
             json.put("result_msg", "ok");
-            System.out.println("[LicDao/addLicRecord]finish!");
+            System.out.println("[UserDao/addUserRecord]finish!");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -88,16 +104,16 @@ public class LicDao {
 
     public void getDeviceRecord(JSONObject param, JSONObject json) {
     }
-    public void deleteLicRecord(String id) throws Exception {
+    public void deleteUserRecord(String id) throws Exception {
         String url = "jdbc:mysql://localhost:3306/KitchenWatchtower?useSSL=false&serverTimezone=UTC";
-        String sql = "DELETE FROM liclic WHERE lic_id = ?";
+        String sql = "DELETE FROM user WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, "root", "584237");
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, id);
             pstmt.executeUpdate();
-            System.out.println("[LicDao/deleteRecord]succdelete");
+            System.out.println("[UserDao/deleteRecord]succdelete");
             System.out.println(pstmt);
 
         } catch (SQLException e) {
@@ -105,16 +121,24 @@ public class LicDao {
         }
     }
 
-    public void updateLicRecord(Lic lic) throws Exception {
+    public void updateUserRecord(User user) throws Exception {
         String url = "jdbc:mysql://localhost:3306/KitchenWatchtower?useSSL=false&serverTimezone=UTC";
-        String sql = "UPDATE liclic SET lic_name = ?, limit_time = ? WHERE lic_id = ?";
+        String sql = "UPDATE user SET user_name = ?, user_phone = ?  WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, "root", "584237");
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, lic.getLicName());
-            pstmt.setString(2, lic.getLimitTime());
-            pstmt.setString(3, lic.getLicId());
+            pstmt.setString(1, user.getUserName());
+            String food_quantity = user.getUserName();
+
+            System.out.println("数量: " + food_quantity);
+            pstmt.setString(2, user.getUserPhone());
+
+            String food_quan = user.getUserPhone();
+
+            System.out.println("数量: " + food_quan);
+
+            pstmt.setString(3, user.getId());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {

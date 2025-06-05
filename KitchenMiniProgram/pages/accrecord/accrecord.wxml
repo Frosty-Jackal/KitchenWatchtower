@@ -4,7 +4,6 @@
 			<input type="text" maxlength="12" placeholder="输入陪餐人关键字来搜索" bindinput="inputSearch"></input>
 			<button class="search-btn" bindtap="submitSearch" wx:if="{{showsearch}}">搜索</button>
 		</view>
-		<button class="search-extra-btn">导出</button>
 	</view>
 
 	<!-- <view class="filter-flex">

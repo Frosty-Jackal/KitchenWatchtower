@@ -17,6 +17,8 @@ Page({
     scrolltop:null, //滚动位置
     page: 0,  //分页
     devicelist:[],
+    allRecords: [], // 完整数据集（应在页面加载时初始化）
+    filteredList: [], // 当前筛选结果
   },
   onLoad: function () { //加载数据渲染页面
     this.fetchServiceData();
@@ -340,7 +342,7 @@ Page({
   getTodoRecord:function(){
     let that=this;
     wx.request({
-      url: 'http://localhost:8080/MyWeb_war_exploded/warehouse_manage_servlet_action?action=get_manage_record',
+      url: 'http://localhost:8080/warehouse/get_record',
       data:{},
       header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
       success:function(res){
@@ -355,6 +357,7 @@ Page({
     console.log(JSON.stringify(res));
     this.setData({
       devicelist:res.data.aaData,
+      allRecords:res.data.aaData,
     })
   },
   OnDeleteRecord:function (e) {
@@ -371,9 +374,13 @@ Page({
           var id = e.currentTarget.dataset.id;
           console.log(id);
           wx.request({
-            url: 'http://localhost:8080/MyWeb_war_exploded/warehouse_manage_servlet_action?action=delete_manage_record',
-            data:{"id":id},
-            header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+            url: 'http://localhost:8080/warehouse/delete_record', // 明确删除端点
+            method: 'POST', // 明确使用POST方法
+            data: { id: id },
+            header: {
+              'content-type': 'application/json', // 正确的内容类型
+              'x-requested-with': 'XMLHttpRequest'
+            },
             success:function(res){
               that.getTodoRecord();
             },
@@ -459,23 +466,50 @@ Page({
       url: 'add',
     })
   },
-  OnsubmitSearch:function(){    
-    let that=this;
-    var id = that.data.searchtext;
-    const searchText = that.data.searchtext;
-    console.log(searchText);
-    console.log(id);
-    wx.request({
-      url: 'http://localhost:8080/MyWeb_war_exploded/warehouse_manage_servlet_action?action=get_manage_record',
-      data:{"food_type": searchText},
-      header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
-      success:function(res){
-        that.handle(res);
-      },
-      fail:function (res) {          
-      },
-    })
+  // OnsubmitSearch:function(){    
+  //   let that=this;
+  //   var id = that.data.searchtext;
+  //   const searchText = that.data.searchtext;
+  //   console.log(searchText);
+  //   console.log(id);
+  //   wx.request({
+  //     url: 'http://localhost:8080/warehouse/get_record',
+  //     data:{food_type: searchText},
+  //     header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+  //     success:function(res){
+  //       that.handle(res);
+  //     },
+  //     fail:function (res) {          
+  //     },
+  //   })
+  // },
+  onSubmitSearch: function() {    
+    const searchText = this.data.searchtext.trim().toLowerCase();
+    console.log('执行本地搜索:', searchText);   
+    if (!searchText) {
+      // 如果搜索文本为空，显示全部记录
+      this.setData({
+        filteredList: [...this.data.allRecords],
+        searchResultCount: this.data.allRecords.length
+      });
+      return;
+    }
+    
+    // 执行本地筛选
+    const filteredList = this.data.allRecords.filter(item => {
+      // 根据实际数据结构调整筛选条件
+      return (
+        item.food_name.toLowerCase().includes(searchText) ||
+        item.food_type.toLowerCase().includes(searchText) 
+      );
+    });    
+    // 更新UI
+    this.setData({
+      devicelist : filteredList,
+      searchResultCount: filteredList.length
+    });
   },
+
   inputSearch:function(e){  //输入搜索文字
     this.setData({
       showsearch:e.detail.cursor>0,

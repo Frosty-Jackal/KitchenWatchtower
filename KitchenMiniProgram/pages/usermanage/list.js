@@ -17,10 +17,16 @@ Page({
     scrolltop:null, //滚动位置
     page: 0,  //分页
     devicelist:[],
+    allRecords: [], // 完整数据集（应在页面加载时初始化）
+    filteredList: [], // 当前筛选结果
   },
   onLoad: function () { //加载数据渲染页面
     this.fetchServiceData();
     this.fetchFilterData();
+    this.getTodoRecord();
+  },
+  onShow: function() {
+    // 每次页面显示时都刷新数据（推荐）
     this.getTodoRecord();
   },
   fetchFilterData:function(){ //获取筛选条件
@@ -336,7 +342,7 @@ Page({
   getTodoRecord:function(){
     let that=this;
     wx.request({
-      url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=get_todo_record',
+      url: 'http://localhost:8080/User/get_record',
       data:{},
       header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
       success:function(res){
@@ -351,12 +357,10 @@ Page({
     console.log(JSON.stringify(res));
     this.setData({
       devicelist:res.data.aaData,
+      allRecords:res.data.aaData,
     })
   },
   OnDeleteRecord:function (e) {
-    console.log(JSON.stringify(e));
-    var id = e.currentTarget.dataset.itemid;
-    console.log(id);
     let that=this;
     wx.showModal({
       cancelColor:'cancelColor',
@@ -364,15 +368,18 @@ Page({
       content: '你确定要删除该记录吗？',
       success:function(res){
         if (res.confirm) {
-          var id = e.currentTarget.dataset.itemid;
+          var id = e.currentTarget.dataset.id;
           console.log(id);
           wx.request({
-            url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=delete_todo_record',
-            data:{"id":id},
-            header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+            url: 'http://localhost:8080/User/delete_record',
+            method: 'POST', // 明确使用POST方法
+            data: { id: id },
+            header: {
+              'content-type': 'application/json', // 正确的内容类型
+              'x-requested-with': 'XMLHttpRequest'
+            },
             success:function(res){
-              wx.navigateBack({
-              });
+              that.getTodoRecord();
             },
             fail:function (res) {
 
@@ -396,9 +403,9 @@ Page({
     let that=this;
     console.log(JSON.stringify(h));
     var id = h.currentTarget.dataset.itemid;
-    var title = h.currentTarget.dataset.title;
-    var object_id= h.currentTarget.dataset.object_id;
-    var content= h.currentTarget.dataset.content;
+    var title = h.currentTarget.dataset.user_phone;
+    var object_id= h.currentTarget.dataset.user_name;
+    var content= h.currentTarget.dataset.user_idnumber;
     var create_time= h.currentTarget.dataset.create_time;
     console.log(JSON.stringify(h));
     var recordObject1 = {
@@ -418,12 +425,14 @@ Page({
     let that=this;
     console.log(JSON.stringify(e));
     var id = e.currentTarget.dataset.itemid;
-    var title = e.currentTarget.dataset.title;
-    var object_id= e.currentTarget.dataset.object_id;
+    var title = e.currentTarget.dataset.user_phone;
+    var object_id= e.currentTarget.dataset.user_name;
+    var content = e.currentTarget.dataset.content;
     var recordObject1 = {
       "id": id,
       "object_id":object_id,
       "title": title,     
+      "content": content
      };
     var record = JSON.stringify(recordObject1);
     console.log(record);
@@ -436,22 +445,48 @@ Page({
       url: 'add',
     })
   },
-  OnsubmitSearch:function(){    
-    let that=this;
-    var id = that.data.searchtext;
-    const searchText = that.data.searchtext;
-    console.log(searchText);
-    console.log(id);
-    wx.request({
-      url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=get_todo_record',
-      data:{"object_id": searchText},
-      header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
-      success:function(res){
-          that.handle(res);
-      },
-      fail:function (res) {          
-      },
-    })
+  // OnsubmitSearch:function(){    
+  //   let that=this;
+  //   var id = that.data.searchtext;
+  //   const searchText = that.data.searchtext;
+  //   console.log(searchText);
+  //   console.log(id);
+  //   wx.request({
+  //     url: 'http://localhost:8080/MyWeb_war_exploded/project_todo_servlet_action?action=get_todo_record',
+  //     data:{"object_id": searchText},
+  //     header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+  //     success:function(res){
+  //         that.handle(res);
+  //     },
+  //     fail:function (res) {          
+  //     },
+  //   })
+  // },
+  OnsubmitSearch: function() {    
+    const searchText = this.data.searchtext.trim().toLowerCase();
+    console.log('执行本地搜索:', searchText);   
+    if (!searchText) {
+      // 如果搜索文本为空，显示全部记录
+      this.setData({
+        filteredList: [...this.data.allRecords],
+        searchResultCount: this.data.allRecords.length
+      });
+      return;
+    }
+    
+    // 执行本地筛选
+    const filteredList = this.data.allRecords.filter(item => {
+      // 根据实际数据结构调整筛选条件
+      return (
+        item.user_name.toLowerCase().includes(searchText) ||
+        item.user_phone.toLowerCase().includes(searchText) 
+      );
+    });    
+    // 更新UI
+    this.setData({
+      devicelist : filteredList,
+      searchResultCount: filteredList.length
+    });
   },
   inputSearch:function(e){  //输入搜索文字
     this.setData({

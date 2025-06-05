@@ -20,33 +20,71 @@ Page({
     //   object_id:record.object_id,
     // })
   },
+  onShow: function() {
+    // 每次页面显示时都刷新数据（推荐）
+    this.getTodoRecord();
+  },
   applySubmit:function(){
-    let that=this;
+    var lic_name =  this.data.lic_name;
+    var limit_time =  this.data.limit_time;
+    var lic_id =  this.data.lic_id;
+    console.log(lic_id);
+    console.log(lic_name);
+    wx.request({
+      url:'http://localhost:8080/lic/add_record',
+      method: 'POST', // 明确指定POST方法
+      data: JSON.stringify({ // 转换为JSON字符串
+        limitTime: limit_time,
+        licId: lic_id,
+        licName: lic_name
+      }),
+      header: {
+        "content-type": "application/json", // 修改为JSON格式
+        "x-requested-with": "XMLHttpRequest"
+      },
+      success:function(res){
+      //that.handleAddTodoRecordResult(res);
+      wx.navigateBack({
+       
+      });
+      },
+      fail:function(res){
+      }
+    })
+  },
+  applySubmit:function(){
+    var foodName = this.data.food_name;
+    var foodType= this.data.food_type;
+    var foodQuantity=this.data.food_quantity;
+    var limitTime=this.data.food_keeptime;
+    var foodQuality= this.data.food_quality;
+    var foodKeepcondition=this.data.food_keepcondition; 
+    var foodSupplier=this.data.supplier;
     wx.showModal({
       cancelColor:'cancelColor',
       title: '提示',
       content: '你确定已将该食材入库吗？',
       success:function(res){
         if (res.confirm) {
-           var food_name = that.data.food_name;
-           var food_type= that.data.food_type;
-           var food_quantity=that.data.food_quantity;
-           var food_keeptime=that.data.food_keeptime;
-           var food_quality= that.data.food_quality;
-           var food_keepcondition=that.data.food_keepcondition; 
-           var supplier=that.data.supplier;
-           var create_time= that.data.create_time;
+           console.log(foodName);
+           console.log(foodType);
           wx.request({
-            url: 'http://localhost:8080/MyWeb_war_exploded/warehouse_manage_servlet_action?action=add_manage_record',
-            data:{
-            "food_name":food_name,
-            "food_type": food_type,
-            "food_quantity":food_quantity,
-            "food_keeptime":food_keeptime,
-            "food_quality":food_quality,
-            "food_keepcondition":food_keepcondition,
-            "supplier":supplier,},
-            header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+            url: 'http://localhost:8080/warehouse/add_record',
+            method: 'POST', // 明确指定POST方法
+      data: JSON.stringify({
+            foodName: foodName,
+            foodType: foodType,
+            limitTime: limitTime,
+            foodQuantity: foodQuantity,
+            foodQuality: foodQuality,
+            foodSupplier:
+            foodSupplier,
+            foodKeepCondition: foodKeepcondition,           
+          }),
+          header: {
+            "content-type": "application/json", // 修改为JSON格式
+            "x-requested-with": "XMLHttpRequest"
+          },
             success:function(res){
                wx.navigateBack({
                });

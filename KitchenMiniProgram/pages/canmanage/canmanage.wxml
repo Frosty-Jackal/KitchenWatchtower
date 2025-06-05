@@ -17,7 +17,7 @@
               <text class="star active">★</text>
               <text class="star active">★</text>
               <text class="star active">★</text>
-              <text class="star">★</text>
+              <text class="star active">★</text>
               <text class="score">{{item.score}}</text>
             </view>
           </view>

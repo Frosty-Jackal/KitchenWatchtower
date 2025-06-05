@@ -42,7 +42,7 @@
 	white-space: nowrap;
 }
 .service-city{
-	color: #666;
+	color: #333;
 }
 /* 在原有wxss基础上添加/修改以下样式 */
 
@@ -71,6 +71,6 @@
 .btn-block.btn-orange:active,
 .search-btn:active,
 .search-extra-btn:active {
-  background-color: #002244 !important; /* 深色变体 */
+  background-color: #FF6B6B !important; /* 深色变体 */
   opacity: 0.8;
 }

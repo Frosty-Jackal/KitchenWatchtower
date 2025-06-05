@@ -41,18 +41,18 @@
 					<image src="https://img95.699pic.com/element/40204/9781.png_300.png" mode="aspectFill"></image>
 				</view> 
 				<view class="service-text">
-					<view class="service-tite">姓名:{{item.object_id}}</view>
+					<view class="service-tite">姓名:{{item.user_name}}</view>
 					<view class="service-tags">
 						<text>{{item.create_time}}</text>
 					</view>
-					<text class="service-city">电话：{{item.title}}</text>
+					<text class="service-city">电话：{{item.user_phone}}</text>
         <view>
-          <text class="service-city">身份证号：{{item.content}}</text>
+          <text class="service-city">身份证号：{{item.user_idnumber}}</text>
         </view>
           <view class="service-tags">
-						<text bindtap="OnDeleteRecord" data-itemId="{{item.id}}">删除</text><text bindtap="OnModifyRecord" data-itemId="{{item.id}}"
-             data-object_id="{{item.object_id}}" data-title="{{item.title}}">修改</text><text bindtap="OndetailRecord" data-itemId="{{item.id}}"
-             data-object_id="{{item.object_id}}" data-title="{{item.title}}" data-content="{{item.content}}" data-create_time="{{item.create_time}}">用户详情</text>
+						<text bindtap="OnDeleteRecord" data-id="{{item.id}}">删除</text><text bindtap="OnModifyRecord" data-itemId="{{item.id}}"
+             data-user_name="{{item.user_name}}" data-user_phone="{{item.user_phone}}" data-user_idnumber="{{item.user_idnumber}}">修改</text><text bindtap="OndetailRecord" data-itemId="{{item.id}}"
+             data-user_name="{{item.user_name}}" data-user_phone="{{item.user_phone}}" data-user_idnumber="{{item.user_idnumber}}" data-create_time="{{item.create_time}}">用户详情</text>
             </view>
 				</view>
 			</navigator>

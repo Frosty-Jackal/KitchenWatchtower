@@ -63,6 +63,17 @@ Page({
 
   applySubmit:function(){
     let that=this;
+    const currentQuantity = Number(that.data.food_quantity);
+    const originalQuantity = Number(that.data.originalfood_quantity);
+    console.log(that.data.food_quantity);
+    console.log(that.data.originalfood_quantity);
+    if (currentQuantity >= originalQuantity) {
+      wx.showToast({
+        title: '修改后的数量必须小于原始数量',
+        icon: 'none'
+      });
+      return; // 阻止后续操作
+    }
     wx.showModal({
       cancelColor:'cancelColor',
       title: '提示',
@@ -70,16 +81,16 @@ Page({
       success:function(res){
         if (res.confirm) {
           var id = that.data.id;
-          var title = that.data.title;
-          var object_id = that.data.object_id;
           var food_quantity=that.data.food_quantity;
           console.log(id);
-          console.log(object_id);
-          console.log(title);
           wx.request({
-            url: 'http://localhost:8080/MyWeb_war_exploded/warehouse_manage_servlet_action?action=modify_manage_record',
-            data:{"id":id,"people_name":object_id,"people_phone":title,"food_quantity":food_quantity},
-            header: { "content-type": "application/x-www-form-urlencoded", "x-requested-with": "XMLHttpRequest", },
+            url: 'http://localhost:8080/warehouse/update_record',
+            method: 'PUT',
+            data: JSON.stringify({
+            id:id,
+            foodQuantity:food_quantity
+            }),
+            header: { "content-type": "application/json" },
             success:function(res){
                wx.navigateBack({
                 

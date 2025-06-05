@@ -1,8 +1,5 @@
-
-
 <view class="container container-gray">
-
-  <view class="group">
+	<view class="group">
 		<view class="group-header">基本信息</view>
 		<view class="group-body">
 			<view class="input-list">
