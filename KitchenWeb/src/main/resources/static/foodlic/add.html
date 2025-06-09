@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>食品经营许可证证照信息添加</title>
+    <style>
+        /* 基础重置与全局样式 */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 1.5rem;
+        }
+
+        /* 容器样式 */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 标题样式 */
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 1.75rem;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            margin: 0 auto 2rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: #2980b9;
+            transform: translateX(-3px);
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e4e7ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* 提交按钮 */
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 2rem auto 0;
+            padding: 1rem;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button[type="submit"]:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(41, 128, 185, 0.3);
+        }
+
+        /* 消息提示 */
+        .message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .message.success {
+            background: #dff0d8;
+            color: var(--success-color);
+            border: 1px solid #d6e9c6;
+        }
+
+        .message.error {
+            background: #f2dede;
+            color: var(--error-color);
+            border: 1px solid #ebccd1;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                margin: 0 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            button[type="submit"] {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/menu.html" class="back-btn">
+        <i class="el-icon-arrow-left"></i> 返回菜单
+    </a>
+    <h2>添加食品经营许可证信息</h2>
+    <form id="addForm" >
+        <div class="form-group">
+            <label>上传许可证图片：</label>
+            <input type="file" id="licImage" accept="image/*" required>
+        </div>
+
+
+        <div class="form-group">
+            <label>证书编号：</label>
+            <input type="text" id="licNum" name="licNum" required>
+        </div>
+        <div class="form-group">
+    <label>经营者名称：</label>
+    <input type="text" id="optName" name="optName" required>
+</div>
+<button type="submit">提交</button>
+</form>
+<div id="message" class="message"></div>
+</div>
+<script>
+    const form = document.getElementById('addForm');
+    const licImage = document.getElementById('licImage');
+    const licNumInput = document.getElementById('licNum');
+    const optNameInput = document.getElementById('optName');
+
+    // 图片选择时立即触发OCR
+    licImage.addEventListener('change', async () => {
+        if (licImage.files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('image', licImage.files[0]);
+
+        try {
+            const response = await fetch('/foodlic/ocr', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.result_code === 0) {
+                // 自动填充字段
+                licNumInput.value = result.data.licNum || '';
+                optNameInput.value = result.data.optName || '';
+                showMessage('识别成功，请检查信息！', 'success');
+            } else {
+                showMessage(`识别失败：${result.result_msg}`, 'error');
+            }
+        } catch (error) {
+            showMessage('识别请求失败：' + error.message, 'error');
+        }
+    });
+
+    // 保留原有提交逻辑（处理手动输入的情况）
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const licNum = licNumInput.value;
+        const optName = optNameInput.value;
+
+        try {
+            const response = await fetch('/foodlic/add_record', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    licNum: licNum,
+                    optName: optName
+                })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.result_msg, 'success');
+                form.reset();
+            } else {
+                showMessage(`添加失败：${result.result_msg}`, 'error');
+            }
+        } catch (error) {
+            showMessage('请求失败：' + error.message, 'error');
+        }
+    });
+</script>
+
+<script>
+    function showMessage(text, type) {
+        message.textContent = text;
+        message.className = `message ${type}`;
+        message.style.display = 'block';
+        setTimeout(() => {
+            message.style.display = 'none';
+        }, 5000);
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = '../login.html';
+            return;
+        }
+    });
+
+</script>
+</body>
+</html>

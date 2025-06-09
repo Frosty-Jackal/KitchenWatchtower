@@ -105,6 +105,10 @@
             <i class="el-icon-video-camera"></i>
             <span slot="title">监控视频</span>
         </el-menu-item>
+        <el-menu-item index="9">
+            <i class="el-icon-document"></i>
+            <span slot="title">证照添加</span>
+        </el-menu-item>
     </el-menu>
 </div>
     <div class="main-container">
@@ -113,7 +117,7 @@
             <h1>明厨亮灶系统 - 供应商管理</h1>
             <div class="user-info">
                 <span class="username">管理员</span>
-                <a href="http://localhost:8080/menu.html" class="logout"><i class="bi bi-box-arrow-right"></i> 退出</a>
+                <a href="http://localhost:8080/menu.html" class="logout"><i class="bi bi-box-arrow-right"></i> 返回菜单</a>
             </div>
         </header>
         
@@ -318,7 +322,8 @@
                     '5': '../compmanage/device_list.html',
                     '6': '../riskwarn/riskwarn.html',
                     '7': '../samplingtask/3.html',
-                    '8': '../monitoringvideo/device_list.html'
+                    '8': '../monitoringvideo/device_list.html',
+                    '9': '../foodlic/add.html'
                 };
                 targetPath = pathMap[key] || '';
                 if (targetPath) {
