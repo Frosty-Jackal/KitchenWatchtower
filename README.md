@@ -10,6 +10,18 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
 
 ## 🚀 Quick Start
 
+### Run Web Application
+1. Import project to IDEA:
+   ```bash
+   Drag the "KitchenWeb" directory into IntelliJ IDEA
+   ```
+2. Start application:
+   - Click the "Run" button in IDEA
+   - Access web interface via:
+     ```
+     http://localhost:8080/menu.html
+     ```
+
 ### Database Preparation
 1. Open terminal and navigate to project directory
    ```bash
@@ -41,32 +53,19 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
 
    _Database preparation completed!_
 
-### Run Web Application
-1. Import project to IDEA:
-   ```bash
-   Drag the "KitchenWeb" directory into IntelliJ IDEA
-   ```
-
-2. Update configuration files:
-   - Modify database connection settings in `KitchenWeb\src\main\java\com\example\demo\dao`
-   - Update all the `root` and `password` parts 
-
-3. Start application:
-   - Click the "Run" button in IDEA
-   - Access web interface via:
-     ```
-     http://localhost:8080/menu.html
-     ```
-
 ### Run Mini-Program
 1. Ensure web application is running (as described above)
 
-2. Import project to WeChat Developer Tools:
+2. Update configuration files in web application:
+   - Modify database connection settings in `KitchenWeb\src\main\java\com\example\demo\dao`
+   - Update all the `root` and `password` parts 
+
+3. Import project to WeChat Developer Tools:
    ```bash
    Drag the "KitchenMiniProgram" directory into WeChat Developer Tools
    ```
 
-3. Update mini-program configuration:
+4. Update mini-program configuration:
    - Modify `appid` in `KitchenMiniProgram/project.config.json`
      ```json
      {
@@ -74,7 +73,7 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
      }
      ```
 
-4. Build and preview:
+5. Build and preview:
    - Click "Compile" button in WeChat Developer Tools
 
    _start mini-program journey!_
