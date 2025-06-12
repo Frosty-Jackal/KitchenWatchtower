@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-import jdk.nashorn.internal.runtime.PropertyAccess;
 
 public class Warehouse {
     private String id;
