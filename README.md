@@ -54,11 +54,12 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
    _Database preparation completed!_
 
 ### Run Mini-Program
-1. Ensure web application is running (as described above)
 
-2. Update configuration files in web application:
+1. Update configuration files in web application:
    - Modify database connection settings in `KitchenWeb\src\main\java\com\example\demo\dao`
-   - Update all the `root` and `password` parts 
+   - Update all the `root` and `password` parts
+
+2. Rerun web application and ensure web application is running 
 
 3. Import project to WeChat Developer Tools:
    ```bash
@@ -79,6 +80,7 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
    _start mini-program journey!_
 
 ## 📋 Recommended Requirements
+- JAVA 
 - MySQL 8.0+ 
 
 ## 📂 Project Structure
