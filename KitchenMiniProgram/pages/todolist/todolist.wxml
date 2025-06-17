@@ -1,0 +1,78 @@
+<view class="container">
+  <view class="header">
+    <view class="title">待办事项管理系统</view>
+    <view class="button-group">
+      <button class="add-btn" bindtap="onAddTap">增加</button>
+      <button class="edit-btn" bindtap="onEditTap">修改</button>
+      <button class="delete-btn" bindtap="onDeleteTap">删除</button>
+    </view>
+  </view>
+  <table class="todo-table">
+    <thead>
+      <tr>
+        <th>序号</th>
+        <th>待办事项</th>
+        <th>状态</th>
+        <th>截止日期</th>
+        <th>优先级</th>
+      </tr>
+      <tr class="spacer-row">
+        <td colspan="20"></td>
+      </tr>
+
+    </thead>
+    <tbody wx:if="{{todos.length > 0}}">
+      <block wx:for="{{todos}}" wx:key="id">
+        <tr data-id="{{item.id}}" class="{{item.id === selectedId ? 'selected' : ''}}" bindtap="onRowTap">
+          <td>{{item.id}}</td>
+          <td>{{item.title}}</td>
+          <td>{{item.status}}</td>
+          <td>{{item.dueDate}}</td>
+          <td>{{item.priority}}</td>
+        </tr>
+        <tr class="spacer-row">
+        <td colspan="20"></td>
+      </tr>
+      </block>
+    </tbody>
+    <tbody wx:else>
+      <tr>
+        <td colspan="5" class="empty-table">暂无待办事项，请点击"增加"按钮添加新待办事项</td>
+      </tr>
+    </tbody>
+  </table>
+  <view class="modal" wx:if="{{showModal}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">{{currentId ? '修改待办事项' : '添加待办事项'}}</text>
+        <text class="close" bindtap="onCloseModal">&times;</text>
+      </view>
+      <form bindsubmit="onFormSubmit">
+        <view class="form-group">
+          <label>待办事项：</label>
+          <input name="title" value="{{itemTitle}}" bindinput="onInputChange" placeholder="请输入待办事项" maxlength="50" />
+        </view>
+        <view class="form-group">
+          <label>状态：</label>
+          <picker name="status" mode="selector" range="{{statusOptions}}" value="{{itemStatus}}" bindchange="onStatusChange">
+            <view class="picker">{{itemStatus}}</view>
+          </picker>
+        </view>
+        <view class="form-group">
+          <label>截止日期：</label>
+          <input name="duedate" type="date" value="{{itemDueDate}}" bindinput="onInputChange" />
+        </view>
+        <view class="form-group">
+          <label>优先级：</label>
+          <picker name="priority" mode="selector" range="{{priorityOptions}}" value="{{itemPriority}}" bindchange="onPriorityChange">
+            <view class="picker">{{itemPriority}}</view>
+          </picker>
+        </view>
+        <view class="form-buttons">
+          <button form-type="submit" class="submit-btn">{{currentId ? '修改' : '添加'}}</button>
+          <button form-type="reset" class="cancel-btn" bindtap="onCloseModal">取消</button>
+        </view>
+      </form>
+    </view>
+  </view>
+</view>

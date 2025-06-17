@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时天气更新</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <!-- 配置Tailwind自定义样式 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        weather: {
+                            sunny: '#FFD700',
+                            cloudy: '#A9A9A9',
+                            rainy: '#4169E1',
+                            snowy: '#F0F8FF',
+                            night: '#1A202C'
+                        },
+                        aqi: {
+                            good: '#00E400',
+                            moderate: '#FFFF00',
+                            unhealthySensitive: '#FF7E00',
+                            unhealthy: '#FF0000',
+                            veryUnhealthy: '#8F3F97',
+                            hazardous: '#7E0023',
+                            uv: {
+                                low: '#0071E3',
+                                moderate: '#22B14C',
+                                high: '#FFC500',
+                                veryHigh: '#FF7518',
+                                extreme: '#FF0000'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        /* 左侧导航栏样式 */
+        .sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 200px;
+            background: #2c3e50;
+            box-shadow: 2px 0 6px rgba(0,0,0,.1);
+            z-index: 1000;
+        }
+
+        .el-menu-vertical-demo {
+            height: 100%;
+            border-right: none;
+        }
+    </style>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            }
+            .card-shadow-hover {
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .weather-gradient {
+                background: linear-gradient(135deg, #4F46E5 0%, #10B981 100%);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .animate-float {
+                animation: float 3s ease-in-out infinite;
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+        }
+        
+        /* 自定义动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .weather-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .weather-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .pulse-loading {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .weather-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .weather-detail-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .weather-detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .forecast-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .forecast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .aqi-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .aqi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .aqi-index {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+        
+        .uv-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-light to-blue-50 min-h-screen text-dark" >
+    <div class="sidebar-container" id="app">
+    <el-menu
+            class="el-menu-vertical-demo"
+            :default-active="activeIndex"
+            @select="handleSelect"
+            background-color="#2c3e50"
+            text-color="#ecf0f1"
+            active-text-color="#3498db">
+
+        <el-menu-item index="0">
+            <i class="el-icon-s-home"></i>
+            <span slot="title">首页</span>
+        </el-menu-item>
+        <el-menu-item index="1">
+            <i class="el-icon-menu"></i>
+            <span slot="title">学校管理</span>
+        </el-menu-item>
+        <el-menu-item index="2">
+            <i class="el-icon-s-shop"></i>
+            <span slot="title">商户管理</span>
+        </el-menu-item>
+        <el-menu-item index="3">
+            <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
+            <span slot="title">供应商管理</span>
+        </el-menu-item>
+        <!-- 新增菜单项 -->
+        <el-menu-item index="4">
+            <i class="el-icon-s-management"></i>
+            <span slot="title">原料管理</span>
+        </el-menu-item>
+        <el-menu-item index="5">
+            <i class="el-icon-s-comment"></i>
+            <span slot="title">投诉管理</span>
+        </el-menu-item>
+        <el-menu-item index="6">
+            <i class="el-icon-warning"></i>
+            <span slot="title">风险预警</span>
+        </el-menu-item>
+        <el-menu-item index="7">
+            <i class="el-icon-s-check"></i>
+            <span slot="title">抽检任务</span>
+        </el-menu-item>
+        <el-menu-item index="8">
+            <i class="el-icon-video-camera"></i>
+            <span slot="title">监控视频</span>
+        </el-menu-item>
+        <el-menu-item index="9">
+            <i class="el-icon-document"></i>
+            <span slot="title">证照添加</span>
+        </el-menu-item>
+        <el-menu-item index="10">
+            <i class="el-icon-sunny"></i>
+            <span slot="title">今日天气</span>
+        </el-menu-item>
+        <el-menu-item index="11">
+            <i class="el-icon-location"></i>
+            <span slot="title">地图展板</span>
+        </el-menu-item>
+    </el-menu>
+</div>
+    <div class="ml-200px">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- 头部标题 -->
+        <header class="text-center mb-12 fade-in">
+            <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-dark mb-2 text-shadow">
+                <i class="fa fa-cloud-sun-o text-accent mr-3"></i>实时天气信息
+            </h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                实时更新中国主要城市天气，每10分钟自动刷新
+            </p>
+        </header>
+        
+        <!-- 城市输入区域 -->
+        <div class="mt-6 bg-white/80 bg-blur rounded-xl p-6 shadow-lg fade-in">
+            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <label for="cityInput" class="text-gray-600 mb-2 sm:mb-0">输入城市拼音（首字母大写）:</label>
+                <input type="text" id="cityInput" value="Chengdu" 
+                       class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                       placeholder="例如: Beijing, NewYork">
+                <button id="updateBtn" 
+                        class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all shadow-md hover:shadow-lg flex items-center">
+                    <i class="fa fa-refresh mr-2"></i>更新天气
+                </button>
+            </div>
+        </div>
+        
+        <!-- 天气卡片容器 -->
+        <div class="weather-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            <!-- 当前天气卡片 -->
+            <div class="card bg-white rounded-2xl overflow-hidden card-shadow transition-all duration-300 hover:card-shadow-hover fade-in" id="weatherCard">
+                <div class="weather-gradient h-2 w-full"></div>
+                <div class="p-6">
+                    <div class="loading flex items-center justify-center mb-4 text-accent italic pulse-loading" id="loading">
+                        <i class="fa fa-spinner fa-spin mr-2"></i>数据加载中...
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="city text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark" id="city">Chengdu</h2>
+                        <div class="text-gray-500 text-sm" id="currentTime">12:30</div>
+                    </div>
+                    <div class="flex items-center justify-center mb-4">
+                        <img src="https://openweathermap.org/img/wn/04d.png" alt="多云" class="icon w-24 h-24 object-contain weather-icon animate-float" id="icon" />
+                        <div class="ml-4">
+                            <h1 class="temp text-[clamp(2.5rem,5vw,3.5rem)] font-bold text-dark" id="temp">21°C</h1>
+                            <div class="description text-xl font-medium" id="description">多云</div>
+                        </div>
+                    </div>
+                    <div class="error text-red-500 mt-4" id="error"></div>
+                </div>
+            </div>
+            
+            <!-- 湿度和风速卡片 -->
+            <div class="card bg-white rounded-2xl overflow-hidden card-shadow transition-all duration-300 hover:card-shadow-hover fade-in">
+                <div class="weather-gradient h-2 w-full"></div>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-4 text-dark">天气详情</h3>
+                    <div class="weather-details-grid">
+                        <div class="weather-detail-card">
+                            <div class="text-primary text-lg mb-1"><i class="fa fa-tint"></i></div>
+                            <div class="text-sm text-gray-500">湿度</div>
+                            <div class="font-bold" id="humidity">60%</div>
+                        </div>
+                        <div class="weather-detail-card">
+                            <div class="text-primary text-lg mb-1">
+                                <i class="fa fa-location-arrow rotate-wind" id="windIcon"></i>
+                            </div>
+                            <div class="text-sm text-gray-500">风速</div>
+                            <div class="font-bold" id="wind">6.2 km/h</div>
+                        </div>
+                        <div class="weather-detail-card">
+                            <div class="text-accent text-lg mb-1"><i class="fa fa-sun-o"></i></div>
+                            <div class="text-sm text-gray-500">体感温度</div>
+                            <div class="font-bold" id="feelsLike">22°C</div>
+                        </div>
+                        <div class="weather-detail-card">
+                            <div class="text-secondary text-lg mb-1"><i class="fa fa-sun-o"></i></div>
+                            <div class="text-sm text-gray-500">紫外线</div>
+                            <div class="font-bold" id="uvIndex">3</div>
+                            <div class="uv-index bg-weather-sunny text-dark text-xs mt-1" id="uvCategory">中等</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 空气质量卡片 -->
+            <div class="card bg-white rounded-2xl overflow-hidden card-shadow transition-all duration-300 hover:card-shadow-hover fade-in">
+                <div class="weather-gradient h-2 w-full"></div>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-4 text-dark">空气质量</h3>
+                    <div class="aqi-card" id="aqiCard">
+                        <div class="aqi-index bg-aqi-good text-dark" id="aqiIndex">50</div>
+                        <div class="text-center text-lg font-medium" id="aqiCategory">优</div>
+                        <div class="text-center text-sm text-gray-600 mt-2">空气质量令人满意，基本无空气污染</div>
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>PM2.5</span>
+                                <span class="font-medium" id="pm25">12 μg/m³</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>PM10</span>
+                                <span class="font-medium" id="pm10">25 μg/m³</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>O₃</span>
+                                <span class="font-medium" id="o3">60 μg/m³</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>NO₂</span>
+                                <span class="font-medium" id="no2">18 μg/m³</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 气压和日照卡片 -->
+        <div class="mt-8 bg-white/80 bg-blur rounded-xl p-6 shadow-lg fade-in">
+            <h3 class="text-lg font-bold mb-4 text-dark">气压与日照</h3>
+            <div class="weather-details-grid">
+                <div class="weather-detail-card">
+                    <div class="text-secondary text-lg mb-1"><i class="fa fa-thermometer-half"></i></div>
+                    <div class="text-sm text-gray-500">气压</div>
+                    <div class="font-bold" id="pressure">1013 hPa</div>
+                </div>
+                <div class="weather-detail-card">
+                    <div class="text-accent text-lg mb-1"><i class="fa fa-moon-o"></i></div>
+                    <div class="text-sm text-gray-500">日出</div>
+                    <div class="font-bold" id="sunrise">06:30</div>
+                </div>
+                <div class="weather-detail-card">
+                    <div class="text-weather-night text-lg mb-1"><i class="fa fa-moon-o"></i></div>
+                    <div class="text-sm text-gray-500">日落</div>
+                    <div class="font-bold" id="sunset">18:45</div>
+                </div>
+                <div class="weather-detail-card">
+                    <div class="text-primary text-lg mb-1"><i class="fa fa-percent"></i></div>
+                    <div class="text-sm text-gray-500">云量</div>
+                    <div class="font-bold" id="clouds">75%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 天气趋势图 -->
+        <div class="mt-8 bg-white/80 bg-blur rounded-xl p-6 shadow-lg fade-in">
+            <h3 class="text-xl font-bold mb-6 text-dark">温度趋势图</h3>
+            <div class="chart-container">
+                <canvas id="temperatureChart"></canvas>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        // API密钥和更新间隔
+        const API_KEY = "13e786b2255800d48474a6fdbcd071dc";
+        const UPDATE_INTERVAL = 1000 * 60 * 10;
+        
+        // 天气卡片元素
+        const weatherCard = {
+            cityElement: document.getElementById('city'),
+            tempElement: document.getElementById('temp'),
+            iconElement: document.getElementById('icon'),
+            descriptionElement: document.getElementById('description'),
+            humidityElement: document.getElementById('humidity'),
+            windElement: document.getElementById('wind'),
+            feelsLikeElement: document.getElementById('feelsLike'),
+            uvIndexElement: document.getElementById('uvIndex'),
+            uvCategoryElement: document.getElementById('uvCategory'),
+            pressureElement: document.getElementById('pressure'),
+            sunriseElement: document.getElementById('sunrise'),
+            sunsetElement: document.getElementById('sunset'),
+            cloudsElement: document.getElementById('clouds'),
+            loadingElement: document.getElementById('loading'),
+            errorElement: document.getElementById('error'),
+            windIcon: document.getElementById('windIcon'),
+            currentTimeElement: document.getElementById('currentTime')
+        };
+        
+        // 空气质量元素
+        const aqiCard = {
+            indexElement: document.getElementById('aqiIndex'),
+            categoryElement: document.getElementById('aqiCategory'),
+            pm25Element: document.getElementById('pm25'),
+            pm10Element: document.getElementById('pm10'),
+            o3Element: document.getElementById('o3'),
+            no2Element: document.getElementById('no2'),
+            cardElement: document.getElementById('aqiCard')
+        };
+        
+        // 温度趋势图
+        let temperatureChart = null;
+        
+        // 初始化天气更新
+        function initWeatherUpdates() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            loadWeatherData(weatherCard.cityElement.textContent);
+            setInterval(() => {
+                loadWeatherData(weatherCard.cityElement.textContent);
+            }, UPDATE_INTERVAL);
+        }
+        
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            weatherCard.currentTimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        
+        // 加载天气数据
+        async function loadWeatherData(city) {
+            weatherCard.loadingElement.style.display = 'flex';
+            weatherCard.errorElement.textContent = '';
+            
+            try {
+                // 获取当前天气数据
+                const currentWeatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`);
+                
+                if (!currentWeatherResponse.ok) {
+                    throw new Error(`API请求失败: ${currentWeatherResponse.status}`);
+                }
+                
+                const currentWeatherData = await currentWeatherResponse.json();
+                updateWeatherUI(weatherCard, currentWeatherData);
+                updateWeatherTheme(currentWeatherData);
+                
+                // 温度趋势图仍使用预报数据中的未来24小时数据
+                const forecastResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`);
+                
+                if (!forecastResponse.ok) {
+                    throw new Error(`API请求失败: ${forecastResponse.status}`);
+                }
+                
+                const forecastData = await forecastResponse.json();
+                updateTemperatureChart(forecastData);
+                
+                // 获取空气质量数据（模拟数据，实际需要AQI API）
+                updateAQIData();
+                
+            } catch (error) {
+                console.error('获取天气数据失败:', error);
+                weatherCard.errorElement.textContent = '获取天气数据失败，请检查城市名称或网络连接';
+            } finally {
+                weatherCard.loadingElement.style.display = 'none';
+            }
+        }
+        
+        // 更新天气UI
+        function updateWeatherUI(card, data) {
+            card.cityElement.textContent = data.name;
+            card.tempElement.textContent = `${data.main.temp}°C`;
+            const weatherIcon = data.weather[0].icon;
+            card.iconElement.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
+            card.descriptionElement.textContent = data.weather[0].description;
+            card.humidityElement.textContent = `${data.main.humidity}%`;
+            const windSpeed = data.wind.speed * 3.6;
+            card.windElement.textContent = `${windSpeed.toFixed(1)} km/h`;
+            
+            // 设置风速图标旋转角度
+            if (data.wind.deg) {
+                card.windIcon.style.transform = `rotate(${data.wind.deg}deg)`;
+            }
+            
+            card.feelsLikeElement.textContent = `${data.main.feels_like}°C`;
+            
+            // 模拟紫外线指数数据（实际应从UV API获取）
+            const uvIndex = Math.floor(Math.random() * 11) + 1;
+            updateUVIndex(card, uvIndex);
+            
+            card.pressureElement.textContent = `${data.main.pressure} hPa`;
+            
+            const sunriseDate = new Date(data.sys.sunrise * 1000);
+            card.sunriseElement.textContent = `${sunriseDate.getHours().toString().padStart(2, '0')}:${sunriseDate.getMinutes().toString().padStart(2, '0')}`;
+            
+            const sunsetDate = new Date(data.sys.sunset * 1000);
+            card.sunsetElement.textContent = `${sunsetDate.getHours().toString().padStart(2, '0')}:${sunsetDate.getMinutes().toString().padStart(2, '0')}`;
+            
+            card.cloudsElement.textContent = `${data.clouds.all}%`;
+        }
+        
+        // 更新紫外线指数
+        function updateUVIndex(card, index) {
+            let category, colorClass;
+            
+            if (index <= 2) {
+                category = '低';
+                colorClass = 'bg-aqi-uv-low text-white';
+            } else if (index <= 5) {
+                category = '中等';
+                colorClass = 'bg-aqi-uv-moderate text-white';
+            } else if (index <= 7) {
+                category = '高';
+                colorClass = 'bg-aqi-uv-high text-white';
+            } else if (index <= 10) {
+                category = '很高';
+                colorClass = 'bg-aqi-uv-veryHigh text-white';
+            } else {
+                category = '极高';
+                colorClass = 'bg-aqi-uv-extreme text-white';
+            }
+            
+            card.uvIndexElement.textContent = index;
+            card.uvCategoryElement.textContent = category;
+            card.uvCategoryElement.className = `uv-index ${colorClass} text-xs mt-1`;
+        }
+        
+        // 更新AQI数据
+        function updateAQIData() {
+            // 实际应用中应该从AQI API获取数据
+            // 这里使用模拟数据
+            const aqiIndex = Math.floor(Math.random() * 150) + 1;
+            let aqiCategory, aqiColor, aqiDescription;
+            
+            if (aqiIndex <= 50) {
+                aqiCategory = '优';
+                aqiColor = 'bg-aqi-good';
+                aqiDescription = '空气质量令人满意，基本无空气污染';
+            } else if (aqiIndex <= 100) {
+                aqiCategory = '良';
+                aqiColor = 'bg-aqi-moderate';
+                aqiDescription = '空气质量可接受，但某些污染物可能对极少数异常敏感人群健康有较弱影响';
+            } else if (aqiIndex <= 150) {
+                aqiCategory = '轻度污染';
+                aqiColor = 'bg-aqi-unhealthySensitive';
+                aqiDescription = '易感人群症状有轻度加剧，健康人群出现刺激症状';
+            } else if (aqiIndex <= 200) {
+                aqiCategory = '中度污染';
+                aqiColor = 'bg-aqi-unhealthy';
+                aqiDescription = '进一步加剧易感人群症状，可能对健康人群心脏、呼吸系统有影响';
+            } else if (aqiIndex <= 300) {
+                aqiCategory = '重度污染';
+                aqiColor = 'bg-aqi-veryUnhealthy';
+                aqiDescription = '心脏病和肺病患者症状显著加剧，运动耐受力降低，健康人群普遍出现症状';
+            } else {
+                aqiCategory = '严重污染';
+                aqiColor = 'bg-aqi-hazardous';
+                aqiDescription = '健康人群运动耐受力降低，有明显强烈症状，提前出现某些疾病';
+            }
+            
+            // 更新UI
+            aqiCard.indexElement.textContent = aqiIndex;
+            aqiCard.categoryElement.textContent = aqiCategory;
+            
+            // 移除旧的颜色类并添加新的
+            aqiCard.indexElement.className = 'aqi-index ' + aqiColor + ' text-dark';
+            
+            // 更新污染物浓度
+            aqiCard.pm25Element.textContent = `${Math.floor(Math.random() * 100)} μg/m³`;
+            aqiCard.pm10Element.textContent = `${Math.floor(Math.random() * 150)} μg/m³`;
+            aqiCard.o3Element.textContent = `${Math.floor(Math.random() * 200)} μg/m³`;
+            aqiCard.no2Element.textContent = `${Math.floor(Math.random() * 100)} μg/m³`;
+        }
+        
+        // 更新温度趋势图
+        function updateTemperatureChart(data) {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            
+            // 提取数据点（未来24小时，每3小时一个点）
+            const labels = [];
+            const temperatures = [];
+            const feelsLike = [];
+            const humidity = [];
+            
+            data.list.slice(0, 8).forEach(item => {
+                const date = new Date(item.dt * 1000);
+                labels.push(`${date.getHours().toString().padStart(2, '0')}:00`);
+                temperatures.push(item.main.temp);
+                feelsLike.push(item.main.feels_like);
+                humidity.push(item.main.humidity);
+            });
+            
+            // 如果图表已存在，销毁它
+            if (temperatureChart) {
+                temperatureChart.destroy();
+            }
+            
+            // 创建新图表
+            temperatureChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '温度 (°C)',
+                            data: temperatures,
+                            borderColor: '#4F46E5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '体感温度 (°C)',
+                            data: feelsLike,
+                            borderColor: '#F59E0B',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: '湿度 (%)',
+                            data: humidity,
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '温度 (°C)'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            max: 100,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '湿度 (%)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 根据天气状况更新主题
+        function updateWeatherTheme(data) {
+            const weatherId = data.weather[0].id;
+            const mainWeather = data.weather[0].main.toLowerCase();
+            const iconCode = data.weather[0].icon;
+            const isNight = iconCode.includes('n');
+            
+            let themeColor;
+            
+            // 根据OpenWeatherMap的天气ID分类设置主题色
+            if (weatherId >= 200 && weatherId < 300) { // 雷暴
+                themeColor = '#303F9F';
+            } else if (weatherId >= 300 && weatherId < 600) { // 雨
+                themeColor = '#1976D2';
+            } else if (weatherId >= 600 && weatherId < 700) { // 雪
+                themeColor = '#E0F7FA';
+            } else if (weatherId >= 700 && weatherId < 800) { // 雾/霾
+                themeColor = '#78909C';
+            } else if (weatherId === 800) { // 晴朗
+                themeColor = isNight ? '#1A237E' : '#FFC107';
+            } else if (weatherId > 800) { // 多云
+                themeColor = isNight ? '#424242' : '#90A4AE';
+            } else {
+                themeColor = '#4F46E5'; // 默认主题色
+            }
+            
+            // 更新UI主题
+            document.querySelectorAll('.weather-gradient').forEach(el => {
+                el.style.background = `linear-gradient(135deg, ${themeColor} 0%, #10B981 100%)`;
+            });
+            document.getElementById('updateBtn').style.backgroundColor = themeColor;
+        }
+        
+        // 更新按钮点击事件
+        document.getElementById('updateBtn').addEventListener('click', function() {
+            const city = document.getElementById('cityInput').value.trim();
+            if (city) {
+                loadWeatherData(city);
+            }
+        });
+        
+        // 添加风速图标旋转样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .rotate-wind {
+                display: inline-block;
+                transition: transform 0.5s ease;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initWeatherUpdates);
+    </script>
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                activeIndex: '10'
+            },
+            methods: {
+                handleSelect(key) {
+                    let targetPath = '';
+                    const pathMap = {
+                        '0': '../menu.html',        // 返回首页
+                        '1': '../schoolmanage/schoolmanage.html',
+                        '2': '../mercmanage/mercmanage.html',
+                        '3': '../suppmanage/suppmanage.html',  // 当前页面
+                        '4': '../matermanage/index.html',
+                        '5': '../compmanage/device_list.html',
+                        '6': '../riskwarn/riskwarn.html',
+                        '7': '../samplingtask/3.html',
+                        '8': '../monitoringvideo/device_list.html',
+                        '9': '../foodlic/add.html',
+                        '10': '../weathermanage/1.html',
+                        '11': '../map/map.html'
+                    };
+                    targetPath = pathMap[key] || '';
+                    if (targetPath) {
+                        window.location.href = targetPath;
+                    } else {
+                        console.warn('未配置的路由路径', key);
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+<style>
+    /* 在原有样式末尾添加 */
+    .ml-200px {
+        margin-left: 200px; /* 匹配导航栏宽度 */
+    }
+    @media (min-width: 640px) {
+        .ml-200px {
+            margin-left: 220px; /* 桌面端额外增加20px间距 */
+        }
+    }
+</style>

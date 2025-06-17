@@ -59,10 +59,6 @@
             width: 150px;
         }
 
-        .form-control.calendar-control {
-            width: 170px;
-        }
-
         .search-btns {
             margin-left: auto;
             display: flex;
@@ -166,9 +162,7 @@
         .page-info {
             margin: 0 10px;
         }
-    </style>
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <style>
+
         /* 左侧导航栏样式 */
         .sidebar-container {
             position: fixed;
@@ -210,7 +204,45 @@
             padding: 20px;
             transition: margin 0.3s;
         }
+
+        /* 下拉菜单样式 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            right: 0;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .operation-link {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 </head>
 <body>
 <div class="container" id="app">
@@ -260,10 +292,19 @@
                 <i class="el-icon-video-camera"></i>
                 <span slot="title">监控视频</span>
             </el-menu-item>
+            <el-menu-item index="10">
+                <i class="el-icon-sunny"></i>
+                <span slot="title">今日天气</span>
+            </el-menu-item>
             <el-menu-item index="9">
                 <i class="el-icon-document"></i>
                 <span slot="title">证照添加</span>
             </el-menu-item>
+            <el-menu-item index="11">
+                <i class="el-icon-location"></i>
+                <span slot="title">地图展板</span>
+            </el-menu-item>
+        </el-menu>
         </el-menu>
     </div>
 
@@ -308,22 +349,34 @@
             <label class="form-label">所在区县</label>
             <select id="district" class="form-control">
                 <option value="">全部</option>
-                <option>彭水县</option>
-                <option>九龙坡区</option>
                 <option>渝中区</option>
+                <option>九龙坡区</option>
                 <option>江北区</option>
                 <option>北碚区</option>
+                <option>沙坪坝区</option>
             </select>
         </div>
 
         <div class="form-group">
             <label class="form-label">查询时间(始)</label>
-            <input id="start-date" type="text" class="form-control" value="2019-05-14 15:00:00">
+            <el-date-picker
+                id="start-date"
+                type="datetime"
+                placeholder="选择日期时间"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                default-value="2019-05-14 15:00:00">
+            </el-date-picker>
         </div>
 
         <div class="form-group">
             <label class="form-label">查询时间(止)</label>
-            <input id="end-date" type="text" class="form-control" value="2019-05-14 15:00:00">
+            <el-date-picker
+                id="end-date"
+                type="datetime"
+                placeholder="选择日期时间"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                default-value="2019-05-14 15:00:00">
+            </el-date-picker>
         </div>
 
         <div class="search-btns">
@@ -340,14 +393,15 @@
     </div>
 
     <div class="tabs">
-        <div class="tab active">已到期</div>
-        <div class="tab normal">即将到期</div>
+        <div class="tab" :class="{active: activeTab === 'expired'}" @click="activeTab = 'expired'">已到期</div>
+        <div class="tab" :class="{active: activeTab === 'expiring'}" @click="activeTab = 'expiring'">即将到期</div>
     </div>
 
-    <table class="data-table">
+    <!-- 已到期数据表格 -->
+    <table v-if="activeTab === 'expired'" class="data-table">
         <thead>
         <tr>
-            <th><input type="checkbox" id="select-all"></th>
+            <th><input type="checkbox" id="select-all-expired"></th>
             <th>商户名称</th>
             <th>所在城市</th>
             <th>所在区县</th>
@@ -358,23 +412,29 @@
             <th>证照类型</th>
             <th>有效截止日期</th>
             <th>操作</th>
-            <th>提醒商户</th>
         </tr>
         </thead>
-        <tbody id="table-body">
+        <tbody id="table-body-expired">
         <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="九龙坡区">
             <td><input type="checkbox"></td>
             <td>绿茶餐厅</td>
             <td>重庆市</td>
             <td>九龙坡区</td>
-            <td>中钞汇街8号成都远洋太古里东里2层2328</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
             <td>王杰</td>
             <td>186-2661-9786</td>
             <td>社会餐饮</td>
             <td>食品经营许可证</td>
             <td>2019-05-15</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
             <td><input type="checkbox"></td>
@@ -387,8 +447,15 @@
             <td>中、小学食堂</td>
             <td>员工健康证</td>
             <td>2019-05-15</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
             <td><input type="checkbox"></td>
@@ -401,22 +468,36 @@
             <td>社会餐饮</td>
             <td>员工健康证</td>
             <td>2019-05-14</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="九龙坡区">
             <td><input type="checkbox"></td>
             <td>绿茶餐厅</td>
             <td>重庆市</td>
             <td>九龙坡区</td>
-            <td>中钞汇街8号成都远洋太古里东里2层2328</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
             <td>王杰</td>
             <td>186-2661-9786</td>
             <td>社会餐饮</td>
             <td>食品经营许可证</td>
             <td>2019-05-13</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="九龙坡区">
             <td><input type="checkbox"></td>
@@ -429,8 +510,15 @@
             <td>中、小学食堂</td>
             <td>食品经营许可证</td>
             <td>2019-05-13</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="渝中区">
             <td><input type="checkbox"></td>
@@ -443,22 +531,36 @@
             <td>社会餐饮</td>
             <td>食品经营许可证</td>
             <td>2019-05-10</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="江北区">
             <td><input type="checkbox"></td>
             <td>绿茶餐厅</td>
             <td>重庆市</td>
             <td>江北区</td>
-            <td>中钞汇街8号成都远洋太古里东里2层2328</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
             <td>王杰</td>
             <td>186-2661-9786</td>
             <td>社会餐饮</td>
             <td>员工健康证</td>
             <td>2019-05-07</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
             <td><input type="checkbox"></td>
@@ -471,52 +573,17 @@
             <td>中、小学食堂</td>
             <td>食品经营许可证</td>
             <td>2019-05-06</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
-        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
-            <td><input type="checkbox"></td>
-            <td>味之绝美蛙鱼头火锅（科华店）</td>
-            <td>重庆市</td>
-            <td>北碚区</td>
-            <td>科华北路22号</td>
-            <td>刘雨馨</td>
-            <td>177-6331-4721</td>
-            <td>社会餐饮</td>
-            <td>食品经营许可证</td>
-            <td>2019-05-06</td>
-            <td>操作</td>
-            <td>查看详情</td>
-        </tr>
-        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="江北区">
-            <td><input type="checkbox"></td>
-            <td>绿茶餐厅</td>
-            <td>重庆市</td>
-            <td>江北区</td>
-            <td>中钞汇街8号成都远洋太古里东里2层2328</td>
-            <td>王杰</td>
-            <td>186-2661-9786</td>
-            <td>社会餐饮</td>
-            <td>员工健康证</td>
-            <td>2019-05-07</td>
-            <td>操作</td>
-            <td>查看详情</td>
-        </tr>
-        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
-            <td><input type="checkbox"></td>
-            <td>成都石室中学文庙校区</td>
-            <td>重庆市</td>
-            <td>北碚区</td>
-            <td>文庙前街93号</td>
-            <td>田间</td>
-            <td>138-4832-7969</td>
-            <td>中、小学食堂</td>
-            <td>食品经营许可证</td>
-            <td>2019-05-06</td>
-            <td>操作</td>
-            <td>查看详情</td>
-        </tr>
-        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="渝中区">
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
             <td><input type="checkbox"></td>
             <td>味之绝美蛙鱼头火锅（科华店）</td>
             <td>重庆市</td>
@@ -525,32 +592,482 @@
             <td>刘雨馨</td>
             <td>177-6331-4721</td>
             <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="沙坪坝区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>沙坪坝区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-07</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
             <td>食品经营许可证</td>
-            <td>2019-05-10</td>
-            <td>操作</td>
-            <td>查看详情</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="江北区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>江北区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-07</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>
 
-    <div id="pagination" class="pagination">
-        <span>共 400 条</span>
-        <div class="page-info">
-            <span>100条/页</span>
-            <select>
-                <option>100</option>
-            </select>
-        </div>
-        <span>&lt;</span>
-        <span class="active">1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>4</span>
-        <span>&gt;</span>
-        <span>前往</span>
-        <input type="text" value="4">
-        <span>页</span>
-    </div>
+    <!-- 即将到期数据表格 -->
+    <table v-if="activeTab === 'expiring'" class="data-table">
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="select-all-expiring"></th>
+            <th>商户名称</th>
+            <th>所在城市</th>
+            <th>所在区县</th>
+            <th>详细地址</th>
+            <th>食品安全管理员</th>
+            <th>联系方式</th>
+            <th>餐饮单位类型</th>
+            <th>证照类型</th>
+            <th>有效截止日期</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="table-body-expiring">
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-15</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="员工健康证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
+            <td>员工健康证</td>
+            <td>2019-05-15</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-14</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="九龙坡区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>九龙坡区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-13</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-13</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="九龙坡区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>九龙坡区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-10</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="江北区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>江北区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-07</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="沙坪坝区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>沙坪坝区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-07</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="绿茶餐厅" data-restaurant-type="社会餐饮" data-contact="186-2661-9786" data-certificate-type="员工健康证" data-city="重庆市" data-district="江北区">
+            <td><input type="checkbox"></td>
+            <td>绿茶餐厅</td>
+            <td>重庆市</td>
+            <td>江北区</td>
+            <td>中纱帽街8号成都远洋太古里东里2层2328</td>
+            <td>王杰</td>
+            <td>186-2661-9786</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-07</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('绿茶餐厅')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('绿茶餐厅')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="成都石室中学文庙校区" data-restaurant-type="中、小学食堂" data-contact="138-4832-7969" data-certificate-type="食品经营许可证" data-city="重庆市" data-district="北碚区">
+            <td><input type="checkbox"></td>
+            <td>成都石室中学文庙校区</td>
+            <td>重庆市</td>
+            <td>北碚区</td>
+            <td>文庙前街93号</td>
+            <td>田间</td>
+            <td>138-4832-7969</td>
+            <td>中、小学食堂</td>
+            <td>食品经营许可证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('成都石室中学文庙校区')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('成都石室中学文庙校区')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr data-business-name="味之绝美蛙鱼头火锅（科华店）" data-restaurant-type="社会餐饮" data-contact="177-6331-4721" data-certificate-type="员工健康证" data-city="重庆市" data-district="渝中区">
+            <td><input type="checkbox"></td>
+            <td>味之绝美蛙鱼头火锅（科华店）</td>
+            <td>重庆市</td>
+            <td>渝中区</td>
+            <td>科华北路22号</td>
+            <td>刘雨馨</td>
+            <td>177-6331-4721</td>
+            <td>社会餐饮</td>
+            <td>员工健康证</td>
+            <td>2019-05-06</td>
+            <td>
+                <div class="dropdown">
+                    <span class="operation-link" @click.stop="toggleDropdown($event)">操作</span>
+                    <div class="dropdown-content">
+                        <a href="#" @click.stop="remindMerchant('味之绝美蛙鱼头火锅（科华店）')">提醒商家</a>
+                        <a href="#" @click.stop="showDetails('味之绝美蛙鱼头火锅（科华店）')">查看详情</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
 <script>
@@ -558,134 +1075,148 @@
         const filterBtn = document.getElementById('filter-btn');
         const resetBtn = document.getElementById('reset-btn');
         const exportBtn = document.getElementById('export-btn');
-        const tableBody = document.getElementById('table-body');
-        const pagination = document.getElementById('pagination');
-        const selectAllCheckbox = document.getElementById('select-all');
-
+        const businessNameInput = document.getElementById('business-name');
+        const restaurantTypeSelect = document.getElementById('restaurant-type');
+        const contactInput = document.getElementById('contact');
+        const certificateTypeSelect = document.getElementById('certificate-type');
+        const citySelect = document.getElementById('city');
+        const districtSelect = document.getElementById('district');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        
         // 重置按钮功能
         resetBtn.addEventListener('click', function() {
-            document.getElementById('business-name').value = '';
-            document.getElementById('restaurant-type').value = '';
-            document.getElementById('contact').value = '';
-            document.getElementById('certificate-type').value = '';
-            document.getElementById('city').value = '';
-            document.getElementById('district').value = '';
-
-            // 重置后显示所有行
-            const rows = tableBody.querySelectorAll('tr');
-            rows.forEach(row => {
+            businessNameInput.value = '';
+            restaurantTypeSelect.value = '';
+            contactInput.value = '';
+            certificateTypeSelect.value = '';
+            citySelect.value = '';
+            districtSelect.value = '';
+            startDateInput.value = '';
+            endDateInput.value = '';
+            
+            // 重新显示所有表格行
+            const expiredRows = document.querySelectorAll('#table-body-expired tr');
+            expiredRows.forEach(row => {
+                row.style.display = '';
+            });
+            
+            const expiringRows = document.querySelectorAll('#table-body-expiring tr');
+            expiringRows.forEach(row => {
                 row.style.display = '';
             });
         });
 
         // 筛选按钮功能
         filterBtn.addEventListener('click', function() {
-            const businessName = document.getElementById('business-name').value.toLowerCase();
-            const restaurantType = document.getElementById('restaurant-type').value;
-            const contact = document.getElementById('contact').value;
-            const certificateType = document.getElementById('certificate-type').value;
-            const city = document.getElementById('city').value;
-            const district = document.getElementById('district').value;
+            const businessName = businessNameInput.value.toLowerCase();
+            const restaurantType = restaurantTypeSelect.value;
+            const contact = contactInput.value;
+            const certificateType = certificateTypeSelect.value;
+            const city = citySelect.value;
+            const district = districtSelect.value;
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
 
-            // 隐藏所有行
-            const rows = tableBody.querySelectorAll('tr');
-            rows.forEach(row => {
-                row.style.display = 'none';
-
-                // 获取行数据
+            // 筛选已到期表格
+            const expiredRows = document.querySelectorAll('#table-body-expired tr');
+            expiredRows.forEach(row => {
                 const rowBusinessName = row.getAttribute('data-business-name').toLowerCase();
                 const rowRestaurantType = row.getAttribute('data-restaurant-type');
                 const rowContact = row.getAttribute('data-contact');
                 const rowCertificateType = row.getAttribute('data-certificate-type');
                 const rowCity = row.getAttribute('data-city');
                 const rowDistrict = row.getAttribute('data-district');
+                const rowValidUntil = row.querySelector('td:nth-child(10)').textContent;
 
-                // 筛选逻辑
                 const matchBusinessName = businessName === '' || rowBusinessName.includes(businessName);
                 const matchRestaurantType = restaurantType === '' || rowRestaurantType === restaurantType;
                 const matchContact = contact === '' || rowContact.includes(contact);
                 const matchCertificateType = certificateType === '' || rowCertificateType === certificateType;
                 const matchCity = city === '' || rowCity === city;
                 const matchDistrict = district === '' || rowDistrict === district;
+                const matchStartDate = startDate === '' || new Date(rowValidUntil) >= new Date(startDate);
+                const matchEndDate = endDate === '' || new Date(rowValidUntil) <= new Date(endDate);
 
-                // 如果所有条件都匹配，则显示该行
-                if (matchBusinessName && matchRestaurantType && matchContact &&
-                    matchCertificateType && matchCity && matchDistrict) {
+                if (matchBusinessName && matchRestaurantType && matchContact && matchCertificateType && matchCity && matchDistrict && matchStartDate && matchEndDate) {
                     row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
             });
 
-            // 更新分页信息（简化版，实际应用中需要更复杂的处理）
-            pagination.innerHTML = `<span>共 ${rows.filter(row => row.style.display !== 'none').length} 条</span>`;
+            // 筛选即将到期表格
+            const expiringRows = document.querySelectorAll('#table-body-expiring tr');
+            expiringRows.forEach(row => {
+                const rowBusinessName = row.getAttribute('data-business-name').toLowerCase();
+                const rowRestaurantType = row.getAttribute('data-restaurant-type');
+                const rowContact = row.getAttribute('data-contact');
+                const rowCertificateType = row.getAttribute('data-certificate-type');
+                const rowCity = row.getAttribute('data-city');
+                const rowDistrict = row.getAttribute('data-district');
+                const rowValidUntil = row.querySelector('td:nth-child(10)').textContent;
+
+                const matchBusinessName = businessName === '' || rowBusinessName.includes(businessName);
+                const matchRestaurantType = restaurantType === '' || rowRestaurantType === restaurantType;
+                const matchContact = contact === '' || rowContact.includes(contact);
+                const matchCertificateType = certificateType === '' || rowCertificateType === certificateType;
+                const matchCity = city === '' || rowCity === city;
+                const matchDistrict = district === '' || rowDistrict === district;
+                const matchStartDate = startDate === '' || new Date(rowValidUntil) >= new Date(startDate);
+                const matchEndDate = endDate === '' || new Date(rowValidUntil) <= new Date(endDate);
+
+                if (matchBusinessName && matchRestaurantType && matchContact && matchCertificateType && matchCity && matchDistrict && matchStartDate && matchEndDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         });
 
         // 导出按钮功能
         exportBtn.addEventListener('click', function() {
-            // 获取所有被选中的行
-            const selectedRows = tableBody.querySelectorAll('tr input[type="checkbox"]:checked');
+            const selectedRows = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                if (row) {
+                    const rowData = {
+                        '商户名称': row.cells[1].textContent,
+                        '所在城市': row.cells[2].textContent,
+                        '所在区县': row.cells[3].textContent,
+                        '详细地址': row.cells[4].textContent,
+                        '食品安全管理员': row.cells[5].textContent,
+                        '联系方式': row.cells[6].textContent,
+                        '餐饮单位类型': row.cells[7].textContent,
+                        '证照类型': row.cells[8].textContent,
+                        '有效截止日期': row.cells[9].textContent
+                    };
+                    selectedRows.push(rowData);
+                }
+            });
+
             if (selectedRows.length === 0) {
                 alert('请至少选择一行数据进行导出');
                 return;
             }
 
-            // 创建一个二维数组来存储数据
-            const data = [];
-            const headers = ['商户名称', '所在城市', '所在区县', '详细地址', '食品安全管理员', '联系方式', '餐饮单位类型', '证照类型', '有效截止日期', '操作', '提醒商户'];
-            data.push(headers);
-
-            // 收集被选中行的数据
-            selectedRows.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-                const rowData = [];
-                const cells = row.querySelectorAll('td');
-                for (let i = 1; i < cells.length; i++) { // 从1开始，跳过选择框列
-                    rowData.push(cells[i].textContent);
-                }
-                data.push(rowData);
-            });
-
-            // 创建Excel内容
-            const ws = XLSX.utils.aoa_to_sheet(data);
+            // 将数据转换为Excel格式
+            const ws = XLSX.utils.json_to_sheet(selectedRows);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-            // 添加BOM来确保Excel正确识别UTF-8编码
-            const wbout = XLSX.write(wb, {bookType: 'xlsx', type: 'binary', bookSST: false, cellStyles: true});
-
-            // 创建导出链接
-            const exportLink = document.createElement('a');
-            const blob = new Blob([s2ab(wbout)], {type: 'application/octet-stream'});
-            exportLink.href = URL.createObjectURL(blob);
-            exportLink.download = '餐饮单位数据.xlsx';
-            document.body.appendChild(exportLink);
-            exportLink.click();
-            document.body.removeChild(exportLink);
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            
+            // 生成Excel文件并导出
+            XLSX.writeFile(wb, '餐饮单位数据.xlsx');
         });
-
-        // 全选功能
-        selectAllCheckbox.addEventListener('change', function() {
-            const checkboxes = tableBody.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
-            });
-        });
-
-        // 辅助函数：将字符串转换为ArrayBuffer
-        function s2ab(s) {
-            const buf = new ArrayBuffer(s.length);
-            const view = new Uint8Array(buf);
-            for (let i = 0; i < s.length; i++) {
-                view[i] = s.charCodeAt(i) & 0xFF;
-            }
-            return buf;
-        }
     });
 </script>
 <script>
     new Vue({
         el: "#app",
         data: {
-            activeIndex: '6'
+            activeIndex: '6',
+            activeTab: 'expired' // 默认显示已到期标签
         },
         methods: {
             handleSelect(key) {
@@ -700,8 +1231,10 @@
                     '5': '../compmanage/device_list.html',  // 投诉管理
                     '6': '../riskwarn/riskwarn.html',        // 风险预警
                     '7': '../samplingtask/3.html',  // 抽检任务
-                    '8': '../monitoringvideo/device_list.html',  // 监控视频
-                    '9': '../foodlic/add.html'
+                    '8': '../monitoringvideo/device_list.html',
+                    '9': '../foodlic/add.html',
+                    '10': '../weathermanage/1.html',
+                    '11': '../map/map.html'
                 };
 
                 targetPath = pathMap[key] || '';
@@ -712,20 +1245,40 @@
                     console.warn('未配置的路由路径', key);
                 }
 
+            },
+            // 新增方法：提醒商家
+            remindMerchant(merchantName) {
+                alert(`正在提醒${merchantName}...`);
+                // 这里可以实现跳转到指定网页的逻辑
+                window.location.href = `http://localhost:8080/compmanage/device_list.html`;
+                return false; // 阻止默认事件行为
+            },
+             // 新增方法：查看详情
+            showDetails(merchantName) {
+                alert(`正在查看${merchantName}的详细信息...`);
+                // 这里可以实现跳转到详情页面的逻辑
+                window.location.href = `http://localhost:8080/compmanage/device_list.html`;
+                return false; // 阻止默认事件行为
+            },
+             // 新增方法：切换下拉菜单显示状态
+            toggleDropdown(event) {
+                event.stopPropagation(); // 阻止事件冒泡
+                const dropdownContent = event.target.nextElementSibling;
+                const isOpen = dropdownContent.style.display === 'block';
+                
+                // 隐藏所有其他下拉菜单
+                document.querySelectorAll('.dropdown-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // 如果当前下拉菜单未打开，则打开它
+                if (!isOpen) {
+                    dropdownContent.style.display = 'block';
+                }
             }
         }
     })
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser) {
-            window.location.href = '../login.html';
-            return;
-        }
-    });
-
-</script>
 </html>

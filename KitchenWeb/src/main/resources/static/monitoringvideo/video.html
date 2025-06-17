@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>商户监控视频播放</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3498db',
+            secondary: '#2c3e50',
+            neutral: '#f5f7fa',
+          },
+          fontFamily: {
+            sans: ['Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .video-container {
+        aspect-ratio: 16/9;
+      }
+      .backdrop-blur {
+        backdrop-filter: blur(8px);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+<!-- 顶部导航栏 -->
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="javascript:void(0)" id="backBtn" class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200">
+      <i class="fa fa-arrow-left mr-2"></i>
+      <span>返回商户列表</span>
+    </a>
+    <h1 class="text-xl font-semibold text-gray-800">监控视频播放</h1>
+    <div class="w-16"></div> <!-- 右侧占位，保持平衡 -->
+  </div>
+</header>
+
+<!-- 主要内容区 -->
+<main class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- 视频标题 -->
+    <div class="p-4 bg-neutral border-b border-gray-200">
+      <h2 id="videoTitle" class="text-lg font-medium text-gray-800">加载中...</h2>
+    </div>
+
+    <!-- 视频播放器 -->
+    <div class="relative bg-black">
+      <video
+              id="videoPlayer"
+              class="w-full h-auto"
+              controls
+              poster="https://picsum.photos/1200/675?grayscale"
+              preload="metadata"
+      >
+        <div class="absolute inset-0 flex items-center justify-center text-white">
+          您的浏览器不支持HTML5视频播放
+        </div>
+      </video>
+
+      <!-- 加载状态覆盖层 -->
+      <div id="loadingOverlay" class="absolute inset-0 bg-black/50 flex items-center justify-center">
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p class="text-white text-lg">正在加载视频...</p>
+        </div>
+      </div>
+
+      <!-- 错误提示覆盖层 -->
+      <div id="errorOverlay" class="absolute inset-0 bg-black/70 flex items-center justify-center hidden">
+        <div class="text-center p-6 bg-black/80 backdrop-blur rounded-lg max-w-md">
+          <i class="fa fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+          <h3 class="text-white text-xl font-medium mb-2">视频加载失败</h3>
+          <p id="errorMessage" class="text-gray-300 mb-4">未能获取视频资源</p>
+          <button id="retryButton" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded transition-colors duration-200">
+            重试
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视频信息 -->
+    <div class="p-4 border-t border-gray-200">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div>
+          <span class="text-gray-500">商户名称:</span>
+          <span id="merchantName" class="ml-2 font-medium text-gray-800">加载中...</span>
+        </div>
+        <div>
+          <span class="text-gray-500">录制时间:</span>
+          <span id="videoTime" class="ml-2 font-medium text-gray-800">加载中...</span>
+        </div>
+        <div>
+          <span class="text-gray-500">文件大小:</span>
+          <span id="fileSize" class="ml-2 font-medium text-gray-800">加载中...</span>
+        </div>
+        <div>
+          <span class="text-gray-500">存储位置:</span>
+          <span id="videoPath" class="ml-2 font-medium text-gray-800">加载中...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 页脚 -->
+<footer class="mt-12 py-6 border-t border-gray-200">
+  <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+    <p>商户监控视频管理系统 &copy; 2025</p>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 获取URL参数
+    const params = new URLSearchParams(window.location.search);
+    const encodedVideoUrl = params.get('videoUrl');
+    const encodedMerchantName = params.get('merchantName');
+    const encodedStartTime = params.get('startTime');
+    const encodedFileSize = params.get('fileSize');
+
+    // 视频元素和覆盖层
+    const videoPlayer = document.getElementById('videoPlayer');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const errorOverlay = document.getElementById('errorOverlay');
+    const errorMessage = document.getElementById('errorMessage');
+    const retryButton = document.getElementById('retryButton');
+
+    // 信息元素
+    const videoTitle = document.getElementById('videoTitle');
+    const merchantNameEl = document.getElementById('merchantName');
+    const videoTimeEl = document.getElementById('videoTime');
+    const fileSizeEl = document.getElementById('fileSize');
+    const videoPathEl = document.getElementById('videoPath');
+
+    // 检查必要参数
+    if (!encodedVideoUrl) {
+      showError('缺少视频URL参数');
+      return;
+    }
+
+    // 解码后自动补全绝对路径（处理相对路径问题）
+    let videoUrl;
+    try {
+      videoUrl = decodeURIComponent(encodedVideoUrl);
+
+      // 补全绝对路径（如果是相对路径且无前缀）
+      if (!videoUrl.startsWith('http') && !videoUrl.startsWith('https')) {
+        videoUrl = `${window.location.origin}${videoUrl}`; // 自动拼接当前域名
+      }
+
+      videoPathEl.textContent = videoUrl;
+      const fileName = videoUrl.split('/').pop() || '监控视频';
+      videoTitle.textContent = fileName;
+    } catch (e) {
+      showError('视频URL解码失败');
+      console.error(e);
+      return;
+    }
+
+    // 设置其他信息（如果有）
+    if (encodedMerchantName) {
+      merchantNameEl.textContent = decodeURIComponent(encodedMerchantName);
+    }
+
+    if (encodedStartTime) {
+      videoTimeEl.textContent = decodeURIComponent(encodedStartTime);
+    }
+
+    if (encodedFileSize) {
+      fileSizeEl.textContent = decodeURIComponent(encodedFileSize) + ' MB';
+    }
+
+    // 加载视频
+    loadVideo(videoUrl);
+
+    // 重试按钮事件
+    retryButton.addEventListener('click', () => {
+      errorOverlay.classList.add('hidden');
+      loadingOverlay.classList.remove('hidden');
+      loadVideo(videoUrl);
+    });
+
+    // 返回按钮逻辑
+    document.getElementById('backBtn').addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        // 根据实际项目结构调整返回路径
+        window.location.href = '../device_list.html';
+      }
+    });
+
+    // 视频加载函数
+    function loadVideo(url) {
+      try {
+        // 设置视频源
+        videoPlayer.src = url;
+
+        // 清除之前的错误
+        videoPlayer.innerHTML = '';
+
+        // 监听加载事件
+        videoPlayer.addEventListener('loadedmetadata', () => {
+          loadingOverlay.classList.add('hidden');
+        });
+
+        // 监听错误事件
+        videoPlayer.addEventListener('error', () => {
+          const errorCode = videoPlayer.error.code;
+          let message = '视频加载失败';
+
+          switch (errorCode) {
+            case 1: message += ' (用户中止)'; break;
+            case 2: message += ' (网络错误)'; break;
+            case 3: message += ' (解码错误)'; break;
+            case 4: message += ' (视频格式不支持)'; break;
+          }
+
+          showError(message);
+        });
+
+        // 尝试播放视频
+        videoPlayer.play().catch(err => {
+          showError(`视频播放失败: ${err.message}`);
+          console.error(err);
+        });
+      } catch (e) {
+        showError('加载视频时发生错误');
+        console.error(e);
+      }
+    }
+
+    // 显示错误信息
+    function showError(message) {
+      loadingOverlay.classList.add('hidden');
+      errorOverlay.classList.remove('hidden');
+      errorMessage.textContent = message;
+    }
+  });
+</script>
+</body>
+</html>

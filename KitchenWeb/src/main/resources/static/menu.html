@@ -104,6 +104,14 @@
                 <i class="el-icon-document"></i>
                 <span slot="title">证照添加</span>
             </el-menu-item>
+            <el-menu-item index="10">
+                <i class="el-icon-sunny"></i>
+                <span slot="title">今日天气</span>
+            </el-menu-item>
+            <el-menu-item index="11">
+                <i class="el-icon-location"></i>
+                <span slot="title">地图展板</span>
+            </el-menu-item>
         </el-menu>
     </div>
 
@@ -154,7 +162,9 @@
                     '6': './riskwarn/riskwarn.html',        // 风险预警
                     '7': './samplingtask/3.html',  // 抽检任务
                     '8': './monitoringvideo/device_list.html',  // 监控视频
-                    '9': './foodlic/add.html'
+                    '9': './foodlic/add.html',
+                    '10': './weathermanage/1.html',
+                    '11': './map/map.html'
                 };
 
                 targetPath = pathMap[key] || '';

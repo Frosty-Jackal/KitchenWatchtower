@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#0FC6C2',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#1D2129',
+                        'sidebar-bg': '#1D2129',
+                        'sidebar-item-hover': '#2B2F36',
+                        'sidebar-item-active': '#165DFF',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 12px rgba(0, 0, 0, 0.08)',
+                        'hover': '0 8px 24px rgba(0, 0, 0, 0.12)',
+                        'sidebar': '2px 0 10px rgba(0, 0, 0, 0.1)',
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item {
+                @apply flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-sidebar-item-hover hover:text-white transition-all duration-300 cursor-pointer;
+            }
+            .sidebar-item.active {
+                @apply bg-sidebar-item-active text-white border-l-4 border-primary;
+            }
+            .filter-input {
+                @apply w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all;
+            }
+            .btn-primary {
+                @apply px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-all shadow-md hover:shadow-lg active:scale-95;
+            }
+            .btn-secondary {
+                @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-all shadow-md hover:shadow-lg active:scale-95;
+            }
+            .btn-success {
+                @apply px-4 py-2 bg-success text-white rounded-md hover:bg-success/90 transition-all shadow-md hover:shadow-lg active:scale-95;
+            }
+            .btn-danger {
+                @apply px-4 py-2 bg-danger text-white rounded-md hover:bg-danger/90 transition-all shadow-md hover:shadow-lg active:scale-95;
+            }
+            .location-marker {
+                @apply w-8 h-8 bg-red-500 rounded-full text-white flex items-center justify-center cursor-pointer shadow-lg hover:bg-red-600 hover:scale-110 transition-all;
+            }
+            .info-window {
+                @apply max-w-[280px] p-4 rounded-lg bg-white shadow-xl;
+            }
+            .map-control {
+                @apply absolute z-10 bg-white rounded-lg shadow-lg p-3 flex flex-col gap-2;
+            }
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            .slide-in {
+                animation: slideIn 0.3s ease-out;
+            }
+            @keyframes slideIn {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(0); }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen">
+<div id="app" class="flex h-screen overflow-hidden">
+
+    <!-- 主内容区 -->
+    <div class="flex-1 transition-all duration-300">
+        <!-- 顶部导航栏 -->
+        <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 sticky top-0 z-10">
+            <div class="flex items-center">
+                <div class="flex items-center gap-2">
+                    <button class="btn-primary flex items-center gap-1" onclick="window.location='../menu.html'">
+                        <i class="fa fa-arrow-left"></i>
+                        返回菜单
+                    </button>
+                    <i class="fa fa-map-marker text-primary text-2xl"></i>
+                    <h1 class="text-xl font-bold text-gray-800">地图管理系统</h1>
+                </div>
+            </div>
+
+            <!-- 删除了右上角的消息提示和邮件提示 -->
+            <div class="flex items-center gap-4">
+                <!-- 这里原本是消息和邮件提示按钮，现在已移除 -->
+            </div>
+        </header>
+
+        <!-- 筛选表单 -->
+        <div class="bg-white p-4 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700 mb-1">位置名称</label>
+                    <input v-model="filter.locationName" type="text" class="filter-input" placeholder="请输入位置名称">
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700 mb-1">联系人</label>
+                    <input v-model="filter.contactPerson" type="text" class="filter-input" placeholder="请输入联系人姓名">
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700 mb-1">联系方式</label>
+                    <input v-model="filter.contact" type="text" class="filter-input" placeholder="请输入联系方式">
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700 mb-1">所在城市</label>
+                    <select v-model="filter.city" class="filter-input appearance-none bg-white">
+                        <option value="">请选择城市</option>
+                        <option value="四川省">四川省</option>
+                        <option value="重庆市">重庆市</option>
+                        <option value="上海市">上海市</option>
+                    </select>
+                    <div class="relative -mt-7 right-3 flex justify-end">
+                        <i class="fa fa-chevron-down text-gray-500 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700 mb-1">所在区县</label>
+                    <select v-model="filter.district" class="filter-input appearance-none bg-white">
+                        <option value="">请选区县</option>
+                        <option value="彭水县">彭水县</option>
+                        <option value="渝中区">渝中区</option>
+                        <option value="北碚区">北碚区</option>
+                        <option value="青羊区">青羊区</option>
+                        <option value="龙泉驿区">龙泉驿区</option>
+                        <option value="锦江区">锦江区</option>
+                        <option value="奉贤区">奉贤区</option>
+                        <option value="武侯区">武侯区</option>
+                        <option value="浦东新区">浦东新区</option>
+                    </select>
+                    <div class="relative -mt-7 right-3 flex justify-end">
+                        <i class="fa fa-chevron-down text-gray-500 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="flex flex-col justify-end">
+                    <div class="flex gap-3">
+                        <button class="btn-primary flex-1" @click="handleFilter">
+                            <i class="fa fa-search mr-2"></i>筛选
+                        </button>
+                        <button class="btn-secondary flex-1" @click="resetFilter">
+                            <i class="fa fa-refresh mr-2"></i>重置
+                        </button>
+                        <button class="btn-success flex-1" @click="exportData">
+                            <i class="fa fa-download mr-2"></i>导出
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 地图容器 -->
+        <div class="p-4">
+            <div class="bg-white rounded-lg shadow-card h-[calc(100vh-240px)] overflow-hidden relative">
+                <!-- 地图加载状态指示器 -->
+                <div id="map-loading" class="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
+                    <div class="text-center">
+                        <i class="fa fa-spinner fa-spin text-primary text-4xl mb-3"></i>
+                        <p class="text-gray-700">正在加载地图...</p>
+                    </div>
+                </div>
+
+                <div id="map" class="w-full h-full"></div>
+
+                <!-- 地图控制面板 - 仅保留缩放控制 -->
+                <div class="map-control top-4 right-4">
+                    <button class="btn-primary mb-2" @click="zoomIn">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    <button class="btn-secondary" @click="zoomOut">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+
+                <!-- 统计信息卡片 -->
+                <div class="map-control bottom-4 left-4 bg-white/90 fade-in">
+                    <h3 class="font-semibold text-gray-800 mb-2">位置统计</h3>
+                    <div class="flex gap-3">
+                        <div class="text-center">
+                            <div class="text-primary text-2xl font-bold">{{ totalLocations }}</div>
+                            <div class="text-xs text-gray-600">总数</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-success text-2xl font-bold">{{ cityCount['重庆市'] || 0 }}</div>
+                            <div class="text-xs text-gray-600">重庆</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-warning text-2xl font-bold">{{ cityCount['四川省'] || 0 }}</div>
+                            <div class="text-xs text-gray-600">四川</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-danger text-2xl font-bold">{{ cityCount['上海市'] || 0 }}</div>
+                            <div class="text-xs text-gray-600">上海</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部版权信息 -->
+        <footer class="bg-white py-4 px-6 text-center text-gray-500 text-sm border-t border-gray-200">
+            <p>© 2025 SCU明厨亮灶管理系统 | 版权所有</p>
+        </footer>
+    </div>
+</div>
+
+<!-- 百度地图API -->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=mxV5CaRPKKCqbPDrq7QHN1nuHJddXSJb"></script>
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script>
+    // 百度地图初始化函数
+
+    function initMap() {
+        // 检查API是否已加载
+        if (!window.BMap) {
+            console.error('百度地图API未正确加载');
+            app.$message.error('地图API加载失败，请检查密钥');
+            return;
+        }
+
+        // 创建地图实例
+        const map = new BMap.Map("map");
+
+        // 设置中心点（默认成都）
+        const center = new BMap.Point(104.065735, 30.659462);
+        map.centerAndZoom(center, 11); // 初始化地图级别
+
+        // 启用地图滚轮缩放
+        map.enableScrollWheelZoom();
+
+        // 添加地图控件
+        map.addControl(new BMap.NavigationControl());
+        map.addControl(new BMap.ScaleControl());
+        map.addControl(new BMap.OverviewMapControl());
+
+        // 存储地图标记点的数组
+        const markers = [];
+
+        // 渲染地图标记点
+        function renderMarkers(locations) {
+            // 清除现有标记
+            markers.forEach(marker => map.removeOverlay(marker));
+            markers.length = 0;
+
+            // 添加新标记
+            locations.forEach(location => {
+                // 模拟经纬度（实际应用中需从地址解析或数据库获取）
+                const point = getRandomPoint(location.address, location.city);
+
+                if (!point) return; // 无效坐标
+
+                // 创建标记
+                const marker = new BMap.Marker(point);
+                markers.push(marker);
+
+                // 标记点击事件
+                marker.addEventListener("click", function() {
+                    showLocationInfo(location, point);
+                });
+
+                // 添加标记到地图
+                map.addOverlay(marker);
+
+                // 自定义标记样式 - 红色定位符号
+                const customIcon = document.createElement("div");
+                customIcon.className = "location-marker-red"; // 红色定位符号样式
+                customIcon.textContent = "位";
+                marker.setIcon(new BMap.Icon(customIcon, new BMap.Size(32, 32), {
+                    anchor: new BMap.Size(16, 16)
+                }));
+                // 添加标记到地图
+                map.addOverlay(marker);
+            });
+
+            // 如果有标记点，调整地图视野以显示所有标记
+            if (markers.length > 0) {
+                const points = markers.map(marker => marker.getPosition());
+                map.setViewport(points);
+            }
+        }
+
+        // 显示位置信息窗口
+        function showLocationInfo(location, point) {
+            // 清除现有信息窗口
+            if (window.infoWindow) {
+                map.removeOverlay(window.infoWindow);
+            }
+
+            // 创建信息窗口内容
+            const content = `
+                    <div class="info-window fade-in">
+                        <div class="info-title font-semibold text-lg mb-2">${location.locationName}</div>
+                        <div class="info-content mb-1"><i class="fa fa-map-marker mr-1 text-gray-500"></i> ${location.address}</div>
+                        <div class="info-content mb-1"><i class="fa fa-user mr-1 text-gray-500"></i> ${location.contactPerson}</div>
+                        <div class="info-content mb-1"><i class="fa fa-phone mr-1 text-gray-500"></i> ${location.contact}</div>
+                        <div class="info-content mb-1"><i class="fa fa-map-o mr-1 text-gray-500"></i> ${location.city} ${location.district}</div>
+                        <div class="mt-3 flex gap-2">
+                            <button class="px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary/90 transition-all" onclick="app.viewDetail(${JSON.stringify(location)})">
+                                <i class="fa fa-info-circle mr-1"></i>详情
+                            </button>
+                            <button class="px-3 py-1 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300 transition-all" onclick="app.navigateToLocation(${JSON.stringify(location)})">
+                                <i class="fa fa-map-marker mr-1"></i>导航
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+            // 创建信息窗口
+            const infoWindow = new BMap.InfoWindow(content, {
+                width: 280,
+                height: "auto"
+            });
+            window.infoWindow = infoWindow;
+
+            // 打开信息窗口
+            map.openInfoWindow(infoWindow, point);
+        }
+
+        // 根据地址生成随机经纬度（实际应用中需使用百度地图地址解析API）
+        function getRandomPoint(address, city) {
+            // 实际项目中应使用BMap.Geocoder进行地址解析
+            // 此处为模拟数据，仅作演示
+
+            let basePoint;
+            if (city.includes("成都") || city.includes("四川省")) {
+                basePoint = new BMap.Point(104.065735, 30.659462); // 成都中心点
+            } else if (city.includes("重庆")) {
+                basePoint = new BMap.Point(106.550423, 29.563491); // 重庆中心点
+            } else if (city.includes("上海")) {
+                basePoint = new BMap.Point(121.473701, 31.230416); // 上海中心点
+            } else {
+                basePoint = new BMap.Point(116.404, 39.915); // 北京中心点（默认）
+            }
+
+            // 生成随机偏移量（模拟不同地址的位置）
+            const offsetX = (Math.random() - 0.5) * 0.2;
+            const offsetY = (Math.random() - 0.5) * 0.2;
+
+            return new BMap.Point(
+                basePoint.lng + offsetX,
+                basePoint.lat + offsetY
+            );
+        }
+
+        // 隐藏加载指示器
+        document.getElementById('map-loading').style.display = 'none';
+
+        // 全局方法绑定
+        app.map = map;
+        app.renderMarkers = renderMarkers;
+        app.zoomIn = () => map.zoomIn();
+        app.zoomOut = () => map.zoomOut();
+
+        // 初始渲染
+        renderMarkers(app.tableData);
+
+        // 显示地图加载成功消息
+        app.$message({
+            message: '地图加载成功',
+            type: 'success',
+            duration: 2000
+        });
+    }
+
+    // 检查百度地图API是否已加载
+    function checkBMapLoaded() {
+        return new Promise((resolve, reject) => {
+            if (window.BMap) {
+                resolve();
+            } else {
+                console.error('百度地图API未正确加载');
+                reject(new Error('百度地图API加载失败'));
+            }
+        });
+    }
+
+    // 主应用
+    const app = new Vue({
+        el: "#app",
+        data() {
+            return {
+                activeIndex: '1', // 默认选中"地图展示"菜单
+                sidebarOpen: false,
+                dropdownOpen: false,
+                filter: {
+                    locationName: '',
+                    contactPerson: '',
+                    contact: '',
+                    city: '',
+                    district: ''
+                },
+                originalTableData: [
+                    { locationName: '彭水苗族土家族自治幼儿园', city: '重庆市', district: '彭水县', address: '彭水街道彭水社区一组', contactPerson: '李琼', contact: '138-9688-9166' },
+                    { locationName: '彭水县职业教育中心', city: '重庆市', district: '彭水县', address: '汉霞街道文庙社区中大道30号', contactPerson: '毛庭雷', contact: '181-8405-6699' },
+                    { locationName: '成都外国语学校', city: '四川省', district: '青羊区', address: '汉霞街道长滩社区', contactPerson: '徐飞', contact: '189-9696-2088' },
+                    { locationName: '成都城市职业技术学院', city: '四川省', district: '龙泉驿区', address: '高谷镇狮子社区2组(服务区北)', contactPerson: '沈洪良', contact: '188-5831-3031' },
+                    { locationName: '千峰教育集团公司', city: '四川省', district: '锦江区', address: '文庙前街93号', contactPerson: '田间', contact: '138-4832-7969' },
+                    { locationName: '上海市奉贤交通进修学校', city: '上海市', district: '奉贤区', address: '科华北路22号', contactPerson: '刘雨馨', contact: '177-6331-4721' },
+                    { locationName: '彭水苗族土家族自治幼儿园', city: '重庆市', district: '彭水县', address: '中纺街58号成都远洋太古里东里2层2328', contactPerson: '王杰', contact: '186-2661-9786' },
+                    { locationName: '彭水县职业教育中心', city: '重庆市', district: '彭水县', address: '文庙前街93号', contactPerson: '田间', contact: '138-4832-7969' },
+                    { locationName: '成都外国语学校', city: '四川省', district: '青羊区', address: '科华北路22号', contactPerson: '刘雨馨', contact: '177-6331-4721' },
+                    { locationName: '成都城市职业技术学院', city: '四川省', district: '龙泉驿区', address: '中纺街58号成都远洋太古里东里2层2328', contactPerson: '王杰', contact: '186-2661-9786' },
+                    { locationName: '彭水县第一中学', city: '重庆市', district: '彭水县', address: '汉葭街道沙沱社区', contactPerson: '张明', contact: '139-8375-6234' },
+                    { locationName: '彭水县民族中学', city: '重庆市', district: '彭水县', address: '汉葭街道坝竹社区', contactPerson: '李强', contact: '136-4837-9021' },
+                    { locationName: '彭水县实验小学', city: '重庆市', district: '彭水县', address: '汉葭街道石嘴社区', contactPerson: '王丽', contact: '135-2736-8910' },
+                    { locationName: '彭水县幼儿园', city: '重庆市', district: '彭水县', address: '汉葭街道渔塘社区', contactPerson: '赵芳', contact: '134-5276-9812' },
+                    { locationName: '彭水县特殊教育学校', city: '重庆市', district: '彭水县', address: '汉葭街道下塘社区', contactPerson: '陈军', contact: '137-6543-2109' },
+                    { locationName: '成都七中', city: '四川省', district: '武侯区', address: '武侯区林荫中街1号', contactPerson: '易国栋', contact: '138-7654-3210' },
+                    { locationName: '成都石室中学', city: '四川省', district: '青羊区', address: '青羊区文庙前街93号', contactPerson: '田间', contact: '138-4832-7969' },
+                    { locationName: '成都树德中学', city: '四川省', district: '青羊区', address: '青羊区宁夏街树德里4号', contactPerson: '胡霞', contact: '139-8765-4321' },
+                    { locationName: '上海中学', city: '上海市', district: '徐汇区', address: '徐汇区上中路400号', contactPerson: '冯志刚', contact: '137-6543-2109' },
+                    { locationName: '华东师范大学第二附属中学', city: '上海市', district: '浦东新区', address: '浦东新区张江高科技园区晨晖路555号', contactPerson: '李志聪', contact: '136-5432-1098' }
+                ],
+                tableData: [],
+                map: null,
+                renderMarkers: null,
+                zoomIn: null,
+                zoomOut: null,
+            }
+        },
+        computed: {
+            totalLocations() {
+                return this.tableData.length;
+            },
+            cityCount() {
+                return this.tableData.reduce((acc, location) => {
+                    acc[location.city] = (acc[location.city] || 0) + 1;
+                    return acc;
+                }, {});
+            }
+        },
+        created() {
+            // 初始化数据
+            this.tableData = [...this.originalTableData];
+        },
+        mounted() {
+            // 显示加载提示
+            this.$message({
+                message: '正在加载地图...',
+                type: 'info',
+                duration: 0,
+                showClose: true
+            });
+
+            // 检查并初始化地图
+            checkBMapLoaded()
+                .then(() => {
+                    initMap();
+                })
+                .catch(error => {
+                    console.error('地图加载失败:', error);
+                    this.$message.error('地图加载失败，请检查网络连接');
+                    // 隐藏加载指示器
+                    document.getElementById('map-loading').style.display = 'none';
+                });
+        },
+        methods: {
+            handleSelect(key) {
+                console.log('选中菜单:', key);
+                // 这里可以添加导航逻辑
+            },
+            handleFilter() {
+                console.log('筛选条件:', this.filter);
+
+                // 显示加载状态
+                const loadingInstance = this.$loading({
+                    lock: true,
+                    text: '正在筛选数据...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+
+                // 模拟API请求延迟
+                setTimeout(() => {
+                    // 筛选数据
+                    const filteredData = this.originalTableData.filter(item => {
+                        return (
+                            (!this.filter.locationName || item.locationName.includes(this.filter.locationName)) &&
+                            (!this.filter.contactPerson || item.contactPerson.includes(this.filter.contactPerson)) &&
+                            (!this.filter.contact || item.contact.includes(this.filter.contact)) &&
+                            (!this.filter.city || item.city.includes(this.filter.city)) &&
+                            (!this.filter.district || item.district.includes(this.filter.district))
+                        );
+                    });
+
+                    // 更新表格数据
+                    this.tableData = filteredData;
+
+                    // 重新渲染地图标记
+                    if (this.renderMarkers) {
+                        this.renderMarkers(this.tableData);
+                    }
+
+                    // 关闭加载状态
+                    loadingInstance.close();
+
+                    // 显示成功提示
+                    this.$message({
+                        message: `筛选完成，共找到 ${filteredData.length} 个位置`,
+                        type: 'success'
+                    });
+                }, 800);
+            },
+            resetFilter() {
+                // 重置筛选条件
+                this.filter = {
+                    locationName: '',
+                    contactPerson: '',
+                    contact: '',
+                    city: '',
+                    district: ''
+                };
+
+                // 重置表格数据
+                this.tableData = [...this.originalTableData];
+
+                // 重新渲染地图标记
+                if (this.renderMarkers) {
+                    this.renderMarkers(this.tableData);
+                }
+
+                // 显示提示
+                this.$message({
+                    message: '已重置筛选条件',
+                    type: 'info'
+                });
+            },
+            exportData() {
+                console.log('导出数据');
+
+                // 显示加载状态
+                const loading = this.$loading({
+                    lock: true,
+                    text: '正在准备数据...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.1)'
+                });
+
+                // 模拟导出过程
+                setTimeout(() => {
+                    loading.close();
+
+                    // 创建一个临时的a标签用于下载
+                    const link = document.createElement('a');
+                    link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(this.convertToCSV(this.tableData));
+                    link.download = '位置数据_' + new Date().toISOString().slice(0,10) + '.csv';
+                    link.click();
+
+                    // 显示成功提示
+                    this.$message({
+                        message: '导出成功',
+                        type: 'success'
+                    });
+                }, 1500);
+            },
+            convertToCSV(arr) {
+                // 将数据转换为CSV格式
+                const header = Object.keys(arr[0]);
+                const csv = [
+                    header.join(','),
+                    ...arr.map(row => header.map(fieldName => {
+                        // 处理可能包含逗号或引号的值
+                        const value = row[fieldName] || '';
+                        return typeof value === 'string' && (value.includes(',') || value.includes('"'))
+                            ? `"${value.replace(/"/g, '""')}"`
+                            : value;
+                    }).join(','))
+                ];
+                return csv.join('\n');
+            },
+            viewDetail(location) {
+                console.log('查看详情:', location);
+
+                // 显示详情对话框
+                this.$alert(`
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold mb-3 text-center">${location.locationName}</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                <div><span class="text-gray-500">所在地区:</span> ${location.city} ${location.district}</div>
+                                <div><span class="text-gray-500">详细地址:</span> ${location.address}</div>
+                                <div><span class="text-gray-500">联系人:</span> ${location.contactPerson}</div>
+                                <div><span class="text-gray-500">联系方式:</span> ${location.contact}</div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition-all" onclick="app.editLocation(${JSON.stringify(location)})">
+                                    <i class="fa fa-edit mr-1"></i>编辑位置
+                                </button>
+                            </div>
+                        </div>
+                    `, '位置信息', {
+                    dangerouslyUseHTMLString: true,
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        console.log('查看详情对话框已关闭');
+                    }
+                });
+            },
+            editLocation(location) {
+                console.log('编辑位置:', location);
+
+                // 显示编辑对话框
+                this.$prompt('请输入新的位置名称', '编辑位置', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputValue: location.locationName
+                }).then(({ value }) => {
+                    // 更新位置名称
+                    const index = this.originalTableData.findIndex(item => item.locationName === location.locationName);
+                    if (index !== -1) {
+                        this.originalTableData[index].locationName = value;
+
+                        // 如果当前筛选结果包含该位置，也更新
+                        const filterIndex = this.tableData.findIndex(item => item.locationName === location.locationName);
+                        if (filterIndex !== -1) {
+                            this.tableData[filterIndex].locationName = value;
+                        }
+
+                        // 重新渲染地图标记
+                        if (this.renderMarkers) {
+                            this.renderMarkers(this.tableData);
+                        }
+
+                        this.$message({
+                            type: 'success',
+                            message: '位置名称已更新'
+                        });
+                    }
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消编辑'
+                    });
+                });
+            },
+            navigateToLocation(location) {
+                console.log('导航到位置:', location);
+
+                // 显示导航确认
+                this.$confirm(`确定要导航到 ${location.locationName} 吗？`, '导航确认', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    // 模拟导航过程
+                    this.$message({
+                        type: 'success',
+                        message: `正在获取前往 ${location.locationName} 的路线...`
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消导航'
+                    });
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

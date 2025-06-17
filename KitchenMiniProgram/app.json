@@ -18,8 +18,8 @@
     "pages/warehousemanage/modify",
     "pages/warehousemanage/index",
     "pages/licmanage/lic_modify",
-    "pages/menu/webview"
-    
+    "pages/menu/webview",
+    "pages/todolist/todolist"
   ],
   "tabBar": {
     "list": [

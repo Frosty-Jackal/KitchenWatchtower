@@ -5,6 +5,14 @@
     <view class="title">明厨亮灶管理系统</view>
   </view>
    <!-- 标题栏结束 -->
+   <view class="logo-container">
+    <image 
+      class="logo-image" 
+      src="logo.png" 
+      mode="aspectFit"
+    />
+  </view>
+ 
   <view class="card-grid">
     <view class="card-item" wx:for="{{cardItems}}" wx:key="index" bindtap="navigateTo" data-path="{{item.pagePath}}">
       <image class="card-image" src="{{item.imagePath}}" mode="aspectFit" />

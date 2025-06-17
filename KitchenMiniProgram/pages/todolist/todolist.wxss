@@ -1,0 +1,306 @@
+/* 基础样式 */
+page {
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200rpx;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 0 20rpx rgba(0, 0, 0, 0.1);
+  padding: 30rpx;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-size: 36rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.button-group {
+  display: flex;
+  gap: 20rpx;
+}
+
+button {
+  padding: 12rpx 24rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: white;
+  border: none;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+}
+
+.edit-btn {
+  background-color: #2196F3;
+}
+
+.delete-btn {
+  background-color: #f44336;
+}
+/* 优化后的表格样式 */
+.todo-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 新增：固定表格布局 */
+  margin-top: 20rpx;
+}
+
+.todo-table th,
+.todo-table td {
+  padding: 20rpx;
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word; /* 新增：长文本换行 */
+  min-width: 0; /* 新增：解决flex容器溢出问题 */
+}
+
+.todo-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* 新增：固定列宽（按需调整） */
+  width: 20%; 
+}
+
+.todo-table td {
+  text-align: left;
+  /* 新增：固定列宽（按需调整） */
+  width: 20%;
+}
+
+/* 响应式列宽（可选） */
+@media screen and (max-width: 750px) {
+  .todo-table th,
+  .todo-table td {
+    width: auto; /* 移动端自动宽度 */
+  }
+}
+
+/* 优化后的空行样式 */
+.spacer-row td {
+  height: 20rpx;
+  background: transparent;
+  padding: 0 !important; /* 清除默认padding */
+  border-bottom: none; /* 清除默认边框 */
+}
+/* 优化后的表格样式 */
+.todo-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 新增：固定表格布局 */
+  margin-top: 20rpx;
+}
+
+.todo-table th,
+.todo-table td {
+  padding: 20rpx;
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word; /* 新增：长文本换行 */
+  min-width: 0; /* 新增：解决flex容器溢出问题 */
+}
+
+.todo-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* 新增：固定列宽（按需调整） */
+  width: 20%; 
+}
+
+.todo-table td {
+  text-align: left;
+  /* 新增：固定列宽（按需调整） */
+  width: 20%;
+}
+
+/* 响应式列宽（可选） */
+@media screen and (max-width: 750px) {
+  .todo-table th,
+  .todo-table td {
+    width: auto; /* 移动端自动宽度 */
+  }
+}
+
+/* 优化后的空行样式 */
+.spacer-row td {
+  height: 20rpx;
+  background: transparent;
+  padding: 0 !important; /* 清除默认padding */
+  border-bottom: none; /* 清除默认边框 */
+}
+/* 表格样式 */
+.todo-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20rpx;
+}
+
+.todo-table th,
+.todo-table td {
+  padding: 20rpx;
+  border-bottom: 1px solid #ddd;
+}
+
+.todo-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 20rpx;
+}
+
+.todo-table td {
+  text-align: left;
+  padding: 40rpx;
+}
+
+.todo-table tr {
+  cursor: pointer;
+}
+
+.todo-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.todo-table tr.selected {
+  background-color: #e3f2fd;
+}
+
+/* 空表格提示 */
+.empty-table {
+  text-align: center;
+  padding: 60rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 600rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.close {
+  font-size: 40rpx;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-group {
+  padding: 20rpx 30rpx;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+input,
+picker {
+  width: 100%;
+  padding: 10rpx;
+  border: 1px solid #ddd;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20rpx 30rpx;
+  gap: 20rpx;
+  border-top: 1px solid #eee;
+}
+
+.submit-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12rpx 24rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+  color: white;
+  border: none;
+  padding: 12rpx 24rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  cursor: pointer;
+}
+
+.picker {
+  width: 100%;
+  padding: 10rpx;
+  border: 1px solid #ddd;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+/* 空行样式 */
+.spacer-row td {
+  height: 20rpx; /* 空行高度 */
+  background: transparent; /* 透明背景 */
+}

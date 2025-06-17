@@ -64,3 +64,17 @@
   /* 添加文字对齐方式 */
   text-align: center;
 }
+.logo-container {
+  width: 100%;
+  padding: 40rpx 0;
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff; /* 可选：设置背景色与标题栏统一 */
+}
+ 
+.logo-image {
+  width: 400rpx;
+  height: 400rpx;
+  border-radius: 20rpx; /* 可选：圆角效果 */
+  box-shadow: 0 10rpx 20rpx rgba(0,0,0,0.1); /* 可选：添加阴影 */
+}

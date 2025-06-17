@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <title>投诉管理系统</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <style>
         /* 左侧导航栏样式 */
         .sidebar-container {
@@ -57,6 +56,36 @@
             margin-left: 200px;
             padding: 20px;
             transition: margin 0.3s;
+        }
+
+        /* 新增样式：投诉状态标签 */
+        .status-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-unprocessed {
+            background-color: #ffe0e0;
+            color: #f56c6c;
+        }
+
+        .status-processed {
+            background-color: #e6ffed;
+            color: #52c41a;
+        }
+
+        /* 新增样式：处理结果标签 */
+        .process-result {
+            margin-top: 5px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: #f5f7fa;
+            border: 1px solid #ebeef5;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #606266;
         }
     </style>
 </head>
@@ -113,6 +142,14 @@
                 <i class="el-icon-document"></i>
                 <span slot="title">证照添加</span>
             </el-menu-item>
+            <el-menu-item index="10">
+                <i class="el-icon-sunny"></i>
+                <span slot="title">今日天气</span>
+            </el-menu-item>
+            <el-menu-item index="11">
+                <i class="el-icon-location"></i>
+                <span slot="title">地图展板</span>
+            </el-menu-item>
         </el-menu>
     </div>
     <!-- 筛选表单 -->
@@ -136,11 +173,20 @@
             <el-select v-model="filters.district" placeholder="选择区县">
                 <el-option label="彭水县" value="彭水县"></el-option>
                 <el-option label="江北区" value="江北区"></el-option>
+                <el-option label="武侯区" value="武侯区"></el-option>
+                <el-option label="锦江区" value="锦江区"></el-option>
+                <el-option label="成华区" value="成华区"></el-option>
+                <el-option label="青羊区" value="青羊区"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="投诉单位">
             <el-select v-model="filters.unit">
                 <el-option label="彭水县食品药品监督管理所" value="彭水县食品药品监督管理所"></el-option>
+                <el-option label="江北区食品药品监督管理所" value="江北区食品药品监督管理所"></el-option>
+                <el-option label="武侯区食品药品监督管理所" value="武侯区食品药品监督管理所"></el-option>
+                <el-option label="锦江区食品药品监督管理所" value="锦江区食品药品监督管理所"></el-option>
+                <el-option label="成华区食品药品监督管理所" value="成华区食品药品监督管理所"></el-option>
+                <el-option label="青羊区食品药品监督管理所" value="青羊区食品药品监督管理所"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="起止时间">
@@ -160,40 +206,31 @@
         </el-form-item>
     </el-form>
 
-    <!-- 标签页 -->
-    <el-tabs v-model="activeTab">
-        <el-tab-pane label="未处理" name="unprocessed"></el-tab-pane>
-        <el-tab-pane label="已处理" name="processed"></el-tab-pane>
-    </el-tabs>
-
     <!-- 表格 -->
     <el-table :data="tableData" border style="width: 100%" height="600px">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="content" label="投诉内容" width="300"></el-table-column>
+        <el-table-column prop="content" label="投诉内容" width="400"></el-table-column>
         <el-table-column prop="merchant" label="投诉商户"></el-table-column>
         <el-table-column prop="address" label="商户地址" width="200"></el-table-column>
         <el-table-column prop="unit" label="负责单位" width="200"></el-table-column>
         <el-table-column prop="contact" label="联系方式"></el-table-column>
         <el-table-column prop="complainer" label="投诉人"></el-table-column>
         <el-table-column prop="date" label="投诉时间"></el-table-column>
-        <el-table-column label="操作" width="100">
+        <el-table-column label="处理结果" width="250">
             <template slot-scope="scope">
-                <el-link type="primary" @click="handleAction(scope.row)">操作</el-link>
+                <div v-if="scope.row.processResult" class="process-result">
+                    {{ scope.row.processResult }}
+                </div>
+                <div v-else class="process-result" style="color: #909399; text-align: center;">
+                    待处理
+                </div>
             </template>
         </el-table-column>
     </el-table>
 
-    <!-- 分页 -->
-    <el-pagination
-            background
-            layout="prev, pager, next"
-            :current-page="currentPage"
-            :page-size="pageSize"
-            :total="total"
-            @current-change="handlePageChange"
-            class="pagination"
-    >
-    </el-pagination>
+    <!-- 分页 - 已删除 -->
+
+    <!-- 查看详情对话框 - 已删除 -->
 </div>
 
 <script>
@@ -211,11 +248,9 @@
                     unit: '',
                     dateRange: []
                 },
-                activeTab: 'unprocessed',
                 tableData: [],
-                currentPage: 1,
-                pageSize: 15,
-                total: 0
+                total: 0,
+                complaintData: [] // 存储所有投诉数据的副本
             };
         },
         created() {
@@ -225,81 +260,297 @@
             fetchData() {
                 // 生成100条模拟数据
                 const allData = Array.from({ length: 100 }, (_, i) => {
-                    const shopType = i % 3;  // 0-烧烤 1-火锅 2-快餐
-                    const district = ['武侯区', '锦江区', '成华区'][i % 3];
+                    const shopType = i % 5;  // 增加更多店铺类型
+                    const district = ['武侯区', '锦江区', '成华区', '彭水县', '江北区', '青羊区'][i % 6];
                     const baseNumber = 17358620000; // 基础号码
-                    const street = ['天府三街', '春熙路', '建设路'][i % 3];
+                    const street = ['天府三街', '春熙路', '建设路', '东大街', '人民中路', '科华北路'][i % 6];
+                    const city = district === '彭水县' || district === '江北区' ? '重庆市' : '成都市';
 
                     return {
+                        id: i + 1,
                         content: this.generateComplaintContent(shopType), // 动态生成投诉内容
                         merchant: this.generateMerchantName(shopType, i), // 生成商户名
-                        address: `四川省成都市${district}${street}${100 + i}号`,
+                        address: `${city}${district}${street}${100 + i}号`,
                         unit: `${district}食品药品监督管理所`,
                         contact: baseNumber + i, // 生成17358620001到17358620100
-                        complainer: ['李大白', '张大强', '王小明'][i % 3],
+                        complainer: ['李大白', '张大强', '王小明', '赵晓丽', '周建国', '孙芳', '刘小红', '陈大勇', '黄小丽', '吴小刚'][i % 10],
                         date: this.generateDate(i),
-                        status: i % 2 === 0 ? 'unprocessed' : 'processed'
+                        processResult: i % 2 === 1 ? this.generateProcessResult(i) : ''
                     };
                 });
                 // 补充特色数据
                 allData.push(
                     {
-                        content: '商家使用过期食材，后厨发现老鼠活动痕迹',
+                        id: 101,
+                        content: '商家使用过期食材，后厨发现老鼠活动痕迹。顾客就餐后出现腹痛、腹泻等症状，疑似食物中毒。现场发现部分蔬菜已发霉，肉类食品无检验检疫证明。',
                         merchant: '老码头火锅（太古里店）',
                         address: '四川省成都市锦江区东大街下东大街段88号',
                         unit: '锦江区食品药品监督管理所',
-                        contact: 17358628888, // 特殊号码1
+                        contact: 17358628888,
                         complainer: '赵晓丽',
                         date: '2024-06-01 18:45:21',
-                        status: 'unprocessed'
+                        processResult: '已对该店进行突击检查，发现部分食材确实存在过期问题，已依法封存并销毁。对商家处以5000元罚款，责令停业整顿3天。要求商家加强食材采购管理，建立严格的进货查验记录制度。'
                     },
                     {
-                        content: '就餐后多人出现腹泻症状，怀疑食物中毒',
+                        id: 102,
+                        content: '就餐后多人出现腹泻症状，怀疑食物中毒。该餐厅为学校食堂承包单位，共有15名学生出现不适症状，已送往医院治疗。初步调查显示，问题可能出在当天供应的凉拌菜上。',
                         merchant: '肯德基（天府广场店）',
                         address: '四川省成都市青羊区人民中路一段16号',
                         unit: '青羊区食品药品监督管理所',
-                        contact: 17358629999, // 特殊号码2
+                        contact: 17358629999,
                         complainer: '周建国',
                         date: '2024-06-02 09:12:34',
-                        status: 'processed'
+                        processResult: '已对该店进行突击检查，封存可疑食品并送检。目前检测结果显示部分食材存在细菌超标问题，已依法进行处罚，责令停业整顿3天。对涉事食材供应商展开调查，并要求学校加强食堂食品安全管理。'
+                    },
+                    {
+                        id: 103,
+                        content: '发现食材中有异物，疑似塑料碎片。顾客在菜品中发现一块约2厘米长的塑料碎片，幸未造成人身伤害。顾客要求餐厅给予合理赔偿并道歉。',
+                        merchant: '星巴克（环球中心店）',
+                        address: '四川省成都市武侯区天府大道北段1700号',
+                        unit: '武侯区食品药品监督管理所',
+                        contact: 17358627777,
+                        complainer: '孙芳',
+                        date: '2024-06-03 14:25:16',
+                        processResult: '已对该店进行检查，未发现生产加工过程中存在明显问题。推测异物可能来自原材料。已要求商家加强原材料验收环节，对涉事批次原料进行封存和追溯。商家已向顾客道歉并给予相应赔偿。'
+                    },
+                    {
+                        id: 104,
+                        content: '店内卫生条件极差，地面油腻易滑倒。厨房垃圾桶未及时清理，异味严重，餐具清洗不彻底，有明显油渍残留。多名顾客反映就餐环境差，影响食欲。',
+                        merchant: '海底捞（建设路店）',
+                        address: '四川省成都市成华区建设路53号',
+                        unit: '成华区食品药品监督管理所',
+                        contact: 17358626666,
+                        complainer: '刘小红',
+                        date: '2024-06-04 11:05:42',
+                        processResult: '已责令商家立即整改，加强卫生管理，并对员工进行卫生培训。复查显示卫生状况已明显改善。对商家下达整改通知书，要求建立健全卫生管理制度，定期进行清洁消毒。'
+                    },
+                    {
+                        id: 105,
+                        content: '食品中吃出头发，要求退款并道歉。顾客在米饭中发现一根长约5厘米的头发，感到非常恶心。餐厅工作人员态度冷漠，未给予满意解决。',
+                        merchant: '乡村基（华阳店）',
+                        address: '四川省成都市双流区华阳大道二段15号',
+                        unit: '武侯区食品药品监督管理所',
+                        contact: 17358625555,
+                        complainer: '陈大勇',
+                        date: '2024-06-05 19:30:15',
+                        processResult: '已要求商家加强员工卫生管理，严格执行戴帽、戴口罩等操作规范。商家已向顾客道歉并给予退款和补偿。对该店进行了卫生检查，未发现其他重大问题，但要求商家进一步加强细节管理。'
+                    },
+                    {
+                        id: 106,
+                        content: '餐厅使用地沟油，顾客怀疑食品安全问题。顾客反映菜品有异味，怀疑使用了劣质油。经初步调查，该餐厅存在从非正规渠道采购食用油的情况。',
+                        merchant: '大龙燚火锅（春熙路店）',
+                        address: '四川省成都市锦江区春熙路东段8号',
+                        unit: '锦江区食品药品监督管理所',
+                        contact: 17358624444,
+                        complainer: '黄小丽',
+                        date: '2024-06-06 12:15:30',
+                        processResult: '已对该店食用油进行抽样检测，结果显示符合食品安全标准。但商家无法提供食用油的正规进货凭证，已对其进行警告和处罚。要求商家严格遵守食品原料采购索证索票制度，确保食品安全。'
+                    },
+                    {
+                        id: 107,
+                        content: '服务员态度恶劣，与顾客发生争执。顾客反映服务员言语不文明，对顾客的合理要求置之不理，甚至发生推搡行为。其他顾客表示受到惊吓，影响就餐体验。',
+                        merchant: '大蓉和（高新区店）',
+                        address: '四川省成都市武侯区高新区天府大道中段1号',
+                        unit: '武侯区食品药品监督管理所',
+                        contact: 17358623333,
+                        complainer: '吴小刚',
+                        date: '2024-06-07 18:20:45',
+                        processResult: '已对该店进行调查，确认服务员存在态度问题。已要求商家对涉事服务员进行批评教育和培训，提高服务意识。商家已向顾客道歉并给予一定补偿。同时，建议商家加强员工管理，提升服务质量。'
+                    },
+                    {
+                        id: 108,
+                        content: '餐厅环境嘈杂，影响就餐体验。餐厅内没有采取有效的隔音措施，音乐音量过大，顾客之间交流困难。此外，餐厅内人员密集，空气不流通，导致顾客感到不适。',
+                        merchant: '豪客来牛排（双流店）',
+                        address: '四川省成都市双流区东升街道棠湖西路一段8号',
+                        unit: '双流区食品药品监督管理所',
+                        contact: 17358622222,
+                        complainer: '李大白',
+                        date: '2024-06-08 13:30:15',
+                        processResult: '已建议商家调整音乐音量，合理安排顾客座位，保持空气流通。商家表示将立即整改，安装隔音材料，优化通风系统。复查显示环境问题已得到改善。'
+                    },
+                    {
+                        id: 109,
+                        content: '菜品中发现虫子，顾客要求赔偿。顾客在蔬菜沙拉中发现一只活虫，感到非常恶心。餐厅仅同意重新制作一份菜品，未满足顾客的赔偿要求。',
+                        merchant: '外婆家（锦里店）',
+                        address: '四川省成都市武侯区武侯祠大街231号',
+                        unit: '武侯区食品药品监督管理所',
+                        contact: 17358621111,
+                        complainer: '张大强',
+                        date: '2024-06-09 19:45:30',
+                        processResult: '已对该店进行检查，发现蔬菜清洗不彻底。已要求商家加强食材清洗和筛选环节，确保食品安全。商家已向顾客道歉并给予三倍赔偿。对该店进行了食品安全知识培训，要求其严格遵守操作规范。'
+                    },
+                    {
+                        id: 110,
+                        content: '餐厅乱收费，账单存在明显错误。顾客发现账单上多收了一道未点的菜品费用，与服务员理论时，服务员态度蛮横，拒绝处理。顾客要求退还多收费用并道歉。',
+                        merchant: '麦当劳（春熙路店）',
+                        address: '四川省成都市锦江区春熙路西段12号',
+                        unit: '锦江区食品药品监督管理所',
+                        contact: 17358620000,
+                        complainer: '王小明',
+                        date: '2024-06-10 14:10:45',
+                        processResult: '已对该店进行调查，确认存在乱收费问题。已要求商家退还多收费用，并对涉事收银员进行批评教育。商家已向顾客道歉并给予一定补偿。同时，建议商家加强财务管理，规范收费行为。'
                     }
                 );
 
-                // 过滤逻辑
-                let filteredData = allData.filter(item => {
-                    const statusMatch = this.activeTab === item.status;
-                    let dateMatch = true;
-                    if (this.filters.dateRange.length === 2) {
-                        const [start, end] = this.filters.dateRange;
+                // 保存数据副本
+                this.complaintData = allData;
+
+                // 执行筛选
+                this.applyFilters();
+            },
+
+            // 应用筛选条件
+            applyFilters() {
+                let filteredData = this.complaintData;
+
+                // 日期筛选
+                if (this.filters.dateRange.length === 2) {
+                    const [start, end] = this.filters.dateRange;
+                    filteredData = filteredData.filter(item => {
                         const itemDate = new Date(item.date);
-                        dateMatch = itemDate >= start && itemDate <= end;
-                    }
-                    return statusMatch && dateMatch;
-                });
+                        return itemDate >= start && itemDate <= end;
+                    });
+                }
+
+                // 商户名称筛选
+                if (this.filters.merchant) {
+                    filteredData = filteredData.filter(item =>
+                        item.merchant.includes(this.filters.merchant)
+                    );
+                }
+
+                // 联系方式筛选
+                if (this.filters.contact) {
+                    filteredData = filteredData.filter(item =>
+                        item.contact.toString().includes(this.filters.contact)
+                    );
+                }
+
+                // 投诉人筛选
+                if (this.filters.complainer) {
+                    filteredData = filteredData.filter(item =>
+                        item.complainer.includes(this.filters.complainer)
+                    );
+                }
+
+                // 城市筛选
+                if (this.filters.city) {
+                    filteredData = filteredData.filter(item =>
+                        item.address.includes(this.filters.city)
+                    );
+                }
+
+                // 区县筛选
+                if (this.filters.district) {
+                    filteredData = filteredData.filter(item =>
+                        item.address.includes(this.filters.district)
+                    );
+                }
+
+                // 投诉单位筛选
+                if (this.filters.unit) {
+                    filteredData = filteredData.filter(item =>
+                        item.unit.includes(this.filters.unit)
+                    );
+                }
 
                 this.total = filteredData.length;
-                const start = (this.currentPage - 1) * this.pageSize;
-                this.tableData = filteredData.slice(start, start + this.pageSize);
+                // 删除分页逻辑，直接显示所有数据
+                this.tableData = filteredData;
             },
-            // 新增数据生成方法
+
+            // 新增数据生成方法 - 增加更多样化的投诉内容
             generateComplaintContent(type) {
-                const base = '商家食材存储环境脏乱差，工作人员不注意卫生，服务态度';
-                const additions = {
-                    0: '烧烤台油污严重，通风系统故障导致店内烟雾弥漫',
-                    1: '火锅底料重复使用，餐具清洗不彻底发现食物残渣',
-                    2: '快餐包装破损导致洒漏，配送员未佩戴口罩'
-                };
-                return base + ['恶劣', '差', '粗暴'][type] + '。' + additions[type];
+                const foodSafetyComplaints = [
+                    '发现食材不新鲜，有明显变质迹象，肉质发粘且有异味，蔬菜有腐烂现象。',
+                    '食品中有异物，疑似金属碎屑，在菜品中发现类似铁丝的金属物体。',
+                    '疑似使用地沟油，菜品有明显的酸败味，食用后感到恶心不适。',
+                    '食材清洗不彻底，有泥沙残留，在青菜中发现大量泥土未洗净。',
+                    '餐具未消毒，有明显污渍，碗碟上残留有食物残渣。',
+                    '厨房卫生条件差，蟑螂老鼠出没，在餐厅角落发现老鼠粪便。',
+                    '食品添加剂超标，菜品味道异常，食用后口干舌燥。',
+                    '发现过期食品原料，面粉已结块发霉，仍在用于食品加工。',
+                    '肉类食品无检验检疫证明，无法提供猪肉的合格证明。',
+                    '食品储存不当，熟食未冷藏，存在食品安全隐患。'
+                ];
+
+                const serviceComplaints = [
+                    '服务态度恶劣，服务员与顾客发生争执，对顾客辱骂推搡。',
+                    '等待时间过长，超过40分钟未上菜，多次催促无人理会。',
+                    '擅自更改订单，未提前告知顾客，将顾客点的菜品换成其他。',
+                    '拒绝提供发票，态度蛮横，称开发票需额外加钱。',
+                    '多收费用，账单存在明显错误，重复计费。',
+                    '服务员不专业，对菜品信息一问三不知。',
+                    '餐厅不接受预订，现场排队时间过长，无任何解释。',
+                    '送餐错误，多次送错菜品，且未及时更正。',
+                    '服务员频繁出错，送错菜品，漏下单。',
+                    '店内无人引导，顾客长时间等待座位，无人安排。'
+                ];
+
+                const environmentComplaints = [
+                    '店内通风不佳，气味难闻，烟味浓重，空气污浊。',
+                    '卫生间卫生状况极差，无法使用，马桶堵塞，地面脏污。',
+                    '餐桌清洁不及时，有上一桌残留垃圾，需顾客自行清理。',
+                    '店内温度过高，空调效果不佳，顾客汗流浃背。',
+                    '噪音过大，影响就餐体验，背景音乐声音过高。',
+                    '餐厅装修简陋，设施陈旧，座椅破损。',
+                    '餐厅光线昏暗，影响就餐心情，阅读菜单困难。',
+                    '餐厅内蚊虫过多，影响用餐，多次驱赶仍有大量蚊虫。',
+                    '餐厅位置偏僻，交通不便，周边无停车位。',
+                    '餐厅内空间狭小，顾客用餐拥挤，行动不便。'
+                ];
+
+                const staffComplaints = [
+                    '工作人员未戴口罩，不符合防疫要求，多名员工未规范佩戴口罩。',
+                    '厨师未戴帽子，头发掉入食物中，在菜品中发现头发。',
+                    '收银员操作不熟练，多次输错金额，导致结账时间过长。',
+                    '服务员频繁出错，送错菜品，漏下单，态度敷衍。',
+                    '店内无人引导，顾客长时间等待座位，无人安排。',
+                    '服务员服务不热情，面无表情，对顾客需求不理会。',
+                    '餐厅培训不足，员工业务不熟练，无法解答顾客问题。',
+                    '员工私自使用顾客餐具，卫生状况堪忧。',
+                    '员工在工作区域吸烟，影响餐厅环境和顾客健康。',
+                    '服务员未经允许擅自收拾顾客未吃完的食物。'
+                ];
+
+                const foodQualityComplaints = [
+                    '菜品口味差，与菜单描述不符，味道过咸，食材不新鲜。',
+                    '食物未煮熟，存在安全隐患，牛排半生不熟，鸡蛋溏心。',
+                    '分量严重不足，价格与实际不符，菜品量少，价格昂贵。',
+                    '菜品中有变质调料的味道，酱汁有酸败味。',
+                    '主食生硬，无法正常食用，米饭夹生，面条未煮熟。',
+                    '菜品口感差，肉质老柴，蔬菜不新鲜。',
+                    '菜品与图片严重不符，图片美观，实际菜品简陋。',
+                    '菜品中调料过多，掩盖了食材本身的味道。',
+                    '菜品温度过低，冷菜不冷，热菜不热。',
+                    '餐厅提供的饮品有异味，疑似变质。'
+                ];
+
+                const complaintTypes = [
+                    foodSafetyComplaints,
+                    serviceComplaints,
+                    environmentComplaints,
+                    staffComplaints,
+                    foodQualityComplaints
+                ];
+
+                // 随机选择一种投诉类型和具体内容
+                const randomComplaintType = complaintTypes[type % complaintTypes.length];
+                return randomComplaintType[Math.floor(Math.random() * randomComplaintType.length)];
             },
+
             generateMerchantName(type, index) {
-                const types = ['烧烤', '火锅', '快餐'];
+                const types = ['烧烤', '火锅', '快餐', '西餐', '中餐'];
                 const brands = {
-                    0: ['何师烧烤', '火焰山烧烤', '木屋烧烤'],
-                    1: ['小龙坎', '大龙燚', '蜀大侠'],
-                    2: ['麦当劳', '华莱士', '乡村基']
+                    0: ['何师烧烤', '火焰山烧烤', '木屋烧烤', '烤匠', '签王之王', '西昌火盆烧烤', '霸王烧烤', '兄弟烧烤', '烧烤研究所', '撸串儿'],
+                    1: ['小龙坎', '大龙燚', '蜀大侠', '谭鸭血', '珮姐老火锅', '周师兄大刀腰片', '朱光玉火锅馆', '贤合庄', '刘一手', '德庄'],
+                    2: ['麦当劳', '华莱士', '乡村基', '肯德基', '德克士', '汉堡王', '必胜客', '真功夫', '永和大王', '老乡鸡'],
+                    3: ['豪客来', '必胜客', '星巴克', '棒约翰', '赛百味', '蓝蛙', '西堤牛排', '王品牛排', '禾绿回转寿司', '吉野家'],
+                    4: ['大蓉和', '眉州东坡', '外婆家', '陶德砂锅', '蓉李记', '老房子', '银杏川菜', '红杏酒家', '巴国布衣', '顺风123']
                 };
-                return `${brands[type][index % 3]}（${['华阳', '春熙路', '天府三街'][index % 3]}店）`;
+                return `${brands[type][index % brands[type].length]}（${['华阳', '春熙路', '天府三街', '太古里', '天府广场', '建设路', '双流', '高新', '郫都', '龙泉驿', '温江', '新都', '青白江', '都江堰', '彭州'][index % 15]}店）`;
             },
+
             generateDate(index) {
                 const baseDate = new Date(2024, 4, 1); // 2024-06-01
                 baseDate.setDate(baseDate.getDate() + index % 30); // 生成30天内日期
@@ -307,10 +558,27 @@
                 return `${baseDate.getFullYear()}-${pad(baseDate.getMonth()+1)}-${pad(baseDate.getDate())} ` +
                     `${pad(8 + index % 10)}:${pad(10 + index % 50)}:${pad(index % 60)}`;
             },
-            handleSearch() {
-                this.currentPage = 1;
-                this.fetchData();
+
+            generateProcessResult(index) {
+                const results = [
+                    '已对该店进行检查，发现问题并责令整改。商家已提交整改报告，情况已得到改善。',
+                    '已对商家进行警告，并要求加强员工培训，提高服务质量。',
+                    '已对涉事食品进行封存和检测，检测结果合格。已要求商家加强食品储存管理。',
+                    '已对商家处以罚款，并责令停业整顿1天。复查显示问题已解决。',
+                    '已要求商家更换不卫生的餐具，并加强厨房清洁。商家已按要求整改。',
+                    '已对商家进行食品安全知识培训，并要求建立进货查验记录制度。',
+                    '已责令商家调整背景音乐音量，并改善通风条件。顾客反馈环境有所改善。',
+                    '已要求商家加强员工服务意识培训，提高服务效率。商家已制定培训计划。',
+                    '已对商家进行批评教育，并要求退还多收费用。商家已向顾客道歉并退款。',
+                    '已要求商家加强食材筛选，确保食品安全。商家已改进操作流程。'
+                ];
+                return results[index % results.length];
             },
+
+            handleSearch() {
+                this.applyFilters();
+            },
+
             handleSelect(key) {
                 let targetPath = '';
 
@@ -324,7 +592,9 @@
                     '6': '../riskwarn/riskwarn.html',        // 风险预警
                     '7': '../samplingtask/3.html',  // 抽检任务
                     '8': '../monitoringvideo/device_list.html',  // 监控视频
-                    '9': '../foodlic/add.html'
+                    '9': '../foodlic/add.html',
+                    '10': '../weathermanage/1.html',
+                    '11': '../map/map.html'
                 };
 
                 targetPath = pathMap[key] || '';
@@ -334,8 +604,8 @@
                 } else {
                     console.warn('未配置的路由路径', key);
                 }
-
             },
+
             handleReset() {
                 this.filters = {
                     merchant: '',
@@ -346,10 +616,11 @@
                     unit: '',
                     dateRange: []
                 };
-                this.fetchData();
+                this.applyFilters();
             },
+
             handleExport() {
-                const headers = ['投诉内容', '投诉商户', '商户地址', '负责单位', '联系方式', '投诉人', '投诉时间'];
+                const headers = ['投诉内容', '投诉商户', '商户地址', '负责单位', '联系方式', '投诉人', '投诉时间', '处理结果'];
                 const rows = this.tableData.map(item => [
                     item.content,
                     item.merchant,
@@ -357,7 +628,8 @@
                     item.unit,
                     item.contact,
                     item.complainer,
-                    item.date
+                    item.date,
+                    item.processResult || '待处理'
                 ]);
 
                 const csvContent = [headers, ...rows]
@@ -372,13 +644,6 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            },
-            handleAction(row) {
-                alert('点击了操作：' + row.merchant);
-            },
-            handlePageChange(page) {
-                this.currentPage = page;
-                this.fetchData();
             }
         }
     });
@@ -391,7 +656,6 @@
             return;
         }
     });
-
 </script>
 </body>
 </html>
