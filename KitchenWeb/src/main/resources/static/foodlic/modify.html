@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>修改证照信息</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+<h2>修改证照信息</h2>
+<form id="editForm">
+    <div class="form-group">
+        <label>证照编号：</label>
+        <input type="text" id="lic_num" name="lic_num" required readonly>
+    </div>
+    <div class="form-group">
+        <label>操作员姓名：</label>
+        <input type="text" id="opt_name" name="opt_name" required>
+    </div>
+    <button type="button" class="btn" onclick="submitForm()">保存修改</button>
+</form>
+
+<script>
+    // 解析URL参数
+    function getParameterByName(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+
+    // 初始化表单数据
+    function initForm() {
+        const licNum = getParameterByName('lic_num');
+        const optName = getParameterByName('opt_name');
+
+        document.getElementById('lic_num').value = licNum;
+        document.getElementById('opt_name').value = optName;
+    }
+
+    // 提交修改
+    function submitForm() {
+        const data = {
+            licNum: document.getElementById('lic_num').value,  // 修改为licNum
+            optName: document.getElementById('opt_name').value  // 修改为optName
+        };
+
+        fetch('/foodlic/update_record', {  // 修改请求路径
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if(data.result_code === 0) {
+                    alert('修改成功！');
+                    window.location.href = '/foodlic/list.html';
+                } else {
+                    alert('修改失败：' + data.result_msg);
+                }
+            });
+    }
+
+    // 初始化
+    initForm();
+</script>
+</body>
+</html>

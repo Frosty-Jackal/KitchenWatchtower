@@ -9,4 +9,17 @@ public class FoodLicService {
         FoodLicDao dao = new FoodLicDao();
         dao.addFoodLicRecord(foodLic, json);
     }
+    public void getDeviceRecord(JSONObject param, JSONObject json) {
+        FoodLicDao dao = new FoodLicDao();
+        dao.getFoodLicRecord(param, json);
+    }
+    public void deleteDeviceRecord(String licNum) throws Exception {
+        FoodLicDao dao = new FoodLicDao();
+        dao.deleteFoodLicRecord(licNum);
+    }
+
+    public void updateDeviceRecord(FoodLic foodLic) throws Exception {
+        FoodLicDao dao = new FoodLicDao();
+        dao.updateFoodLicRecord(foodLic);
+    }
 }

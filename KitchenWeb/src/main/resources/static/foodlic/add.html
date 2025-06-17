@@ -178,15 +178,45 @@
     </style>
 </head>
 <body>
+<style>
+    /* 修改后的返回按钮样式 */
+    .back-btn {
+        position: fixed;      /* 改为固定定位 */
+        top: 20px;            /* 距离视口顶部20px */
+        left: 20px;           /* 距离视口左侧20px */
+        z-index: 999;         /* 确保按钮在最上层 */
+        margin: 0;            /* 移除原有margin */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 添加阴影增强层次感 */
+    }
+
+    /* 修改容器顶部间距 */
+    .container {
+        margin-top: 80px;     /* 为固定定位按钮留出空间 */
+        border-radius: 16px 16px 0 0; /* 顶部圆角保持美观 */
+    }
+
+    /* 响应式调整（移动端） */
+    @media (max-width: 480px) {
+        .back-btn {
+            top: 10px;
+            left: 10px;
+            padding: 0.6rem 1.2rem;
+        }
+        .container {
+            margin-top: 60px;
+            border-radius: 12px 12px 0 0;
+        }
+    }
+</style>
+<a href="./list.html" class="back-btn">
+    <i class="el-icon-arrow-left"></i> 返回证照管理
+</a>
 <div class="container">
-    <a href="/menu.html" class="back-btn">
-        <i class="el-icon-arrow-left"></i> 返回菜单
-    </a>
     <h2>添加食品经营许可证信息</h2>
     <form id="addForm" >
         <div class="form-group">
             <label>上传许可证图片：</label>
-            <input type="file" id="licImage" accept="image/*" required>
+            <input type="file" id="licImage" accept="image/*" >
         </div>
 
 

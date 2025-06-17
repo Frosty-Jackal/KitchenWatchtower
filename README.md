@@ -1,10 +1,13 @@
 
 # KitchenWatchtower
-
+<div align="center">
+<img src="page/logo.png" alt="System Architecture" width="300" height="300">
+</div>
 A team project for Sichuan University's Problem Solving Practical Course, implementing a kitchen monitoring system with real-time data visualization and mini-program integration.
 
 <div align="center">
-  <img src="page/Composition.jpg" alt="System Architecture" width="400" height="300">
+   
+  <img src="page/Composition.jpg" alt="System Architecture" width="300" height="300">
 </div>
 
 

@@ -102,7 +102,7 @@
             </el-menu-item>
             <el-menu-item index="9">
                 <i class="el-icon-document"></i>
-                <span slot="title">证照添加</span>
+                <span slot="title">证照管理</span>
             </el-menu-item>
             <el-menu-item index="10">
                 <i class="el-icon-sunny"></i>
@@ -119,20 +119,22 @@
     <div class="main-container">
         <h2>欢迎来到明厨亮灶管理系统</h2>
         <div class="logo-container">
-            <!-- SVG LOGO -->
-            <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
-                <!-- 厨师帽 -->
-                <path d="M60 60 C50 40, 80 20, 100 40 C120 20, 150 40, 140 60 Z" fill="#3498db" stroke="#2c3e50" stroke-width="3"/>
-                <rect x="70" y="60" width="60" height="20" fill="#2c3e50" rx="5"/>
-                <!-- 炊烟 -->
-                <path d="M85 10 C80 5, 90 -5, 95 5 C100 15, 90 25, 95 35" stroke="#aaa" stroke-width="3" fill="none"/>
-                <!-- 圆形背景 -->
-                <circle cx="100" cy="120" r="50" fill="#f39c12" opacity="0.2"/>
-                <!-- 中心餐具 -->
-                <rect x="97" y="90" width="6" height="40" fill="#2c3e50" rx="2"/> <!-- 刀 -->
-                <circle cx="85" cy="105" r="5" fill="#2c3e50"/> <!-- 勺子头 -->
-                <rect x="83" y="105" width="4" height="25" fill="#2c3e50"/> <!-- 勺子柄 -->
-            </svg>
+            <img src="logo.png" alt="系统LOGO" class="system-logo">
+
+<!--            &lt;!&ndash; SVG LOGO &ndash;&gt;-->
+<!--            <svg width="200" height="200" viewBox="0 0 200 200" fill="none">-->
+<!--                &lt;!&ndash; 厨师帽 &ndash;&gt;-->
+<!--                <path d="M60 60 C50 40, 80 20, 100 40 C120 20, 150 40, 140 60 Z" fill="#3498db" stroke="#2c3e50" stroke-width="3"/>-->
+<!--                <rect x="70" y="60" width="60" height="20" fill="#2c3e50" rx="5"/>-->
+<!--                &lt;!&ndash; 炊烟 &ndash;&gt;-->
+<!--                <path d="M85 10 C80 5, 90 -5, 95 5 C100 15, 90 25, 95 35" stroke="#aaa" stroke-width="3" fill="none"/>-->
+<!--                &lt;!&ndash; 圆形背景 &ndash;&gt;-->
+<!--                <circle cx="100" cy="120" r="50" fill="#f39c12" opacity="0.2"/>-->
+<!--                &lt;!&ndash; 中心餐具 &ndash;&gt;-->
+<!--                <rect x="97" y="90" width="6" height="40" fill="#2c3e50" rx="2"/> &lt;!&ndash; 刀 &ndash;&gt;-->
+<!--                <circle cx="85" cy="105" r="5" fill="#2c3e50"/> &lt;!&ndash; 勺子头 &ndash;&gt;-->
+<!--                <rect x="83" y="105" width="4" height="25" fill="#2c3e50"/> &lt;!&ndash; 勺子柄 &ndash;&gt;-->
+<!--            </svg>-->
         </div>
         <span id="userDisplay"></span>
         <button id="logoutBtn" class="logout-btn">退出登录</button>
@@ -162,7 +164,7 @@
                     '6': './riskwarn/riskwarn.html',        // 风险预警
                     '7': './samplingtask/3.html',  // 抽检任务
                     '8': './monitoringvideo/device_list.html',  // 监控视频
-                    '9': './foodlic/add.html',
+                    '9': './foodlic/list.html',
                     '10': './weathermanage/1.html',
                     '11': './map/map.html'
                 };
@@ -204,13 +206,56 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <style>
     .logo-container {
-        margin: 20px 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        margin: 30px 0 40px;  /* 增加上下间距 */
+        position: relative;
+        /* 保持原有动画 */
         animation: fadeIn 1s ease-in-out;
     }
 
+    .system-logo {
+        width: 180px;  /* 推荐尺寸 */
+        height: auto;
+        border-radius: 12px;  /* 圆角效果 */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);  /* 立体阴影 */
+        transition: transform 0.3s ease;
+        /* 保持响应式 */
+        max-width: 80%;
+    }
+
+    /* 悬停效果 */
+    .system-logo:hover {
+        transform: translateY(-3px);
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .logo-container {
+            margin: 20px 0;
+        }
+        .system-logo {
+            width: 140px;
+        }
+    }
+    /* 添加LOGO背景装饰 */
+    .logo-container::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        width: 120px;
+        height: 120px;
+        background: rgba(52, 152, 219, 0.1);
+        border-radius: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+        50% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+        100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+    }
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -265,3 +310,4 @@ document.addEventListener('DOMContentLoaded', function() {
         background-color: #c0392b;
     }
 </style>
+

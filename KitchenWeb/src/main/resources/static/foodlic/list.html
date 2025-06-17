@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>证照管理系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; }
+        .toolbar { margin-bottom: 15px; display: flex; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f5f5f5; cursor: pointer; }
+        th:hover { background-color: #eee; }
+        .search-box { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 200px;
+            background: #2c3e50;
+            box-shadow: 2px 0 6px rgba(0,0,0,.1);
+            z-index: 1000;
+        }
+        .el-menu-vertical-demo {
+            height: 100%;
+            border-right: none;
+        }
+
+        .el-menu-item {
+            color: #ecf0f1 !important;
+            height: 56px;
+            line-height: 56px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .el-menu-item:hover {
+            background: #34495e !important;
+        }
+
+        .el-menu-item.is-active {
+            color: #3498db !important;
+            background: #2c3e50 !important;
+            border-left: 3px solid #3498db;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", Arial, sans-serif;
+            margin: 0;
+            font-size: 12px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px 40px;
+            margin-left: 200px;  /* 新增左边距 */
+            min-height: 100vh;    /
+        }
+        .filter-form {
+            margin-bottom: 25px; /* 增加底部间距 */
+            padding: 0 20px;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: nowrap; /* 禁止换行 */
+            margin-bottom: 15px;
+            align-items: center;
+            justify-content: space-between; /* 均匀分布元素 */
+            width: 100%;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 40px; /* 大幅增加右侧间距 */
+            margin-bottom: 0;
+            flex: 0 1 auto; /* 允许元素根据内容伸缩 */
+        }
+        .filter-item:last-child {
+            margin-right: 0; /* 最后一个元素不需要右边距 */
+        }
+        .filter-label {
+            margin-right: 12px; /* 增加标签右侧间距 */
+            white-space: nowrap;
+            font-weight: 500;
+            color: #333;
+        }
+        .el-input__inner {
+            height: 36px; /* 增大输入框高度 */
+            line-height: 36px;
+            padding: 0 12px;
+            min-width: 180px; /* 设置最小宽度 */
+        }
+        .el-select .el-input__inner {
+            padding-right: 30px;
+        }
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            gap: 12px; /* 增加按钮间距 */
+        }
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            min-width: 80px;
+        }
+
+        /* 筛选按钮 - 蓝色 */
+        .action-button.filter-btn {
+            color: #1890ff;
+            border-color: #1890ff;
+            background-color: rgba(24, 144, 255, 0.1);
+        }
+        .action-button.filter-btn:hover {
+            background-color: rgba(24, 144, 255, 0.2);
+        }
+
+        /* 重置按钮 - 红色 */
+        .action-button.reset-btn {
+            color: #f5222d;
+            border-color: #f5222d;
+            background-color: rgba(245, 34, 45, 0.1);
+        }
+        .action-button.reset-btn:hover {
+            background-color: rgba(245, 34, 45, 0.2);
+        }
+
+        /* 导出按钮 - 绿色 */
+        .action-button.export-btn {
+            color: #52c41a;
+            border-color: #52c41a;
+            background-color: rgba(82, 196, 26, 0.1);
+        }
+        .action-button.export-btn:hover {
+            background-color: rgba(82, 196, 26, 0.2);
+        }
+
+        .action-button i {
+            margin-right: 4px;
+        }
+        .compact-table {
+            margin-top: 10px;
+        }
+        .compact-table .el-table {
+            table-layout: fixed; /* 使表格列宽均匀分布 */
+        }
+
+        .compact-table .el-table th > .cell,
+        .compact-table .el-table td > .cell {
+            text-align: center; /* 文字居中 */
+            white-space: nowrap; /* 不换行 */
+            overflow: hidden; /* 隐藏溢出 */
+            text-overflow: ellipsis; /* 溢出显示省略号 */
+        }
+        .compact-table .el-table__header-wrapper,
+        .compact-table .el-table__body-wrapper {
+            width: 100% !important;
+        }
+        /* 操作列保持适当宽度 */
+        .compact-table .el-table__body td:last-child .cell {
+            padding: 0 8px;
+        }
+        /* 移除固定列宽设置，让表格自动均匀分配 */
+        .compact-table .el-table__header th,
+        .compact-table .el-table__body td {
+            padding: 8px 0;
+            width: auto !important; /* 移除固定宽度 */
+        }
+
+        .compact-table .el-table__header th {
+            padding: 8px 0;
+            background-color: #f5f7fa;
+        }
+        .compact-table .el-table__body td {
+            padding: 6px 0;
+        }
+        .compact-table .cell {
+            line-height: 1.3;
+            padding: 0 5px;
+        }
+        .pagination {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        .page-info {
+            color: #606266;
+        }
+        .page-size {
+            margin: 0 10px;
+        }
+        .page-jump {
+            display: flex;
+            align-items: center;
+        }
+        .page-jump input {
+            width: 40px;
+            margin: 0 5px;
+            text-align: center;
+            height: 28px;
+            padding: 0 5px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app">
+<div class="sidebar-container">
+    <el-menu
+            class="el-menu-vertical-demo"
+            :default-active="activeIndex"
+            @select="handleSelect"
+            background-color="#2c3e50"
+            text-color="#ecf0f1"
+            active-text-color="#3498db">
+
+        <el-menu-item index="0">
+            <i class="el-icon-s-home"></i>
+            <span slot="title">首页</span>
+        </el-menu-item>
+        <el-menu-item index="1">
+            <i class="el-icon-menu"></i>
+            <span slot="title">学校管理</span>
+        </el-menu-item>
+        <el-menu-item index="2">
+            <i class="el-icon-s-shop"></i>
+            <span slot="title">商户管理</span>
+        </el-menu-item>
+        <el-menu-item index="3">
+            <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
+            <span slot="title">供应商管理</span>
+        </el-menu-item>
+        <!-- 新增菜单项 -->
+        <el-menu-item index="4">
+            <i class="el-icon-s-management"></i>
+            <span slot="title">原料管理</span>
+        </el-menu-item>
+        <el-menu-item index="5">
+            <i class="el-icon-s-comment"></i>
+            <span slot="title">投诉管理</span>
+        </el-menu-item>
+        <el-menu-item index="6">
+            <i class="el-icon-warning"></i>
+            <span slot="title">风险预警</span>
+        </el-menu-item>
+        <el-menu-item index="7">
+            <i class="el-icon-s-check"></i>
+            <span slot="title">抽检任务</span>
+        </el-menu-item>
+        <el-menu-item index="8">
+            <i class="el-icon-video-camera"></i>
+            <span slot="title">监控视频</span>
+        </el-menu-item>
+        <el-menu-item index="9">
+            <i class="el-icon-document"></i>
+            <span slot="title">证照管理</span>
+        </el-menu-item>
+        <el-menu-item index="10">
+            <i class="el-icon-sunny"></i>
+            <span slot="title">今日天气</span>
+        </el-menu-item>
+        <el-menu-item index="11">
+            <i class="el-icon-location"></i>
+            <span slot="title">地图展板</span>
+        </el-menu-item>
+    </el-menu>
+</div>
+
+    <div class="content-container">
+<div class="toolbar">
+    <input type="text" id="searchInput" class="search-box" placeholder="输入证照号或营业者搜索...">
+    <button class="btn" onclick="AddData()">添加数据</button>
+    <button class="btn" onclick="exportData()">导出数据</button>
+</div>
+
+<table id="data-table">
+    <thead>
+    <tr>
+        <th onclick="sortTable(0)">证照编号（点我可排序）</th>
+        <th onclick="sortTable(1)">营业者（点我可排序）</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+</table>
+</div>
+</div>
+<script>
+    let allData = [];
+    let currentSort = { col: 0, asc: true };
+
+    function loadData() {
+        // 构造请求参数（与后端@RequestBody对应）
+        const requestBody = {
+            // 可在此添加查询参数（如果需要）
+            // searchKey: document.getElementById('searchInput').value
+        };
+
+        fetch('/foodlic/get_record', {
+            method: 'POST',  // 修改为POST方法
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)  // 发送JSON请求体
+        })
+            .then(res => res.json())
+            .then(data => {
+                if(data.result_code === 0) {  // 验证返回码
+                    allData = data.aaData || [];  // 从aaData字段获取数据
+                    renderTable(allData);
+                } else {
+                    alert('数据加载失败: ' + (data.result_msg || '未知错误'));
+                }
+            });
+    }
+
+    // 渲染表格
+    function renderTable(data) {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = data.map(item => `
+            <tr>
+                <td>${item.lic_num}</td>
+                <td>${item.opt_name}</td>
+                <td>
+                    <button class="btn" onclick="editItem('${item.lic_num}', '${item.opt_name}')">修改</button>
+                    <button class="btn" onclick="deleteItem('${item.lic_num}')">删除</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // 搜索功能
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const value = e.target.value.toLowerCase();
+        const filtered = allData.filter(item =>
+            item.lic_num.includes(value) ||
+            item.opt_name.toLowerCase().includes(value)
+        );
+        renderTable(filtered);
+    });
+
+    // 排序功能
+    function sortTable(column) {
+        const isSameColumn = column === currentSort.col;
+        currentSort = { col: column, asc: !isSameColumn || !currentSort.asc };
+
+        allData.sort((a, b) => {
+            const valA = a[Object.keys(a)[column]];
+            const valB = b[Object.keys(b)[column]];
+            return currentSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+        renderTable(allData);
+    }
+
+    // 导出功能
+    function exportData() {
+        const csvContent = [
+            ['证照编号', '经营者'],
+            ...allData.map(item => [item.lic_num, item.opt_name])
+        ]
+            .map(e => e.join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'foodlic_data.csv';
+        link.click();
+    }
+
+    function deleteItem(licNum) {
+        if(confirm('确定要删除该记录吗？')) {
+            fetch('/foodlic/delete_record', {  // 修改为后端实际路径
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ lic_num: licNum })  // 构造请求体
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.result_code === 0) {
+                        loadData();
+                    } else {
+                        alert('删除失败: ' + data.result_msg);
+                    }
+                });
+        }
+    }
+    function AddData() {
+        window.location.href = './add.html';  // 确保add.html在相同目录
+    }
+    // 修改跳转
+    function editItem(licNum, optName) {
+        window.location.href = `/foodlic/modify.html?lic_num=${licNum}&opt_name=${optName}`;
+    }
+
+    // 初始化加载
+    loadData();
+</script>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            activeIndex: '9'  // 修改为当前页面对应的菜单索引（供应商管理对应index="3"）
+        },
+        methods: {
+            handleSelect(key) {
+                let targetPath = '';
+                const pathMap = {
+                    '0': '../menu.html',        // 返回首页
+                    '1': '../schoolmanage/schoolmanage.html',
+                    '2': '../mercmanage/mercmanage.html',
+                    '3': '../suppmanage/suppmanage.html',  // 当前页面
+                    '4': '../matermanage/index.html',
+                    '5': '../compmanage/device_list.html',
+                    '6': '../riskwarn/riskwarn.html',
+                    '7': '../samplingtask/3.html',
+                    '8': '../monitoringvideo/device_list.html',
+                    '9': '../foodlic/list.html',
+                    '10': '../weathermanage/1.html',
+                    '11': '../map/map.html'
+                };
+                targetPath = pathMap[key] || '';
+                if (targetPath) {
+                    window.location.href = targetPath;
+                } else {
+                    console.warn('未配置的路由路径', key);
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
+<style>
+.content-container {
+    margin-left: 220px;  /* 关键修改：增加左侧间距 */
+    padding: 20px;       /* 新增内边距 */
+    transition: margin 0.3s; /* 添加过渡动画 */
+}
+
+/* 响应式适配（当屏幕宽度 < 768px 时） */
+@media (max-width: 768px) {
+    .content-container {
+        margin-left: 0;   /* 移动端取消左边距 */
+        padding: 10px;
+    }
+
+    .sidebar-container {
+        transform: translateX(-100%); /* 隐藏侧边栏 */
+    }
+}
+</style>
