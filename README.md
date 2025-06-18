@@ -1,13 +1,15 @@
 
-# KitchenWatchtower
+# KitchenWatchtower(明厨亮灶管理系统)
 <div align="center">
 <img src="page/logo.png" alt="System Architecture" width="300" height="300">
 </div>
-A team project for Sichuan University's Problem Solving Practical Course, implementing a kitchen monitoring system with real-time data visualization and mini-program integration.
+<b>
+  This is a team project for Sichuan University's Problem Solving Practical Course, implementing a kitchen monitoring system with real-time data visualization web-end and mini-program integration.
+<b>
 
 <div align="center">
    
-  <img src="page/Composition.jpg" alt="System Architecture" width="300" height="300">
+  <img src="page/Composition.jpg" alt="System Architecture" width="400" height="320">
 </div>
 
 
@@ -70,7 +72,8 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
    ```
 
 4. Update mini-program configuration:
-   - Modify `appid` in `KitchenMiniProgram/project.config.json`
+
+   Modify `appid` in `KitchenMiniProgram/project.config.json`
      ```json
      {
        "appid": "<your-app-id>"
@@ -78,7 +81,8 @@ A team project for Sichuan University's Problem Solving Practical Course, implem
      ```
 
 5. Build and preview:
-   - Click "Compile" button in WeChat Developer Tools
+   
+   Click "Compile" button in WeChat Developer Tools
 
    _start mini-program journey!_
 

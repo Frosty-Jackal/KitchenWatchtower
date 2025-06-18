@@ -13,19 +13,29 @@
     </style>
 </head>
 <body>
-<h2>修改证照信息</h2>
+<div>
+    <a href="./list.html" class="back-btn">
+        <i class="el-icon-arrow-left"></i>
+        返回证照管理
+    </a>
+</div>
+<div class="container">
+    <div class="header">
+        <!-- 页面标题 -->
+        <h2 style="margin: 0; flex: 1; text-align: center;">修改证照信息</h2>
+    </div>
 <form id="editForm">
     <div class="form-group">
-        <label>证照编号：</label>
+        <label>证照编号(不允许修改证照编号）：</label>
         <input type="text" id="lic_num" name="lic_num" required readonly>
     </div>
     <div class="form-group">
-        <label>操作员姓名：</label>
+        <label>经营者：</label>
         <input type="text" id="opt_name" name="opt_name" required>
     </div>
-    <button type="button" class="btn" onclick="submitForm()">保存修改</button>
+    <button type="button" class="btn" onclick="submitForm()">提交修改</button>
 </form>
-
+</div>
 <script>
     // 解析URL参数
     function getParameterByName(name) {
@@ -70,3 +80,117 @@
 </script>
 </body>
 </html>
+<style>
+    /* 新增CSS变量定义 */
+    :root {
+        --primary-color: #007bff;
+        --primary-hover: #0056b3;
+        --bg-color: #f8f9fa;
+        --border-color: #e9ecef;
+    }
+
+    /* 新增容器样式 */
+
+
+    /* 新增标题栏样式 */
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+
+    /* 按钮悬停效果 */
+    .back-btn:hover {
+        color: var(--primary-hover);
+        transform: translateX(-2px);
+    }
+
+    /* 输入框聚焦效果 */
+    input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+    }
+
+    /* 按钮动画效果 */
+    .btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+    /* 修改后的返回按钮样式 */
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 999;
+        margin: 0;
+        padding: 12px 24px;  /* 增大按钮尺寸 */
+        font-size: 16px;      /* 增大字体 */
+        border-radius: 30px;  /* 圆形按钮效果 */
+        background: #e6f7ff;  /* 浅蓝色背景 */
+        color: #007bff;       /* 深蓝色文字 */
+        border: 2px solid #b3e5ff;  /* 边框增强层次感 */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);  /* 缓动动画 */
+        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    /* 悬停状态 */
+    .back-btn:hover {
+        background: #b3e5ff;
+        color: #0056b3;
+        transform: translateX(-4px) translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    /* 点击状态 */
+    .back-btn:active {
+        transform: translateX(-2px) translateY(0);
+        box-shadow: 0 3px 6px rgba(0, 123, 255, 0.15);
+    }
+
+    /* 图标样式增强 */
+    .back-btn i {
+        font-size: 18px;
+        transition: transform 0.3s;
+    }
+
+    .back-btn:hover i {
+        transform: translateX(-4px);
+    }
+
+    /* 修改容器顶部间距 */
+    .container {
+        margin-top: 100px;    /* 为固定定位按钮留出更多空间 */
+        border-radius: 16px 16px 0 0;
+        background: white;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    /* 响应式调整（手机端） */
+    @media (max-width: 480px) {
+        .back-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            top: 10px;
+            left: 10px;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 1.5rem;
+        }
+    }
+</style>

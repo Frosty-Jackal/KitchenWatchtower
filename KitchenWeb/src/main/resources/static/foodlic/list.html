@@ -5,7 +5,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>证照管理系统</title>
+    <title>食品经营许可证管理系统</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; }
         .toolbar { margin-bottom: 15px; display: flex; gap: 10px; }
@@ -288,16 +288,16 @@
 
     <div class="content-container">
 <div class="toolbar">
-    <input type="text" id="searchInput" class="search-box" placeholder="输入证照号或营业者搜索...">
-    <button class="btn" onclick="AddData()">添加数据</button>
-    <button class="btn" onclick="exportData()">导出数据</button>
+    <input type="text" id="searchInput" class="search-box" placeholder="输入证照号或经营者搜索...">
+    <button class="btn" onclick="AddData()">添加证照</button>
+    <button class="btn" onclick="exportData()">导出证照集</button>
 </div>
 
 <table id="data-table">
     <thead>
     <tr>
         <th onclick="sortTable(0)">证照编号（点我可排序）</th>
-        <th onclick="sortTable(1)">营业者（点我可排序）</th>
+        <th onclick="sortTable(1)">经营者（点我可排序）</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -342,8 +342,8 @@
                 <td>${item.lic_num}</td>
                 <td>${item.opt_name}</td>
                 <td>
-                    <button class="btn" onclick="editItem('${item.lic_num}', '${item.opt_name}')">修改</button>
-                    <button class="btn" onclick="deleteItem('${item.lic_num}')">删除</button>
+                    <button class="btn" onclick="editItem('${item.lic_num}', '${item.opt_name}')">修改信息</button>
+                    <button class="btn" onclick="deleteItem('${item.lic_num}')">删除证照</button>
                 </td>
             </tr>
         `).join('');

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地图展示</title>
+    <title>地图展板</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
@@ -104,7 +104,7 @@
                         返回菜单
                     </button>
                     <i class="fa fa-map-marker text-primary text-2xl"></i>
-                    <h1 class="text-xl font-bold text-gray-800">地图管理系统</h1>
+                    <h1 class="text-xl font-bold text-gray-800">地图展板（支持输入“学校管理”中的学校信息来查询）</h1>
                 </div>
             </div>
 
@@ -118,13 +118,13 @@
         <div class="bg-white p-4 shadow-sm">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700 mb-1">位置名称</label>
-                    <input v-model="filter.locationName" type="text" class="filter-input" placeholder="请输入位置名称">
+                    <label class="text-sm font-medium text-gray-700 mb-1">学校地址</label>
+                    <input v-model="filter.locationName" type="text" class="filter-input" placeholder="请输入学校地址">
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="text-sm font-medium text-gray-700 mb-1">联系人</label>
-                    <input v-model="filter.contactPerson" type="text" class="filter-input" placeholder="请输入联系人姓名">
+                    <label class="text-sm font-medium text-gray-700 mb-1">校长</label>
+                    <input v-model="filter.contactPerson" type="text" class="filter-input" placeholder="请输入校长姓名">
                 </div>
 
                 <div class="flex flex-col">
