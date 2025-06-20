@@ -7,15 +7,16 @@
 
 .navbar {
   padding: 20rpx;
-  background: white;
+  background: #FF7D67;
   box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.05);
 }
 
 .nav-title {
   font-size: 36rpx;
   font-weight: bold;
-  color: #333;
+  color: #FFFFFF;
   text-align: center;
+  background-color:  #FF7D67;
 }
 .card-list {
   margin-top: 20rpx;
@@ -73,16 +74,6 @@
   align-items: center;
 }
 
-.star {
-  font-size: 28rpx;
-  color: #ddd;
-  margin-left: 4rpx;
-}
-
-.star.active {
-  color: #ffa726;
-}
-
 .score {
   font-size: 28rpx;
   color: #666;
@@ -118,4 +109,20 @@
   color: #1976d2;
   padding: 8rpx 16rpx;
   border-radius: 30rpx;
+}
+.star {
+  font-size: 14px;
+  color: #ddd;  /* 默认白星颜色 */
+  margin-right: 3px;
+  margin-left: 0px;
+}
+
+.star.active {  /* 确保没有拼写错误 */
+  color: #ffd21e !important;  /* 黄星颜色 */
+}
+.score1{
+  margin-left: 150px;
+}
+.canteen-card .star.active {
+  color: #ffd21e !important;
 }

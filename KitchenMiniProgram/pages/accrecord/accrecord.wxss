@@ -1,76 +1,143 @@
-.service-list{
-	padding: 0 20rpx;
-}
-.service-item{
-	display: flex;
-	padding: 20rpx 0; 
-	border-bottom: 1rpx solid #e8e8e8;
-}
-.service-img{
-	width: 220rpx;
-	height: 200rpx;
-}
-.service-item image{
-	width: 220rpx;
-	height: 220rpx;
-}
-.service-text{
-	flex: 1;
-	margin-left: 20rpx;
-	width: 100%;
-}
-.service-tite{
-	color: #333;
-	width: 100%;
-	font-size: 34rpx;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-.service-tags{
-	margin: 6rpx 0;
-}
-.service-tags text{
-	padding: 6rpx 16rpx;
-	border: 1rpx solid #FF6B6B;
-	line-height: 1;
-	color: #FF6B6B;
-	font-size: 28rpx;
-	border-radius: 4rpx;
-	margin-right: 10rpx;
-	margin-bottom: 10rpx;
-	white-space: nowrap;
-}
-.service-city{
-	color: #333;
-}
-/* 在原有wxss基础上添加/修改以下样式 */
-
-/* 修改添加按钮样式 */
-.btn-block.btn-orange {
-  background-color: #f7982a; /* 深蓝色背景 */
-  border-color: #f7982a;    /* 边框颜色同步 */
-  color: white !important;   /* 文字颜色改为白色 */
+/* 整体容器样式 */
+.container {
+  height: 100vh;
+  background-color: #F8F8F8;
+  padding: 20rpx;
 }
 
-/* 新增搜索按钮样式 */
+/* 搜索区域 */
+.search-flex {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx;
+  background: #FFFFFF;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.search-flex.tophide {
+  transform: translateY(-120%);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+  background: #FFF5F4;
+  border-radius: 50rpx;
+  padding: 15rpx 25rpx;
+  box-shadow: 0 3rpx 10rpx rgba(255, 125, 103, 0.1);
+}
+
+.search-bar input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #FF7D67;
+}
+
 .search-btn {
-  background-color: #f7982a !important;
-  color: white !important;
-  border: 1rpx solid #003366 !important;
+  background: #FF7D67;
+  color: white;
+  padding: 10rpx 30rpx;
+  border-radius: 50rpx;
+  font-size: 26rpx;
+  line-height: 1.4;
 }
 
-/* 新增导出按钮样式 */
-.search-extra-btn {
-  background-color: #f8f8f8!important;
-  color: white !important;
-  border: 1rpx solid #f8f8f8 !important;
+/* 滚动主体区域 */
+.container-body {
+  height: calc(100vh - 40rpx);
+  margin-top: 120rpx;
 }
 
-/* 可选：调整按钮悬停状态（根据实际需要添加） */
-.btn-block.btn-orange:active,
-.search-btn:active,
-.search-extra-btn:active {
-  background-color: #FF6B6B !important; /* 深色变体 */
-  opacity: 0.8;
+/* 服务列表项 */
+.service-item {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 5rpx 25rpx rgba(255, 125, 103, 0.05);
+  transition: transform 0.2s;
+}
+
+.service-item:active {
+  transform: scale(0.98);
+}
+
+/* 文字样式 */
+.service-title {
+  font-size: 34rpx;
+  color: #FF7D67;
+  font-weight: bold;
+  margin-bottom: 15rpx;
+}
+
+.service-tags text {
+  font-size: 24rpx;
+  color: #999;
+  background: #FFF5F4;
+  padding: 5rpx 15rpx;
+  border-radius: 30rpx;
+  margin-right: 10rpx;
+}
+
+.service-city {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin: 15rpx 0;
+}
+
+/* 操作按钮 */
+.service-actions {
+  display: flex;
+  gap: 25rpx;
+  margin-top: 20rpx;
+  border-top: 1rpx solid #FFEBE8;
+  padding-top: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  text-align: center;
+  padding: 15rpx 0;
+  background: #FFF5F4;
+  color: #FF7D67;
+  border-radius: 50rpx;
+  font-size: 26rpx;
+  transition: all 0.3s;
+}
+
+.action-btn:active {
+  background: #FF7D67;
+  color: white;
+}
+
+/* 返回顶部按钮 */
+.gototop {
+  position: fixed;
+  right: 40rpx;
+  bottom: -100rpx;
+  background: #FF7D67;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  opacity: 0;
+}
+
+.gototop.active {
+  bottom: 120rpx;
+  opacity: 1;
+}
+
+.gototop::after {
+  content: "↑";
+  color: white;
+  font-size: 32rpx;
 }

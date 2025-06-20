@@ -1,373 +1,122 @@
+// index.js
 Page({
   data: {
-    showsearch:false,   //显示搜索按钮
-    searchtext:'',  //搜索文字
-    filterdata:{},  //筛选条件数据
-    showfilter:false, //是否显示下拉筛选
-    showfilterindex:null, //显示哪个筛选类目
-    servicelist:[], //服务集市列表
-    scrolltop:null, //滚动位置
-    page: 0,  //分页
-    todoList: [
+    searchtext: '',
+    scrolltop: 0,
+    originalList: [
       {
         id: 1,
-        imgurl: '/pages/accrecord/pc1.png', // 示例图片路径
         device_id: '李校长',
         create_time: '2025-5-19 12:30',
         device_name: '成都市青羊区校长陪餐'
       },
       {
         id: 2,
-        imgurl: '/pages/accrecord/pc2.png', // 示例图片路径
         device_id: '王老板',
         create_time: '2025-5-20 18:45',
         device_name: '成都市温江区商务宴请'
+      },
+      {
+        id: 3,
+        device_id: '张主任',
+        create_time: '2025-5-21 09:15',
+        device_name: '武汉市江汉区教育督导'
+      },
+      {
+        id: 4,
+        device_id: '陈经理',
+        create_time: '2025-5-22 14:30',
+        device_name: '杭州市西湖区企业洽谈'
+      },
+      {
+        id: 5,
+        device_id: '林总监',
+        create_time: '2025-5-23 11:00',
+        device_name: '南京市鼓楼区项目评审'
+      },
+      {
+        id: 6,
+        device_id: '周科长',
+        create_time: '2025-5-24 16:45',
+        device_name: '重庆市渝中区政务接待'
+      },
+      {
+        id: 7,
+        device_id: '郑主管',
+        create_time: '2025-5-25 10:20',
+        device_name: '深圳市南山区客户答谢'
+      },
+      {
+        id: 8,
+        device_id: '吴书记',
+        create_time: '2025-5-26 14:00',
+        device_name: '西安市雁塔区学术交流'
+      },
+      {
+        id: 9,
+        device_id: '冯校长',
+        create_time: '2025-5-27 09:30',
+        device_name: '苏州市工业园区投资考察'
+      },
+      {
+        id: 10,
+        device_id: '许经理',
+        create_time: '2025-5-28 17:15',
+        device_name: '天津市和平区年度总结'
       }
-    ]
+    ],
+    filteredList: []
   },
-  onLoad: function () { //加载数据渲染页面
-    this.fetchServiceData();
-    this.fetchFilterData();
-    this.getTodoRecord();
-  },
-  fetchFilterData:function(){ //获取筛选条件
-    this.setData({
-      filterdata:{
-        "sort": [
-            {
-                "id": 0,
-                "title": "全部"
-            },
-            {
-              "id": 1,
-              "title": "人力资源",
-              "subsort": [
-                {
-                    "id": 1,
-                    "title": "全部"
-                },
-                {
-                    "id": 11,
-                    "title": "社会及商业保险"
-                },
-                {
-                    "id": 12,
-                    "title": "招聘、猎头"
-                },
-                {
-                    "id": 13,
-                    "title": "薪酬绩效"
-                },
-              ]
-            },
-            {
-              "id": 2,
-              "title": "财务法务",
-              "subsort": [
-                {
-                    "id": 2,
-                    "title": "全部"
-                },
-                {
-                    "id": 21,
-                    "title": "知识产权保护"
-                },
-                {
-                    "id": 22,
-                    "title": "工商注册"
-                },
-                {
-                    "id": 23,
-                    "title": "法律咨询"
-                },
-              ]
-            },
-            {
-              "id": 3,
-              "title": "行政办公",
-              "subsort": [
-                {
-                    "id": 3,
-                    "title": "全部"
-                },
-                {
-                    "id": 31,
-                    "title": "翻译"
-                },
-                {
-                    "id": 32,
-                    "title": "速记"
-                }
-              ]
-            },
-            {
-              "id": 4,
-              "title": "创业指导",
-              "subsort": [
-                {
-                    "id": 4,
-                    "title": "全部"
-                },
-                {
-                    "id": 41,
-                    "title": "创业培训"
-                }
-              ]
-            },
-        ],
-        "city": [
-            {
-                "id": 0,
-                "title": "全部"
-            },
-            {
-              "id": 1,
-              "title": "湖北省",
-              "subcity": [
-                {
-                    "id": 1,
-                    "title": "全部"
-                },
-                {
-                    "id": 11,
-                    "title": "武汉市"
-                },
-                {
-                    "id": 12,
-                    "title": "襄阳市"
-                },
-                {
-                    "id": 13,
-                    "title": "孝感市"
-                },
-                {
-                    "id": 14,
-                    "title": "随州市"
-                },
-                {
-                    "id": 15,
-                    "title": "荆州市"
-                },
-                {
-                    "id": 16,
-                    "title": "黄冈市"
-                },
-                {
-                    "id": 17,
-                    "title": "天门市"
-                },
-                {
-                    "id": 18,
-                    "title": "仙桃市"
-                },
-                {
-                    "id": 19,
-                    "title": "潜江市"
-                },
-                {
-                    "id": 20,
-                    "title": "十堰市"
-                },
-                {
-                    "id": 21,
-                    "title": "宜昌市"
-                },
-                {
-                    "id": 22,
-                    "title": "咸宁市"
-                },
-              ]
-            },
-            {
-              "id": 2,
-              "title": "浙江省",
-              "subcity": [
-                {
-                    "id": 2,
-                    "title": "全部"
-                },
-                {
-                    "id": 21,
-                    "title": "杭州市"
-                },
-                {
-                    "id": 22,
-                    "title": "金华市"
-                },
-                {
-                    "id": 23,
-                    "title": "义乌市"
-                },
-              ]
-            },
-            {
-              "id": 3,
-              "title": "江苏省",
-              "subcity": [
-                {
-                    "id": 3,
-                    "title": "全部"
-                },
-                {
-                    "id": 31,
-                    "title": "南京市"
-                },
-                {
-                    "id": 32,
-                    "title": "苏州市"
-                }
-              ]
-            }
-        ],
-      }
-    })
-  },
-  fetchServiceData:function(){  //获取城市列表
-    let _this = this;
-    wx.showToast({
-      title: '加载中',
-      icon: 'loading'
-    })
-    const perpage = 10;
-    this.setData({
-      page:this.data.page+1
-    })
-    const page = this.data.page;
-    const newlist = [];
-    for (var i = (page-1)*perpage; i < page*perpage; i++) {
-      newlist.push({
-        "id":i+1,
-        "name":"上海拜特信息技术有限公司"+(i+1),
-        "city":"上海",
-        "tag":"法律咨询",
-        "imgurl":"http://img.mukewang.com/57fdecf80001fb0406000338-240-135.jpg"
-      })
-    }
-    setTimeout(()=>{
-      _this.setData({
-        servicelist:_this.data.servicelist.concat(newlist)
-      })
-    },1500)
-  },
-  inputSearch:function(e){  //输入搜索文字
-    this.setData({
-      showsearch:e.detail.cursor>0,
-      searchtext:e.detail.value
-    })
-  },
-  submitSearch:function(){  //提交搜索
-    console.log(this.data.searchtext);
-    this.fetchServiceData();
-  },
-  setFilterPanel: function(e){ //展开筛选面板
-    const d = this.data;
-    const i = e.currentTarget.dataset.findex;
-    if(d.showfilterindex == i){
-      this.setData({
-        showfilter: false,
-        showfilterindex: null
-      })
-    }else{    
-      this.setData({
-        showfilter: true,
-        showfilterindex:i,
-      })
-    }
-    console.log(d.showfilterindex);
-  },
-  hideFilter: function(){ //关闭筛选面板
-    this.setData({
-      showfilter: false,
-      showfilterindex: null
-    })
-  },
-  scrollHandle:function(e){ //滚动事件
-    this.setData({
-      scrolltop:e.detail.scrollTop
-    })
-  },
-  goToTop:function(){ //回到顶部
-    this.setData({
-      scrolltop:0
-    })
-  },
-  scrollLoading:function(){ //滚动加载
-    this.fetchServiceData();
-  },
-  onPullDownRefresh:function(){ //下拉刷新
-    this.setData({
-      page:0,
-      servicelist:[]
-    })
-    this.fetchServiceData();
-    this.fetchFilterData();
-    setTimeout(()=>{
-      wx.stopPullDownRefresh()
-    },1000)
-  },
-  getTodoRecord:function(){
-    let that=this;
-      wx.request({
-        url:'http://localhost:8080/wtqjsz092_war_exploded/device_file_servlet_action?action=get_device_record',
-        data:{},
-        header:{"content-type":"application/x-www-form-urlencoded","x-requested-with":"XMLHttpRequest",
-        },
-        success:function(res){
-          that.handleGetTodoRecordResult(res);
-        },
-        fail:function(res){
 
-        }
-      })
-     
+  onLoad: function() {
+    // 初始化时显示全部数据
+    this.setData({ filteredList: this.data.originalList })
   },
-  handleGetTodoRecordResult:function(res){
-    console.log(JSON.stringify(res));
+
+  inputSearch: function(e) {
     this.setData({
-      todoList:res.data.aaData,
-    });
-  },
-  onDeleteRecord:function(e){
-    console.log(JSON.stringify(e));
-    wx.showModal({
-      cancelColor:"cancelColor",
-      title:"提示",
-      content:"你真的要删吗",
-      success:function(res){
-        if(res.confirm)
-        {
-          var id = e.currentTarget.dataset.itemid;
-          let that=this;
-          console.log(id);
-          wx.request({
-            url:'http://localhost:8080/wtqjsz092_war_exploded/device_file_servlet_action?action=delete_device_record',
-            data:{"id":id},
-            header:{"content-type":"application/x-www-form-urlencoded","x-requested-with":"XMLHttpRequest",
-            },
-            success:function(res){
-            //that.handleDeleteTodoRecordResult(res);
-            },
-            fail:function(res){
-            }
-        })
-      }
-    }
+      searchtext: e.detail.value,
     })
   },
-  onModifyRecord:function(e){
-    console.log(JSON.stringify(e));
-    let that = this;
-    var id = e.currentTarget.dataset.itemid;
-    var device_name = e.currentTarget.dataset.itemdname;
-    var device_id = e.currentTarget.dataset.itemdid;
-    var record=JSON.stringify({"id":id , "device_name" : device_name , "device_id":device_id});
-    wx.navigateTo({
-      url:"todo_modify?record="+record,
-    })
+
+  submitSearch: function() {
+    const keyword = this.data.searchtext.toLowerCase()
+    const filtered = this.data.originalList.filter(item => 
+      item.device_id.includes(keyword) ||
+      item.device_name.includes(keyword)
+    )
+    this.setData({ filteredList: filtered })
   },
-  onAddRecord:function(e){
-    wx.navigateTo({
-      url:"todo_add",
-    })
+  // 刷新功能实现
+Butrefresh: function() {
+  // 1. 重置搜索条件
+  this.setData({
+    searchtext: '',
+    // 2. 恢复完整数据集
+    filteredList: this.data.originalList
+  })
+  
+  // 3. 滚动条回到顶部（可选）
+  this.goToTop()
+  
+  // 4. 显示刷新反馈（新增）
+  wx.showToast({
+    title: '已刷新',
+    icon: 'success',
+    duration: 1000
+  })
+},
+
+  scrollHandle: function(e) {
+    this.setData({ scrolltop: e.detail.scrollTop })
+  },
+
+  goToTop: function() {
+    this.setData({ scrolltop: 0 })
+  },
+
+  scrollLoading: function() {
+    // 静态数据无需加载更多
+    console.log('已到列表底部')
   },
 })
