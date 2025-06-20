@@ -19,20 +19,17 @@
       <img src="page/s1.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
       <p style="margin-top: 8px; color: #666; font-size: 0.9em;">丰富进阶功能支持</p>
     </div>
-
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s2.jpg" alt="数据可视化看板" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
-      <p style="margin-top: 8px; color: #666; font-size: 0.9em;">系统数据监控仪表盘</p>
+      <img src="page/s2.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <p style="margin-top: 8px; color: #666; font-size: 0.9em;">系统多数据仪表盘</p>
     </div>
-
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s3.jpg" alt="小程序操作界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
-      <p style="margin-top: 8px; color: #666; font-size: 0.9em;">必要交互功能齐备</p>
+      <img src="page/s3.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <p style="margin-top: 8px; color: #666; font-size: 0.9em;">必备交互功能齐全</p>
     </div>
-
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s4.jpg" alt="告警通知系统" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
-      <p style="margin-top: 8px; color: #666; font-size: 0.9em;">AI智能文字识别集成</p>
+      <img src="page/s4.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <p style="margin-top: 8px; color: #666; font-size: 0.9em;">AI智能识别功能集成</p>
     </div>
   </div>
 </div>
