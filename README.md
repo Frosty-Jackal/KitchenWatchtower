@@ -16,19 +16,19 @@
 <div align="center">
   <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s1.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <img src="page/s1.jpg" alt="系统实时监控界面">
       <p style="margin-top: 8px; color: #666; font-size: 0.9em;">丰富进阶功能支持</p>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s2.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <img src="page/s2.jpg" alt="系统实时监控界面" >
       <p style="margin-top: 8px; color: #666; font-size: 0.9em;">系统多数据仪表盘</p>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s3.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <img src="page/s3.jpg" alt="系统实时监控界面" >
       <p style="margin-top: 8px; color: #666; font-size: 0.9em;">必备交互功能齐全</p>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="page/s4.jpg" alt="系统实时监控界面" style="width: 200px; height: 180px; object-fit: cover; border-radius: 8px;">
+      <img src="page/s4.jpg" alt="系统实时监控界面">
       <p style="margin-top: 8px; color: #666; font-size: 0.9em;">AI智能识别功能集成</p>
     </div>
   </div>
