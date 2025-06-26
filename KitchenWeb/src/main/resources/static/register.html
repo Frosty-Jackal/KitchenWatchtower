@@ -281,6 +281,16 @@
                 <input type="password" id="confirmPassword" placeholder="请再次输入密码">
                 <div id="confirmPasswordError" class="error">两次输入的密码不一致</div>
             </div>
+            <div class="form-group">
+                <label for="phone">手机号码</label>
+                <input type="text" id="phone" placeholder="请输入手机号码">
+                <div id="phoneError" class="error">请输入有效的手机号码</div>
+            </div>
+            <div class="form-group">
+                <label for="email">电子邮箱</label>
+                <input type="text" id="email" placeholder="请输入电子邮箱">
+                <div id="emailError" class="error">请输入有效的电子邮箱</div>
+            </div>
             <button id="registerBtn">注册</button>
             <div class="login-link">
                 已有账号？<a href="login.html">立即登录</a>
@@ -311,6 +321,8 @@
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
             
             // 重置错误信息
             document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
@@ -333,6 +345,20 @@
                 return;
             }
             
+            // 验证手机号
+            const phoneRegex = /^1[3456789]\d{9}$/;
+            if (phone && !phoneRegex.test(phone)) {
+                document.getElementById('phoneError').style.display = 'block';
+                return;
+            }
+            
+            // 验证邮箱
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                return;
+            }
+            
             // 检查用户名是否已存在
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             const userExists = users.some(user => user.username === username);
@@ -342,8 +368,17 @@
                 return;
             }
             
+            // 生成唯一的用户ID
+            const userId = Date.now().toString();
+            
             // 保存用户信息
-            users.push({ username, password });
+            users.push({ 
+                id: userId,
+                username, 
+                password,
+                phone,
+                email
+            });
             localStorage.setItem('users', JSON.stringify(users));
             
             // 注册成功，跳转到登录页

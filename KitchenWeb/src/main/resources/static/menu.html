@@ -137,6 +137,7 @@
 <!--            </svg>-->
         </div>
         <span id="userDisplay"></span>
+        <button id="homeBtn" class="user-home-btn">用户首页（修改密码等）</button>
         <button id="logoutBtn" class="logout-btn">退出登录</button>
         <p>请选择左侧菜单进行操作</p>
     </div>
@@ -183,13 +184,16 @@
 
 </script>
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) {
         window.location.href = 'login.html';
         return;
         }
-
+    document.getElementById('homeBtn').addEventListener('click', function() {
+        window.location.href = './index.html';
+    });
     document.getElementById('userDisplay').textContent = `当前用户: ${currentUser.username}`;
 
     // 退出登录按钮
@@ -308,6 +312,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .logout-btn:hover {
         background-color: #c0392b;
+    }
+    .user-home-btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin: 0 10px 10px 0;
+        min-width: 180px;
+    }
+
+    .user-home-btn:hover {
+        background-color: #2980b9;
+    }
+
+    /* 移动端按钮堆叠显示 */
+    @media (max-width: 480px) {
+        .user-home-btn, .logout-btn {
+            width: 100%;
+            margin: 5px 0;
+        }
     }
 </style>
 

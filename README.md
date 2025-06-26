@@ -110,6 +110,8 @@
 ## 📋 Recommended Requirements
 - JAVA 
 - MySQL 8.0+ 
+- IntellJ IDEA 2019.3.3+
+- 新版的微信开发者工具
 
 ## 📂 Project Structure
 ```

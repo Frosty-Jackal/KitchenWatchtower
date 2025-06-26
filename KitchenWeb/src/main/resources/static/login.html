@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>明厨亮灶系统用户登录</title>
+    <title>用户登录</title>
     <style>
         * {
             margin: 0;
@@ -184,13 +184,13 @@
         }
 
         .register-link a {
-            color: #ff4444;
+            color: #0096ff;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
         }
 
         .register-link a:hover {
-            color: #ff6666;
+            color: #00bfff;
             text-shadow: 0 0 15px rgba(0, 191, 255, 0.8);
         }
 
@@ -241,7 +241,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>明厨亮灶系统-用户登录</h2>
+        <h2>用户登录</h2>
         <div id="loginForm">
             <div class="form-group">
                 <label for="username">用户名</label>
@@ -253,10 +253,10 @@
                 <input type="password" id="password" placeholder="请输入密码">
                 <div id="passwordError" class="error">密码不能为空</div>
             </div>
-            <div id="loginError" class="error">用户名错误/密码错误/用户名不存在</div>
+            <div id="loginError" class="error">用户名或密码错误</div>
             <button id="loginBtn">登录</button>
             <div class="register-link">
-                没有账号？<a href="register.html">立即注册</a>
+                没有账号？<a href="register.html" style="color:#ff8888">立即注册</a>
             </div>
         </div>
     </div>
@@ -290,7 +290,13 @@
             
             if (user) {
                 // 登录成功，将当前用户信息存储在localStorage中
-                localStorage.setItem('currentUser', JSON.stringify({ username: user.username }));
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    phone: user.phone || '',
+                    email: user.email || '',
+                    avatarUrl: user.avatarUrl || 'https://via.placeholder.com/150'
+                }));
                 
                 // 跳转到首页
                 window.location.href = 'menu.html';

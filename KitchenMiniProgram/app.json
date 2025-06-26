@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/menu/menu",
+    "pages/map/index",
     "pages/usermanage/list",
     "pages/usermanage/index",
     "pages/logs/logs",
@@ -45,6 +46,14 @@
     "navigationBarTitleText": "明厨亮灶",
     "navigationBarBackgroundColor": "#ffffff"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于地图展示"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

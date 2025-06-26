@@ -1,0 +1,47 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="map-container">
+    <map
+      id="myMap"
+      longitude="{{longitude}}"
+      latitude="{{latitude}}"
+      scale="{{scale}}"
+      markers="{{markers}}"
+      show-location="true"
+      enable-3D="true"
+      enable-overlooking="{{setting.enableOverlooking}}"
+      enable-rotate="{{setting.enableRotate}}"
+      enable-satellite="{{setting.enableSatellite}}"
+      enable-traffic="{{setting.enableTraffic}}"
+      enable-zoom="{{setting.enableZoom}}"
+      enable-scroll="{{setting.enableScroll}}"
+      show-compass="{{setting.showCompass}}"
+      show-scale="{{setting.showScale}}"
+    ></map>
+    
+    <!-- 加载中提示 -->
+    <view class="loading-box" wx:if="{{loading}}">
+      <view class="loading-circle"></view>
+      <text class="loading-text">定位中...</text>
+    </view>
+    
+    <!-- 重新定位按钮 -->
+    <view class="control-btn relocate-btn" bindtap="reLocation">
+      <view class="icon-container">
+        <view class="location-icon"></view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="map-info">
+    <text class="map-info-text">当前位置</text>
+  </view>
+  
+  <!-- 位置授权被拒绝时的提示 -->
+  <view class="auth-tip" wx:if="{{locationAuthDenied}}">
+    <view class="auth-tip-content">
+      <text class="auth-tip-text">需要获取您的位置才能使用完整功能</text>
+      <button class="auth-btn" type="primary" bindtap="openSetting">前往开启</button>
+    </view>
+  </view>
+</view> 
