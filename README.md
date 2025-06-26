@@ -6,11 +6,12 @@
 <b>
   This is a team project for Sichuan University's Problem Solving Practical Course, implementing a kitchen monitoring system with real-time data visualization web-end and mini-program integration.
 <b>
-
 <div align="center">
-   
   <img src="page/Composition.jpg" alt="System Architecture" width="400" height="320">
 </div>
+<b>
+  This project adopts a Monolithic Spring Boot Architecture with Embedded Vue.js Components, where frontend assets are served directly from Spring Boot's static resources directory without separate build process.
+  <b>
 
 ## 📸 Project Highlights
 <div align="center">
@@ -33,6 +34,13 @@
     </div>
   </div>
 </div>
+
+## 📋 Recommended Requirements
+- JAVA 23.0.2
+- Node.js v20.15.1
+- MySQL 8.3.0
+- IntellJ IDEA 2019.3.3
+- 微信开发者工具 1.03.0
 
 ## 🚀 Quick Start
 
@@ -106,12 +114,6 @@
    Click "Compile" button in WeChat Developer Tools
 
    _start mini-program journey!_
-
-## 📋 Recommended Requirements
-- JAVA 
-- MySQL 8.0+ 
-- IntellJ IDEA 2019.3.3+
-- 新版的微信开发者工具
 
 ## 📂 Project Structure
 ```
