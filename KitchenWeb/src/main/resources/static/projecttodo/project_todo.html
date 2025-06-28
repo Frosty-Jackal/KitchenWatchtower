@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>代办事项管理</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 200px;
+            background: #2c3e50;
+            box-shadow: 2px 0 6px rgba(0,0,0,.1);
+            z-index: 1000;
+        }
+        .container {
+            margin-left: 200px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            min-height: 100vh;
+            transition: margin 0.3s;
+        }
+        .el-menu-vertical-demo {
+            height: 100%;
+            border-right: none;
+        }
+        .el-menu-item {
+            color: #ecf0f1 !important;
+            height: 56px;
+            line-height: 56px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .el-menu-item:hover {
+            background: #34495e !important;
+        }
+        .el-menu-item.is-active {
+            color: #3498db !important;
+            background: #2c3e50 !important;
+            border-left: 3px solid #3498db;
+        }
+        .priority-low { background-color: #67c23a !important; }
+        .priority-medium { background-color: #e6a23c !important; }
+        .priority-high { background-color: #f56c6c !important; }
+        .status-pending { background-color: #f0f2f5 !important; color: #909399 !important; }
+        .status-processing { background-color: #ecf5ff !important; color: #409EFF !important; }
+        .status-completed { background-color: #f0f9eb !important; color: #67c23a !important; }
+        
+        /* 对话框样式优化 */
+        .custom-dialog .el-dialog {
+            max-width: 80%;
+            min-width: 600px;
+        }
+       .action-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px; /* 按钮之间的间距 */
+    align-items: center;
+}
+
+/* 确保小屏幕下按钮也有足够空间 */
+@media (max-width: 600px) {
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 3px;
+    }
+}
+        .custom-dialog .el-dialog__body {
+            padding: 20px 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .dialog-form .el-form-item {
+            margin-bottom: 18px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+
+    <div class="sidebar-container">
+        <el-menu class="el-menu-vertical-demo" :default-active="activeIndex" @select="handleSelect"
+                 background-color="#2c3e50" text-color="#ecf0f1" active-text-color="#3498db">
+            <el-menu-item index="0"><i class="el-icon-s-home"></i><span slot="title">首页</span></el-menu-item>
+            <el-menu-item index="1"><i class="el-icon-menu"></i><span slot="title">学校管理</span></el-menu-item>
+            <el-menu-item index="2"><i class="el-icon-s-shop"></i><span slot="title">商户管理</span></el-menu-item>
+            <el-menu-item index="3"><i class="el-icon-s-goods"></i><span slot="title">供应商管理</span></el-menu-item>
+            <el-menu-item index="4"><i class="el-icon-s-management"></i><span slot="title">原料管理</span></el-menu-item>
+            <el-menu-item index="5"><i class="el-icon-s-comment"></i><span slot="title">投诉管理</span></el-menu-item>
+            <el-menu-item index="6"><i class="el-icon-warning"></i><span slot="title">风险预警</span></el-menu-item>
+            <el-menu-item index="7"><i class="el-icon-s-check"></i><span slot="title">抽检任务</span></el-menu-item>
+            <el-menu-item index="8"><i class="el-icon-video-camera"></i><span slot="title">监控视频</span></el-menu-item>
+            <el-menu-item index="9"><i class="el-icon-document"></i><span slot="title">证照添加</span></el-menu-item>
+            <el-menu-item index="10">
+                <i class="el-icon-sunny"></i>
+                <span slot="title">今日天气</span>
+            </el-menu-item>
+            <el-menu-item index="11">
+                <i class="el-icon-location"></i>
+                <span slot="title">地图展板</span>
+            </el-menu-item>
+            <el-menu-item index="12">
+                <i class="el-icon-s-flag"></i>
+                <span slot="title">项目待办</span>
+            </el-menu-item>
+        </el-menu>
+    </div>
+    
+    <el-row :gutter="20" class="mb-20">
+        <el-col :span="24">
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+                <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+                <el-breadcrumb-item>代办事项</el-breadcrumb-item>
+            </el-breadcrumb>
+            <h1 style="font-size: 24px; margin: 10px 0;">代办事项管理</h1>
+        </el-col>
+    </el-row>
+
+    <el-form :inline="true" :model="filters" label-width="80px" class="filter-form mb-20">
+        <el-form-item label="事项标题"><el-input v-model="filters.title"></el-input></el-form-item>
+        <el-form-item label="负责人"><el-input v-model="filters.responsible"></el-input></el-form-item>
+        <el-form-item label="优先级">
+            <el-select v-model="filters.priority" placeholder="选择优先级">
+                <el-option label="低" value="low"></el-option>
+                <el-option label="中" value="medium"></el-option>
+                <el-option label="高" value="high"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+            <el-select v-model="filters.status" placeholder="选择状态">
+                <el-option label="待处理" value="pending"></el-option>
+                <el-option label="进行中" value="processing"></el-option>
+                <el-option label="已完成" value="completed"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="截止日期">
+            <el-date-picker v-model="filters.dateRange" type="daterange"
+                    start-placeholder="开始日期" end-placeholder="结束日期"
+                    align="right" unlink-panels></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="handleSearch">筛选</el-button>
+            <el-button type="danger" icon="el-icon-refresh" @click="handleReset">重置</el-button>
+            <el-button type="success" icon="el-icon-download" @click="handleExport">导出</el-button>
+            <el-button type="primary" icon="el-icon-plus" @click="openAddDialog">新增事项</el-button>
+        </el-form-item>
+    </el-form>
+
+    <el-tabs v-model="activeTab" class="mb-20">
+        <el-tab-pane label="待处理" name="pending"></el-tab-pane>
+        <el-tab-pane label="进行中" name="processing"></el-tab-pane>
+        <el-tab-pane label="已完成" name="completed"></el-tab-pane>
+    </el-tabs>
+
+    <el-table :data="tableData" border style="width: 100%" height="600px">
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="title" label="事项标题" width="200"></el-table-column>
+        <el-table-column prop="description" label="事项描述" width="300"></el-table-column>
+        <el-table-column prop="responsible" label="负责人"></el-table-column>
+        <el-table-column prop="deadline" label="截止日期" width="180"></el-table-column>
+        <el-table-column label="优先级" width="100">
+            <template slot-scope="scope">
+                <el-tag :type="getPriorityType(scope.row.priority)">{{ getPriorityText(scope.row.priority) }}</el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column label="状态" width="100">
+            <template slot-scope="scope">
+                <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column label="创建时间" width="180"></el-table-column>
+<el-table-column label="操作" width="300">
+    <template slot-scope="scope">
+        <div class="action-buttons">
+            <el-button size="small" type="primary" @click="openDetailDialog(scope.row)">查看</el-button>
+            <el-button v-if="scope.row.status === 'pending'" size="small" type="success" @click="handleComplete(scope.row)">完成</el-button>
+            <el-button v-if="scope.row.status === 'pending'" size="small" type="warning" @click="openEditDialog(scope.row)">编辑</el-button>
+            <el-button v-if="scope.row.status === 'pending'" size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+        </div>
+    </template>
+</el-table-column>
+    </el-table>
+
+    <el-pagination background layout="prev, pager, next, jumper"
+            :current-page="currentPage" :page-size="pageSize" :total="total"
+            @current-change="handlePageChange" class="pagination mt-20"></el-pagination>
+
+    <!-- 详情模态框 -->
+    <el-dialog title="事项详情" :visible.sync="detailDialogVisible" :close-on-click-modal="false" 
+               class="custom-dialog">
+        <div class="detail-content">
+            <el-descriptions :column="1" border>
+                <el-descriptions-item label="事项标题">{{ detailItem.title }}</el-descriptions-item>
+                <el-descriptions-item label="事项描述">{{ detailItem.description }}</el-descriptions-item>
+                <el-descriptions-item label="负责人">{{ detailItem.responsible }}</el-descriptions-item>
+                <el-descriptions-item label="截止日期">{{ detailItem.deadline }}</el-descriptions-item>
+                <el-descriptions-item label="优先级">
+                    <el-tag :type="getPriorityType(detailItem.priority)">{{ getPriorityText(detailItem.priority) }}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="状态">
+                    <el-tag :type="getStatusType(detailItem.status)">{{ getStatusText(detailItem.status) }}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ detailItem.createTime }}</el-descriptions-item>
+            </el-descriptions>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="detailDialogVisible = false">关闭</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- 编辑模态框 -->
+    <el-dialog title="编辑事项" :visible.sync="editDialogVisible" :close-on-click-modal="false" 
+               class="custom-dialog">
+        <el-form :model="editForm" :rules="editRules" ref="editFormRef" label-width="100px" class="dialog-form">
+            <el-form-item label="事项标题" prop="title">
+                <el-input v-model="editForm.title" placeholder="请输入事项标题"></el-input>
+            </el-form-item>
+            <el-form-item label="事项描述" prop="description">
+                <el-input type="textarea" v-model="editForm.description" :rows="4" placeholder="请输入事项描述"></el-input>
+            </el-form-item>
+            <el-form-item label="负责人" prop="responsible">
+                <el-input v-model="editForm.responsible" placeholder="请输入负责人"></el-input>
+            </el-form-item>
+            <el-form-item label="截止日期" prop="deadline">
+                <el-date-picker v-model="editForm.deadline" type="date" placeholder="请选择截止日期"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="优先级" prop="priority">
+                <el-select v-model="editForm.priority" placeholder="请选择优先级">
+                    <el-option label="低" value="low"></el-option>
+                    <el-option label="中" value="medium"></el-option>
+                    <el-option label="高" value="high"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="状态" prop="status" v-if="!isAddMode">
+                <el-select v-model="editForm.status" placeholder="选择状态" disabled>
+                    <el-option label="待处理" value="pending"></el-option>
+                    <el-option label="进行中" value="processing"></el-option>
+                    <el-option label="已完成" value="completed"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="resetEditForm">取消</el-button>
+            <el-button type="primary" @click="submitEditForm">保存</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- 新增事项模态框 -->
+    <el-dialog title="新增事项" :visible.sync="addDialogVisible" :close-on-click-modal="false" 
+               class="custom-dialog">
+        <el-form :model="addForm" :rules="addRules" ref="addFormRef" label-width="100px" class="dialog-form">
+            <el-form-item label="事项标题" prop="title">
+                <el-input v-model="addForm.title" placeholder="请输入事项标题"></el-input>
+            </el-form-item>
+            <el-form-item label="事项描述" prop="description">
+                <el-input type="textarea" v-model="addForm.description" :rows="4" placeholder="请输入事项描述"></el-input>
+            </el-form-item>
+            <el-form-item label="负责人" prop="responsible">
+                <el-input v-model="addForm.responsible" placeholder="请输入负责人"></el-input>
+            </el-form-item>
+            <el-form-item label="截止日期" prop="deadline">
+                <el-date-picker v-model="addForm.deadline" type="date" placeholder="请选择截止日期"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="优先级" prop="priority">
+                <el-select v-model="addForm.priority" placeholder="请选择优先级">
+                    <el-option label="低" value="low"></el-option>
+                    <el-option label="中" value="medium"></el-option>
+                    <el-option label="高" value="high"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="状态" prop="status">
+                <el-select v-model="addForm.status" placeholder="请选择状态" disabled>
+                    <el-option label="待处理" value="pending"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="addDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitAddForm">保存</el-button>
+        </div>
+    </el-dialog>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                activeIndex: '12',
+                filters: { title: '', responsible: '', priority: '', status: '', dateRange: [] },
+                activeTab: 'pending',
+                tableData: [],
+                currentPage: 1,
+                pageSize: 15,
+                total: 0,
+                detailDialogVisible: false,
+                editDialogVisible: false,
+                addDialogVisible: false,
+                isAddMode: false,
+                detailItem: {},
+                editForm: { id: null, title: '', description: '', responsible: '', deadline: '', priority: 'medium', status: 'pending' },
+                addForm: { title: '', description: '', responsible: '', deadline: '', priority: 'medium', status: 'pending' },
+                editRules: {
+                    title: [{ required: true, message: '请输入事项标题', trigger: 'blur' }],
+                    description: [{ required: true, message: '请输入事项描述', trigger: 'blur' }],
+                    responsible: [{ required: true, message: '请输入负责人', trigger: 'blur' }],
+                    deadline: [{ required: true, message: '请选择截止日期', trigger: 'change' }]
+                },
+                addRules: {
+                    title: [{ required: true, message: '请输入事项标题', trigger: 'blur' }],
+                    description: [{ required: true, message: '请输入事项描述', trigger: 'blur' }],
+                    responsible: [{ required: true, message: '请输入负责人', trigger: 'blur' }],
+                    deadline: [{ required: true, message: '请选择截止日期', trigger: 'change' }]
+                },
+                defaultDeadline: new Date()
+            };
+        },
+        created() {
+            this.loadFromLocalStorage();
+            this.fetchData();
+        },
+        methods: {
+            loadFromLocalStorage() {
+                const savedData = localStorage.getItem('todoList');
+                if (savedData) {
+                    this.tableData = JSON.parse(savedData);
+                }
+            },
+            saveToLocalStorage() {
+                localStorage.setItem('todoList', JSON.stringify(this.tableData));
+            },
+            generateMockData() {
+                const allData = Array.from({ length: 100 }, (_, i) => {
+                    const priority = ['low', 'medium', 'high'][i % 3];
+                    const status = ['pending', 'processing', 'completed'][i % 3];
+                    const responsible = ['张三', '李四', '王五', '赵六'][i % 4];
+                    const departments = ['食品安全部', '运营管理部', '技术支持部', '财务部'][i % 4];
+
+                    return {
+                        id: i + 1,
+                        title: this.generateTitle(i),
+                        description: this.generateDescription(i),
+                        responsible: `${responsible} (${departments})`,
+                        deadline: this.generateDeadline(i),
+                        priority: priority,
+                        status: status,
+                        createTime: this.generateCreateTime(i)
+                    };
+                });
+                
+                allData.push(
+                    { id: 101, title: '处理用户投诉 - 老码头火锅食材过期', description: '用户反映在老码头火锅(太古里店)食用到过期食材，需要立即调查处理并回复用户', 
+                      responsible: '张三 (食品安全部)', deadline: '2024-06-30', priority: 'high', status: 'pending', createTime: '2024-06-20 10:30:00' },
+                    { id: 102, title: '系统升级维护', description: '投诉管理系统需要进行安全补丁升级，计划本周五晚上22:00-24:00进行维护', 
+                      responsible: '赵六 (技术支持部)', deadline: '2024-06-28', priority: 'medium', status: 'processing', createTime: '2024-06-22 14:15:00' },
+                    { id: 103, title: '月度工作报告提交', description: '需要整理并提交6月份食品安全管理工作报告', 
+                      responsible: '李四 (运营管理部)', deadline: '2024-07-05', priority: 'medium', status: 'pending', createTime: '2024-06-23 09:45:00' }
+                );
+                return allData;
+            },
+            generateTitle(index) {
+                const categories = ['系统维护', '用户投诉处理', '数据报表', '培训安排', '安全检查', '会议组织'];
+                const details = ['月度报告提交', '季度安全评估', '新员工培训', '服务器升级', '数据库备份', '用户反馈跟进'];
+                return `${categories[index % 6]} - ${details[index % 6]}`;
+            },
+            generateDescription(index) {
+                const descriptions = [
+                    '需要在本周五前完成系统月度维护工作，包括服务器状态检查、软件版本更新和安全漏洞扫描。',
+                    '处理用户投诉，调查事件原因并给出解决方案，24小时内回复用户。',
+                    '整理并生成6月份食品安全数据报表，包含投诉统计、处理进度和改进建议。',
+                    '安排新入职员工进行食品安全管理系统操作培训，时间定在下周一上午9点。',
+                    '对辖区内重点商户进行季度安全检查，提交检查报告并跟踪整改情况。',
+                    '组织召开食品安全管理委员会月度会议，准备会议资料并记录会议纪要。'
+                ];
+                return descriptions[index % 6];
+            },
+            generateDeadline(index) {
+                const baseDate = new Date();
+                baseDate.setDate(baseDate.getDate() + 1 + index % 30);
+                return this.formatDate(baseDate);
+            },
+            generateCreateTime(index) {
+                const baseDate = new Date();
+                baseDate.setDate(baseDate.getDate() - 30 + index % 30);
+                return this.formatDateTime(baseDate);
+            },
+            formatDate(date) {
+                return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+            },
+            formatDateTime(date) {
+                return `${this.formatDate(date)} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+            },
+            getPriorityType(priority) {
+                return { low: 'success', medium: 'warning', high: 'danger' }[priority] || 'info';
+            },
+            getPriorityText(priority) {
+                return { low: '低', medium: '中', high: '高' }[priority] || priority;
+            },
+            getStatusType(status) {
+                return { pending: 'info', processing: 'primary', completed: 'success' }[status] || 'info';
+            },
+            getStatusText(status) {
+                return { pending: '待处理', processing: '进行中', completed: '已完成' }[status] || status;
+            },
+            handleSearch() {
+                this.currentPage = 1;
+                this.fetchData();
+            },
+            handleSelect(key) {
+                const pathMap = {
+                    '0': '../menu.html',
+                    '1': '../schoolmanage/schoolmanage.html',
+                    '2': '../mercmanage/mercmanage.html',
+                    '3': '../suppmanage/suppmanage.html',
+                    '4': '../matermanage/index.html',       // 原料管理
+                    '5': '../compmanage/device_list.html',  // 投诉管理
+                    '6': '../riskwarn/riskwarn.html',        // 风险预警
+                    '7': '../samplingtask/3.html',  // 抽检任务
+                    '8': '../monitoringvideo/device_list.html',  // 监控视频
+                    '9': '../foodlic/list.html',
+                    '10': '../weathermanage/1.html',
+                    '11': '../map/map.html',
+                    '12': '../projecttodo/project_todo.html'
+                };
+                const targetPath = pathMap[key] || '';
+                if (targetPath) window.location.href = targetPath;
+                else console.warn('未配置的路由路径', key);
+            },
+            handleReset() {
+                this.filters = { title: '', responsible: '', priority: '', status: '', dateRange: [] };
+                this.fetchData();
+            },
+            handleExport() {
+                const headers = ['事项ID', '事项标题', '事项描述', '负责人', '截止日期', '优先级', '状态', '创建时间'];
+                const rows = this.tableData.map(item => [
+                    item.id, item.title, item.description, item.responsible, item.deadline,
+                    this.getPriorityText(item.priority), this.getStatusText(item.status), item.createTime
+                ]);
+                const csvContent = [headers, ...rows].map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')).join('\n');
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "代办事项数据.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            openDetailDialog(row) {
+                this.detailItem = { ...row };
+                this.detailDialogVisible = true;
+            },
+            openEditDialog(row) {
+                this.isAddMode = false;
+                this.editForm = { ...row };
+                this.editDialogVisible = true;
+            },
+            openAddDialog() {
+                this.isAddMode = true;
+                this.addForm = { 
+                    title: '', description: '', responsible: '', 
+                    deadline: this.formatDate(new Date()), priority: 'medium', status: 'pending' 
+                };
+                this.addDialogVisible = true;
+            },
+            resetEditForm() {
+                if (this.isAddMode) {
+                    this.$refs.addFormRef.resetFields();
+                    this.addDialogVisible = false;
+                } else {
+                    this.$refs.editFormRef.resetFields();
+                    this.editDialogVisible = false;
+                }
+            },
+            submitEditForm() {
+                this.$refs.editFormRef.validate(valid => {
+                    if (valid) {
+                        const index = this.tableData.findIndex(item => item.id === this.editForm.id);
+                        if (index !== -1) {
+                            this.tableData.splice(index, 1, { ...this.editForm });
+                            this.saveToLocalStorage();
+                            this.editDialogVisible = false;
+                            this.$message({ type: 'success', message: '编辑成功' });
+                            this.fetchData();
+                        }
+                    }
+                });
+            },
+            submitAddForm() {
+                this.$refs.addFormRef.validate(valid => {
+                    if (valid) {
+                        const maxId = this.tableData.length > 0 ? Math.max(...this.tableData.map(item => item.id)) : 0;
+                        const newItem = {
+                            ...this.addForm,
+                            id: maxId + 1,
+                            createTime: this.formatDateTime(new Date())
+                        };
+                        this.tableData.unshift(newItem);
+                        this.saveToLocalStorage();
+                        this.addDialogVisible = false;
+                        this.$message({ type: 'success', message: '新增成功' });
+                        this.fetchData();
+                    }
+                });
+            },
+            handleComplete(row) {
+                this.$confirm(`确定要将事项 "${row.title}" 标记为已完成吗?`, '提示', {
+                    confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
+                }).then(() => {
+                    row.status = 'completed';
+                    this.saveToLocalStorage();
+                    this.$message({ type: 'success', message: '事项已标记为已完成!' });
+                    this.fetchData();
+                }).catch(() => {});
+            },
+            handleDelete(row) {
+                this.$confirm(`确定要删除事项 "${row.title}" 吗?`, '提示', {
+                    confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
+                }).then(() => {
+                    const index = this.tableData.findIndex(item => item.id === row.id);
+                    if (index !== -1) {
+                        this.tableData.splice(index, 1);
+                        this.saveToLocalStorage();
+                        this.$message({ type: 'success', message: '删除成功' });
+                        this.fetchData();
+                    }
+                }).catch(() => {});
+            },
+            handlePageChange(page) {
+                this.currentPage = page;
+                this.fetchData();
+            },
+            fetchData() {
+                let filteredData = this.tableData.length === 0 ? this.generateMockData() : this.tableData;
+                
+                filteredData = filteredData.filter(item => {
+                    const statusMatch = this.activeTab === item.status;
+                    const titleMatch = !this.filters.title || item.title.includes(this.filters.title);
+                    const responsibleMatch = !this.filters.responsible || item.responsible.includes(this.filters.responsible);
+                    const priorityMatch = !this.filters.priority || item.priority === this.filters.priority;
+                    const statusMatchFilter = !this.filters.status || item.status === this.filters.status;
+                    let dateMatch = true;
+                    
+                    if (this.filters.dateRange.length === 2) {
+                        const [start, end] = this.filters.dateRange;
+                        const itemDate = new Date(item.deadline);
+                        dateMatch = itemDate >= start && itemDate <= end;
+                    }
+                    
+                    return statusMatch && titleMatch && responsibleMatch && priorityMatch && statusMatchFilter && dateMatch;
+                });
+
+                this.total = filteredData.length;
+                const start = (this.currentPage - 1) * this.pageSize;
+                this.tableData = filteredData.slice(start, start + this.pageSize);
+            }
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        //if (!currentUser) window.location.href = '../login.html';
+    });
+</script>
+</body>
+</html>
