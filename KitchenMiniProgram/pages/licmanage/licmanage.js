@@ -4,8 +4,9 @@ Page({
     allRecords: [], // 原始数据
     searchQuery: '',
     sortOptions: ['证书名 ↑', '证书名 ↓', '有效期 ↑', '有效期 ↓'],
-  sortIndex: 0
+  sortIndex: 0,
   },
+  
   onLoad(options) {
     this.getTodoRecord();
   },
@@ -68,12 +69,8 @@ Page({
   },
   onSearchInput(e) {
     const query = e.detail.value.toLowerCase();
-    this.setData({
-      searchQuery: query,
-      todoList: this.data.allRecords.filter(item =>
-        item.device_name.toLowerCase().includes(query) ||
-        item.device_id.toString().includes(query)
-      )
+    this.setData({ searchQuery: query }, () => {
+      this.applyFilterAndSort(); // 搜索后立即应用
     });
   },
   // 新增数据刷新方法
@@ -95,8 +92,26 @@ Page({
 },
 onSortChange(e) {
   const index = e.detail.value;
-  const sortedList = [...this.data.todoList];
-  switch (parseInt(index)) {
+  this.setData({ sortIndex: index }, () => {
+    this.applyFilterAndSort(); // 排序后立即应用
+  });
+},
+// 新增状态保持方法
+applyFilterAndSort: function() {
+  let filteredList = this.data.allRecords;
+  
+  // 应用搜索过滤
+  if (this.data.searchQuery) {
+    const query = this.data.searchQuery.toLowerCase();
+    filteredList = filteredList.filter(item => 
+      item.device_name.toLowerCase().includes(query) ||
+      item.device_id.toString().includes(query)
+    );
+  }
+
+  // 应用排序
+  const sortedList = [...filteredList];
+  switch (parseInt(this.data.sortIndex)) {
     case 0:
       sortedList.sort((a, b) => a.device_name.localeCompare(b.device_name));
       break;
@@ -110,7 +125,8 @@ onSortChange(e) {
       sortedList.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
       break;
   }
-  this.setData({ sortIndex: index, todoList: sortedList });
+
+  this.setData({ todoList: sortedList });
 }
 
 })

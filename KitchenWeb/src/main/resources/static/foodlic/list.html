@@ -225,89 +225,89 @@
 </head>
 <body>
 <div id="app">
-<div class="sidebar-container">
-    <el-menu
-            class="el-menu-vertical-demo"
-            :default-active="activeIndex"
-            @select="handleSelect"
-            background-color="#2c3e50"
-            text-color="#ecf0f1"
-            active-text-color="#3498db">
+    <div class="sidebar-container">
+        <el-menu
+                class="el-menu-vertical-demo"
+                :default-active="activeIndex"
+                @select="handleSelect"
+                background-color="#2c3e50"
+                text-color="#ecf0f1"
+                active-text-color="#3498db">
 
-        <el-menu-item index="0">
-            <i class="el-icon-s-home"></i>
-            <span slot="title">首页</span>
-        </el-menu-item>
-        <el-menu-item index="1">
-            <i class="el-icon-menu"></i>
-            <span slot="title">学校管理</span>
-        </el-menu-item>
-        <el-menu-item index="2">
-            <i class="el-icon-s-shop"></i>
-            <span slot="title">商户管理</span>
-        </el-menu-item>
-        <el-menu-item index="3">
-            <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
-            <span slot="title">供应商管理</span>
-        </el-menu-item>
-        <!-- 新增菜单项 -->
-        <el-menu-item index="4">
-            <i class="el-icon-s-management"></i>
-            <span slot="title">原料管理</span>
-        </el-menu-item>
-        <el-menu-item index="5">
-            <i class="el-icon-s-comment"></i>
-            <span slot="title">投诉管理</span>
-        </el-menu-item>
-        <el-menu-item index="6">
-            <i class="el-icon-warning"></i>
-            <span slot="title">风险预警</span>
-        </el-menu-item>
-        <el-menu-item index="7">
-            <i class="el-icon-s-check"></i>
-            <span slot="title">抽检任务</span>
-        </el-menu-item>
-        <el-menu-item index="8">
-            <i class="el-icon-video-camera"></i>
-            <span slot="title">监控视频</span>
-        </el-menu-item>
-        <el-menu-item index="9">
-            <i class="el-icon-document"></i>
-            <span slot="title">证照管理</span>
-        </el-menu-item>
-        <el-menu-item index="10">
-            <i class="el-icon-sunny"></i>
-            <span slot="title">今日天气</span>
-        </el-menu-item>
-        <el-menu-item index="11">
-            <i class="el-icon-location"></i>
-            <span slot="title">地图展板</span>
-        </el-menu-item>
-        <el-menu-item index="12">
-            <i class="el-icon-s-flag"></i>
-            <span slot="title">项目待办</span>
-        </el-menu-item>
-    </el-menu>
-</div>
+            <el-menu-item index="0">
+                <i class="el-icon-s-home"></i>
+                <span slot="title">首页</span>
+            </el-menu-item>
+            <el-menu-item index="1">
+                <i class="el-icon-menu"></i>
+                <span slot="title">学校管理</span>
+            </el-menu-item>
+            <el-menu-item index="2">
+                <i class="el-icon-s-shop"></i>
+                <span slot="title">商户管理</span>
+            </el-menu-item>
+            <el-menu-item index="3">
+                <i class="el-icon-s-goods"></i> <!-- 使用Element图标库 -->
+                <span slot="title">供应商管理</span>
+            </el-menu-item>
+            <!-- 新增菜单项 -->
+            <el-menu-item index="4">
+                <i class="el-icon-s-management"></i>
+                <span slot="title">原料管理</span>
+            </el-menu-item>
+            <el-menu-item index="5">
+                <i class="el-icon-s-comment"></i>
+                <span slot="title">投诉管理</span>
+            </el-menu-item>
+            <el-menu-item index="6">
+                <i class="el-icon-warning"></i>
+                <span slot="title">风险预警</span>
+            </el-menu-item>
+            <el-menu-item index="7">
+                <i class="el-icon-s-check"></i>
+                <span slot="title">抽检任务</span>
+            </el-menu-item>
+            <el-menu-item index="8">
+                <i class="el-icon-video-camera"></i>
+                <span slot="title">监控视频</span>
+            </el-menu-item>
+            <el-menu-item index="9">
+                <i class="el-icon-document"></i>
+                <span slot="title">证照管理</span>
+            </el-menu-item>
+            <el-menu-item index="10">
+                <i class="el-icon-sunny"></i>
+                <span slot="title">今日天气</span>
+            </el-menu-item>
+            <el-menu-item index="11">
+                <i class="el-icon-location"></i>
+                <span slot="title">地图展板</span>
+            </el-menu-item>
+            <el-menu-item index="12">
+                <i class="el-icon-s-flag"></i>
+                <span slot="title">项目待办</span>
+            </el-menu-item>
+        </el-menu>
+    </div>
 
     <div class="content-container">
-<div class="toolbar">
-    <input type="text" id="searchInput" class="search-box" placeholder="输入证照号或经营者搜索...">
-    <button class="btn" onclick="AddData()">添加证照</button>
-    <button class="btn" onclick="exportData()">导出证照集</button>
-</div>
+        <div class="toolbar">
+            <input type="text" id="searchInput" class="search-box" placeholder="输入证照号或经营者搜索...">
+            <button class="btn" onclick="AddData()">添加证照</button>
+            <button class="btn" onclick="exportData()">导出证照集</button>
+        </div>
 
-<table id="data-table">
-    <thead>
-    <tr>
-        <th onclick="sortTable(0)">证照编号（点我可排序）</th>
-        <th onclick="sortTable(1)">经营者（点我可排序）</th>
-        <th>操作</th>
-    </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-</table>
-</div>
+        <table id="data-table">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)">证照编号（点我可排序）</th>
+                <th onclick="sortTable(1)">经营者（点我可排序）</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
 </div>
 <script>
     let allData = [];
@@ -459,21 +459,21 @@
 </body>
 </html>
 <style>
-.content-container {
-    margin-left: 220px;  /* 关键修改：增加左侧间距 */
-    padding: 20px;       /* 新增内边距 */
-    transition: margin 0.3s; /* 添加过渡动画 */
-}
-
-/* 响应式适配（当屏幕宽度 < 768px 时） */
-@media (max-width: 768px) {
     .content-container {
-        margin-left: 0;   /* 移动端取消左边距 */
-        padding: 10px;
+        margin-left: 220px;  /* 关键修改：增加左侧间距 */
+        padding: 20px;       /* 新增内边距 */
+        transition: margin 0.3s; /* 添加过渡动画 */
     }
 
-    .sidebar-container {
-        transform: translateX(-100%); /* 隐藏侧边栏 */
+    /* 响应式适配（当屏幕宽度 < 768px 时） */
+    @media (max-width: 768px) {
+        .content-container {
+            margin-left: 0;   /* 移动端取消左边距 */
+            padding: 10px;
+        }
+
+        .sidebar-container {
+            transform: translateX(-100%); /* 隐藏侧边栏 */
+        }
     }
-}
 </style>
