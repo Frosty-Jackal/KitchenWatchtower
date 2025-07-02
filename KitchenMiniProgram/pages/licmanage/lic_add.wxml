@@ -1,7 +1,7 @@
 <view class="container container-gray">
   <view class="ocr-container">
   <view wx:if="{{!faceImgUrl}}">
-    <button type="primary" class="custom-button" bindtap="chooseMedia">上传证件图片</button>
+    <button type="primary" class="custom-button" bindtap="chooseMedia">上传证件图片(支持智能文字识别）</button>
   </view>
   
   <view wx:if="{{faceImgUrl}}" class="preview-container">
